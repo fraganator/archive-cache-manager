@@ -348,3 +348,7 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+
+# Older versions of LaunchBox plugin assembly
+Unbroken.LaunchBox.Plugins/
