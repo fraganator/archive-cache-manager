@@ -69,7 +69,8 @@
     <PostBuildEvent>copy /Y $(TargetPath) c:\LaunchBox\Plugins\ArchiveCacheManager
 mkdir $(SolutionDir)..\release\ArchiveCacheManager
 copy /Y $(TargetPath) $(SolutionDir)..\release\ArchiveCacheManager
-copy /Y  $(SolutionDir)..\*.md $(SolutionDir)..\release\ArchiveCacheManager
+copy /Y  $(SolutionDir)..\README.md $(SolutionDir)..\release\ArchiveCacheManager\readme.txt
+copy /Y  $(SolutionDir)..\HISTORY.md $(SolutionDir)..\release\ArchiveCacheManager\history.txt
 mkdir $(SolutionDir)..\release\ArchiveCacheManager\7-Zip
 copy /Y  $(SolutionDir)..\thirdparty\7-Zip\* $(SolutionDir)..\release\ArchiveCacheManager\7-Zip
 move /Y $(SolutionDir)..\release\ArchiveCacheManager\7-Zip\7z.exe $(SolutionDir)..\release\ArchiveCacheManager\7-Zip\7z.exe.original
