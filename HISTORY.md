@@ -1,6 +1,6 @@
 # Archive Cache Manager change history
 
-## v2.0.0 (2021-03-04)
+## v2.0.0 (2021-03-10)
 * Code now open source under LGPL
 * Rewritten to use LaunchBox plugin API
 * Added configuration window in Tools menu
