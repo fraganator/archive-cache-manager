@@ -1,5 +1,9 @@
 # Archive Cache Manager change history
 
+## v2.0.1 (2021-03-11)
+* Support Startup Screen progress bar during initial extraction
+* Minor bug fixes
+
 ## v2.0.0 (2021-03-10)
 * Code now open source under LGPL
 * Rewritten to use LaunchBox plugin API
