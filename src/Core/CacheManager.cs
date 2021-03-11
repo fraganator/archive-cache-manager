@@ -18,7 +18,7 @@ namespace ArchiveCacheManager
             {
                 Version version = Assembly.GetExecutingAssembly().GetName().Version;
 
-                return string.Format("v{0}.{1}.{2}", version.Major, version.Minor, version.Revision);
+                return string.Format("v{0}.{1}.{2}", version.Major, version.Minor, version.Build);
             }
         }
 

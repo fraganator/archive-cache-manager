@@ -11,10 +11,10 @@ namespace ArchiveCacheManager
     {
         public static string Get7zVersion()
         {
-            string stdout = null;
-            string stderr = null;
+            string stdout = string.Empty;
+            string stderr = string.Empty;
             int exitCode = 0;
-            string versionInfo = null;
+            string versionInfo = string.Empty;
 
             if (run7z("", ref stdout, ref stderr, ref exitCode))
             {
@@ -25,7 +25,8 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
-        /// Run the 7z extract command on the specified archive.
+        /// Run the 7z extract command on the specified archive. Console output from 7z will be redirected to this app's console so
+        /// LaunchBox has access to the extraction progress.
         /// </summary>
         /// <param name="archivePath"></param>
         /// <param name="stdout"></param>
@@ -38,11 +39,11 @@ namespace ArchiveCacheManager
             // {0} = archive path
             // -o{1} = output path
             // -y = answer yes to any queries
-            // -aoa = 
-            // -bsp1 = show progress
-            string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa", archivePath, cachePath);
+            // -aoa = overwrite all existing files
+            // -bsp1 = redirect progress to stdout
+            string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa -bsp1", archivePath, cachePath);
 
-            run7z(args, ref stdout, ref stderr, ref exitCode);
+            run7z(args, ref stdout, ref stderr, ref exitCode, true);
         }
 
         /// <summary>
@@ -74,8 +75,8 @@ namespace ArchiveCacheManager
             // Parse stdout for all "Size = " entries
             // Extract sizes and sum
             // Return -1 on error
-            string stdout = null;
-            string stderr = null;
+            string stdout = string.Empty;
+            string stderr = string.Empty;
             int exitCode = 0;
             long size = 0;
 
@@ -104,8 +105,8 @@ namespace ArchiveCacheManager
         /// <param name="args"></param>
         public static void Call7z(string[] args)
         {
-            string stdout = null;
-            string stderr = null;
+            string stdout = string.Empty;
+            string stderr = string.Empty;
             int exitCode = 0;
             string[] quotedArgs = args;
             string argString;
@@ -136,7 +137,7 @@ namespace ArchiveCacheManager
         /// <param name="stdout"></param>
         /// <param name="stderr"></param>
         /// <param name="exitCode"></param>
-        static bool run7z(string args, ref string stdout, ref string stderr, ref int exitCode)
+        static bool run7z(string args, ref string stdout, ref string stderr, ref int exitCode, bool redirectOutput = false)
         {
             Process process = new Process();
             process.StartInfo.FileName = PathUtils.GetLaunchBox7zPath();
@@ -146,17 +147,49 @@ namespace ArchiveCacheManager
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
+            if (redirectOutput)
+            {
+                process.OutputDataReceived += new DataReceivedEventHandler(Process_OutputDataReceived);
+                process.ErrorDataReceived += new DataReceivedEventHandler(Process_ErrorDataReceived);
+            }
+
             process.Start();
 
-            // TODO
-            // Mimic extraction progress. Capture asynchronous stdout and write to own stdout.
-            
-            stdout = process.StandardOutput.ReadToEnd();
-            stderr = process.StandardError.ReadToEnd();
+            if (redirectOutput)
+            {
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+            }
+            else
+            {
+                stdout = process.StandardOutput.ReadToEnd();
+                stderr = process.StandardError.ReadToEnd();
+            }
+
             process.WaitForExit();
             exitCode = process.ExitCode;
 
             return true;
+        }
+
+        /// <summary>
+        /// Redirects stdout to the console.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            Console.Out.WriteLine(e.Data);
+        }
+
+        /// <summary>
+        /// Redirects stderr to the console.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            Console.Error.WriteLine(e.Data);
         }
     }
 }

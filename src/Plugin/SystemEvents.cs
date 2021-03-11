@@ -1,4 +1,5 @@
-﻿using Unbroken.LaunchBox.Plugins;
+﻿using System.Diagnostics;
+using Unbroken.LaunchBox.Plugins;
 
 namespace ArchiveCacheManager
 {
