@@ -141,16 +141,13 @@ namespace ArchiveCacheManager
         /// <param name="sizeToFree">Number of bytes to free in the cache</param>
         public static void ClearCacheSpace(long sizeToFree)
         {
-            long freeCacheSpace = (Config.CacheSize * 1024 * 1024) - DiskUtils.DirectorySize(new DirectoryInfo(PathUtils.CachePath()));
+            long availableCacheSpace = (Config.CacheSize * 1024 * 1024) - DiskUtils.DirectorySize(new DirectoryInfo(PathUtils.CachePath()));
 
-            if (freeCacheSpace < sizeToFree)
+            if (availableCacheSpace < sizeToFree)
             {
-                // This can occur if cache size config made smaller than what's already in cache.
-                // Need to maek room for the game, and also cleanup oversized cache.
-                if (freeCacheSpace < 0)
-                {
-                    sizeToFree += Math.Abs(freeCacheSpace);
-                }
+                // Subtract the available space to get the minimum number of bytes to delete from the cache.
+                // Also handles case where available space is negative (configured cache size smaller than what's in the cache right now)
+                long sizeToDelete = sizeToFree - availableCacheSpace;
 
                 Logger.Log("Clearing space in cache.");
                 long deletedSize = 0;
@@ -171,7 +168,7 @@ namespace ArchiveCacheManager
                     Logger.Log(string.Format("Deleting cached item \"{0}\".", dirs[i]));
                     DiskUtils.DeleteDirectory(dirs[i]);
 
-                    if (deletedSize > sizeToFree)
+                    if (deletedSize > sizeToDelete)
                     {
                         break;
                     }
