@@ -11,6 +11,7 @@ namespace ArchiveCacheManager
         public static string mEmulator = "none";
         public static string mPlatform = "none";
         public static string mTitle = "none";
+        public static string mFileInArchive = string.Empty;
 
         private static readonly string section = "Game";
 
@@ -23,6 +24,7 @@ namespace ArchiveCacheManager
         public static string Emulator => mEmulator;
         public static string Platform => mPlatform;
         public static string Title => mTitle;
+        public static string FileInArchive => mFileInArchive;
 
         /// <summary>
         /// Loads some basic information about the game being launched.
@@ -40,6 +42,7 @@ namespace ArchiveCacheManager
                     mEmulator = iniData[section][nameof(Emulator)];
                     mPlatform = iniData[section][nameof(Platform)];
                     mTitle = iniData[section][nameof(Title)];
+                    mFileInArchive = iniData[section][nameof(FileInArchive)];
                 }
                 catch (Exception e)
                 {
@@ -55,7 +58,8 @@ namespace ArchiveCacheManager
         /// <param name="emulator">The emulator used to play the rom.</param>
         /// <param name="platform">The platform of the game.</param>
         /// <param name="title">The game title.</param>
-        public static void SaveInfo(string path, string emulator, string platform, string title)
+        /// <param name="fileInArchive">The game title.</param>
+        public static void SaveInfo(string path, string emulator, string platform, string title, string fileInArchive)
         {
             var parser = new FileIniDataParser();
             IniData iniData = new IniData();
@@ -64,6 +68,7 @@ namespace ArchiveCacheManager
             mEmulator = emulator;
             mPlatform = platform;
             mTitle = title;
+            mFileInArchive = fileInArchive;
 
             try
             {
@@ -71,6 +76,7 @@ namespace ArchiveCacheManager
                 iniData[section][nameof(Emulator)] = mEmulator;
                 iniData[section][nameof(Platform)] = mPlatform;
                 iniData[section][nameof(Title)] = mTitle;
+                iniData[section][nameof(FileInArchive)] = mFileInArchive;
 
                 parser.WriteFile(PathUtils.GetGameInfoPath(), iniData);
             }

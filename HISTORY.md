@@ -1,5 +1,10 @@
 # Archive Cache Manager change history
 
+## v2.0.2 (2021-03-14)
+* New feature - Select and play ROM file from archive
+    * Right-click a game and click "Select ROM In Archive..."
+    * Currently only supports LaunchBox
+
 ## v2.0.1 (2021-03-11)
 * Support Startup Screen progress bar during initial extraction
 * Minor bug fixes

@@ -60,6 +60,12 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArchiveListWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ArchiveListWindow.Designer.cs">
+      <DependentUpon>ArchiveListWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfigWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +73,7 @@
       <DependentUpon>ConfigWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="GameLaunching.cs" />
+    <Compile Include="GameMenuItem.cs" />
     <Compile Include="PriorityEditWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +94,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ArchiveListWindow.resx">
+      <DependentUpon>ArchiveListWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ConfigWindow.resx">
       <DependentUpon>ConfigWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -123,6 +133,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\folder-horizontal-open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon16x16-play.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

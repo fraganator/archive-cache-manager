@@ -20,7 +20,8 @@ namespace ArchiveCacheManager
 
         private static readonly string configFileName = @"config.ini";
         private static readonly string gameInfoFileName = @"game.ini";
-        private static readonly string actual7zFileName = @"7-zip.exe";
+        private static readonly string default7zFileName = @"7z.exe";
+        private static readonly string alt7zFileName = @"7-zip.exe";
         private static readonly string relativePluginPath = @"Plugins\ArchiveCacheManager";
         private static readonly string relative7zPath = @"ThirdParty\7-Zip";
         private static readonly string logFileName = @"events.log";
@@ -91,7 +92,7 @@ namespace ArchiveCacheManager
             string path;
 
             // Called from <LaunchBox>\ThirdParty\7-Zip\7z.exe
-            if (string.Equals(assemblyFileName, "7z.exe", StringComparison.InvariantCultureIgnoreCase))
+            if (string.Equals(assemblyFileName, default7zFileName, StringComparison.InvariantCultureIgnoreCase))
             {
                 // Call GetFullPath to resolve ..\.. in path
                 path = Path.GetFullPath(Path.Combine(assemblyDirectory, @"..\.."));
@@ -116,7 +117,23 @@ namespace ArchiveCacheManager
         /// Absolute path to 7z.exe.
         /// </summary>
         /// <returns>Absolute path to 7z.exe.</returns>
-        public static string GetLaunchBox7zPath() => Path.Combine(launchBoxRootPath, relative7zPath, actual7zFileName);
+        public static string GetLaunchBox7zPath()
+        {
+            string path;
+
+            // Called from <LaunchBox>\ThirdParty\7-Zip\7z.exe
+            if (string.Equals(assemblyFileName, default7zFileName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                path = Path.Combine(launchBoxRootPath, relative7zPath, alt7zFileName);
+            }
+            // Called from <LaunchBox>\Core\LaunchBox.exe
+            else
+            {
+                path = Path.Combine(launchBoxRootPath, relative7zPath, default7zFileName);
+            }
+
+            return path;
+        }
 
         /// <summary>
         /// Absolute path to 7-Zip folder.

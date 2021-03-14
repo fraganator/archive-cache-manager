@@ -9,6 +9,13 @@ namespace ArchiveCacheManager
     class GameLaunching : IGameLaunchingPlugin
     {
         private static bool cacheManagerActive = false;
+        private static string mFileInArchive = string.Empty;
+
+        public static string FileInArchive
+        {
+            get => mFileInArchive;
+            set => mFileInArchive = value;
+        }
 
         public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
@@ -27,7 +34,9 @@ namespace ArchiveCacheManager
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
 
                 cacheManagerActive = true;
-                GameInfo.SaveInfo(game.ApplicationPath, emulator.Title, game.Platform, game.Title);
+                GameInfo.SaveInfo(game.ApplicationPath, emulator.Title, game.Platform, game.Title, mFileInArchive);
+                mFileInArchive = string.Empty;
+
                 Replace7z();
             }
         }

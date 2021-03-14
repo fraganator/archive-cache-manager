@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -58,10 +59,58 @@ namespace ArchiveCacheManager
             // This command is a duplicate of that used by LaunchBox.
             // l = list
             // {0} = archive path
-            // -stl = technical listing
+            // -slt = technical listing
             string args = string.Format("l \"{0}\" -slt", archivePath);
 
             run7z(args, ref stdout, ref stderr, ref exitCode);
+        }
+
+        /// <summary>
+        /// Get an undecorated file list for the specified archive.
+        /// </summary>
+        /// <param name="archivePath"></param>
+        /// <returns>A simple file list of archive contents.</returns>
+        public static string[] GetFileList(string archivePath)
+        {
+            // Run List command
+            // Parse stdout for all "Path = " entries
+            // Return -1 on error
+            string stdout = string.Empty;
+            string stderr = string.Empty;
+            int exitCode = 0;
+            List<string> fileList = new List<string>();
+            bool foundFirstPath = false;
+
+            List(archivePath, ref stdout, ref stderr, ref exitCode);
+
+            if (exitCode == 0)
+            {
+                string[] stdoutArray = stdout.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string line in stdoutArray)
+                {
+                    if (line.StartsWith("Path ="))
+                    {
+                        if (foundFirstPath)
+                        {
+                            // Format of line is "Path = Filename.xyz"
+                            // Split on '=' and get second element
+                            fileList.Add(line.Split("=".ToCharArray())[1].Trim());
+                        }
+                        else
+                        {
+                            // The first "Path = " entry from 7z is the archive name itself, so skip adding it to the list
+                            foundFirstPath = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Logger.Log(string.Format("Error listing archive {0}. 7-Zip returned exit code {1} with error output:\r\n{2}", archivePath, exitCode, stderr));
+            }
+
+            return fileList.ToArray();
         }
 
         /// <summary>
@@ -137,7 +186,7 @@ namespace ArchiveCacheManager
         /// <param name="stdout"></param>
         /// <param name="stderr"></param>
         /// <param name="exitCode"></param>
-        static bool run7z(string args, ref string stdout, ref string stderr, ref int exitCode, bool redirectOutput = false)
+        static bool run7z(string args, ref string stdout, ref string stderr, ref int exitCode, bool redirectOutput = false, bool redirectError = false)
         {
             Process process = new Process();
             process.StartInfo.FileName = PathUtils.GetLaunchBox7zPath();
@@ -146,50 +195,35 @@ namespace ArchiveCacheManager
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-
-            if (redirectOutput)
+            string asyncError = "";
+            string asyncOutput = "";
+            process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
             {
-                process.OutputDataReceived += new DataReceivedEventHandler(Process_OutputDataReceived);
-                process.ErrorDataReceived += new DataReceivedEventHandler(Process_ErrorDataReceived);
-            }
+                if (redirectOutput)
+                {
+                    Console.Out.WriteLine(e.Data);
+                }
+                asyncOutput = string.Format("{0}\r\n{1}", asyncOutput, e.Data);
+            });
+            process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+            {
+                if (redirectError)
+                {
+                    Console.Error.WriteLine(e.Data);
+                }
+                asyncError = string.Format("{0}\r\n{1}", asyncError, e.Data);
+            });
 
             process.Start();
-
-            if (redirectOutput)
-            {
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-            }
-            else
-            {
-                stdout = process.StandardOutput.ReadToEnd();
-                stderr = process.StandardError.ReadToEnd();
-            }
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
 
             process.WaitForExit();
             exitCode = process.ExitCode;
+            stdout = asyncOutput;
+            stderr = asyncError;
 
             return true;
-        }
-
-        /// <summary>
-        /// Redirects stdout to the console.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Out.WriteLine(e.Data);
-        }
-
-        /// <summary>
-        /// Redirects stderr to the console.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            Console.Error.WriteLine(e.Data);
         }
     }
 }

@@ -1,7 +1,7 @@
 # Archive Cache Manager
 ![Achive Cache Manager logo](images/logo-v2-title.png?raw=true "Achive Cache Manager")
 
-A LaunchBox plugin which extracts and caches ROM archives, letting you play games faster. Also provides ROM file extension priority (supporting PCSX2 + bin/cue files and others).
+A LaunchBox plugin which extracts and caches ROM archives, letting you play games faster. Also allows playing individual ROMs from merged archives, and setting preferred file type from archive (supporting PCSX2 + bin/cue files, and others).
 
 
 ## Description
@@ -13,6 +13,8 @@ As the cache approaches its maximum size, the least recently played games are de
 
 
 ## Features
+* _NEW FEATURE_ - Select and play individual ROM files from an archive!
+    * Useful for GoodMerged sets.
 * Skip the extraction wait time for recently played games.
 * Configurable cache size and location.
 * Configurable minimum archive size (skip caching small archives).
@@ -25,9 +27,12 @@ Why use Archive Cache Manager? Here's some example use cases.
 * ROM library maintained as accurately ripped/dumped collections, where specialised compression formats not an option.
 * Extract and play archives from location other than `LaunchBox\ThirdParty\7-Zip\Temp`, such as high speed SSD.
 * Playing ripped PS2 games with PCSX2 where the disc image is bin/cue format, avoiding the "CDVD plugin failed to open" error message.
+* Your library contains GoodMerged sets, and you want a quick way to play individual ROMs.
 
 
 ## Installation
+* Download the latest release from https://forums.launchbox-app.com/files/file/234-archive-cache-manager/ or https://github.com/fraganator/archive-cache-manager/releases
+* Unblock the download if necessary (right-click file -> Properties -> Unblock)
 * Extract this archive to your `LaunchBox\Plugins` folder, then run LaunchBox / BigBox.
 * Within LaunchBox, ensure the desired emulator has the _"Extract ROM archives before running"_ option checked.
 
@@ -35,6 +40,17 @@ Why use Archive Cache Manager? Here's some example use cases.
 ## Uninstallation
 * Quit LaunchBox / BigBox, then navigate to the `LaunchBox\Plugins` folder and delete `ArchiveCacheManager`.
 * Delete the archive cache folder (default is `LaunchBox\ArchiveCache`).
+
+
+## Usage
+Archive Cache Manager is designed to run transparent to the user. All that is required is the emulator has the _"Extract ROM archives before running"_ option checked. Extraction and cache management is carried out automatically when a game is launched.
+
+### Selecting and Playing Individual ROMs From an Archive
+To play an individual ROM from an archive containing multiple ROMs (different regions, hacks, or discs), right-click it and choose "Select ROM In Archive...".
+
+A window will popup with a full listing of the archive contents. Select the desired ROM file, then click Play. That ROM will now launch with the configured emulator.
+
+![ROM file selection window](images/select-file-window.png?raw=true "ROM file selection window")
 
 
 ## Configuration

@@ -98,15 +98,31 @@ namespace ArchiveCacheManager
             string stderr = string.Empty;
             int exitCode = 0;
 
-            if (ArchiveInCache())
+            if (GameInfo.FileInArchive.Equals(string.Empty))
             {
-                stdout = ListCacheArchive();
+                if (ArchiveInCache())
+                {
+                    stdout = ListCacheArchive();
+                }
+                else
+                {
+                    Zip.List(Archive.Path, ref stdout, ref stderr, ref exitCode);
+                }
+                stdout = ApplyExtensionPriority(stdout);
             }
             else
             {
-                Zip.List(Archive.Path, ref stdout, ref stderr, ref exitCode);
+                if (ArchiveInCache())
+                {
+                    stdout = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), GameInfo.FileInArchive);
+                }
+                else
+                {
+                    stdout = "Path = " + GameInfo.FileInArchive;
+                }
+
+                Logger.Log(string.Format("Loading individual file from archive \"{0}\".", GameInfo.FileInArchive));
             }
-            stdout = ApplyExtensionPriority(stdout);
 
             Console.Write(stdout);
             Console.Write(stderr);
