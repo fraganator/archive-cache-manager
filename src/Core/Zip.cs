@@ -107,7 +107,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                Logger.Log(string.Format("Error listing archive {0}. 7-Zip returned exit code {1} with error output:\r\n{2}", archivePath, exitCode, stderr));
+                Logger.Log(string.Format("Error listing archive {0}.", archivePath));
             }
 
             return fileList.ToArray();
@@ -214,19 +214,33 @@ namespace ArchiveCacheManager
                 asyncError = string.Format("{0}\r\n{1}", asyncError, e.Data);
             });
 
-            process.Start();
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
+            try
+            {
+                process.Start();
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
 
-            // LB allows terminating the extraction process by pressing Esc on the loading screen. If this process is killed,
-            // the child process (the real 7z in this case) will NOT be terminated. Add 7z as a tracked child process, which
-            // will be automatically killed if this process is also killed.
-            ChildProcessTracker.AddProcess(process);
+                // LB allows terminating the extraction process by pressing Esc on the loading screen. If this process is killed,
+                // the child process (the real 7z in this case) will NOT be terminated. Add 7z as a tracked child process, which
+                // will be automatically killed if this process is also killed.
+                ChildProcessTracker.AddProcess(process);
 
-            process.WaitForExit();
-            exitCode = process.ExitCode;
+                process.WaitForExit();
+                exitCode = process.ExitCode;
+            }
+            catch (Exception e)
+            {
+                exitCode = -1;
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+            }
+
             stdout = asyncOutput;
             stderr = asyncError;
+
+            if (exitCode != 0)
+            {
+                Logger.Log(string.Format("7-Zip returned exit code {0} with error output:\r\n{1}", exitCode, stderr));
+            }
 
             return true;
         }

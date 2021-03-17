@@ -16,22 +16,25 @@ namespace ArchiveCacheManager
         {
             try
             {
-                // Enumerate and delete all files in all subdirectories
-                foreach (string filePath in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                if (Directory.Exists(path))
                 {
-                    // Clear any read-only or other special file attributes.
-                    File.SetAttributes(filePath, FileAttributes.Normal);
-                    File.Delete(filePath);
-                }
-                // Enumerate and delete all subdirectories
-                foreach (string dirPath in Directory.EnumerateDirectories(path))
-                {
-                    Directory.Delete(dirPath, true);
-                }
+                    // Enumerate and delete all files in all subdirectories
+                    foreach (string filePath in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+                    {
+                        // Clear any read-only or other special file attributes.
+                        File.SetAttributes(filePath, FileAttributes.Normal);
+                        File.Delete(filePath);
+                    }
+                    // Enumerate and delete all subdirectories
+                    foreach (string dirPath in Directory.EnumerateDirectories(path))
+                    {
+                        Directory.Delete(dirPath, true);
+                    }
 
-                if (!contentsOnly)
-                {
-                    Directory.Delete(path, true);
+                    if (!contentsOnly)
+                    {
+                        Directory.Delete(path, true);
+                    }
                 }
             }
             catch (Exception e)

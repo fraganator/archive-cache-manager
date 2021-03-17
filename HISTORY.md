@@ -1,5 +1,10 @@
 # Archive Cache Manager change history
 
+## v2.0.3 (2021-03-17)
+* Aborting game startup process (`Esc` on Startup Screen) now terminates extract operation
+* Cleanup partially extracted archive from cache on 7z error, or previous startup process abort
+* Fix archive list error when selecting individual ROM after a previous game launch failure
+
 ## v2.0.2 (2021-03-14)
 * New feature - Select and play ROM file from archive
     * Right-click a game and click "Select ROM In Archive..."

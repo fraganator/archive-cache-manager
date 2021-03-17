@@ -25,6 +25,12 @@ namespace ArchiveCacheManager
 
         public void OnSelected(IGame selectedGame)
         {
+            // HACK
+            // In case where game is launched, but launch failed or aborted, 7z isn't cleaned up. If this code then runs, it will
+            // call the archive cache manager version of 7z, which will not return the correct results (file priority will be applied,
+            // and the first file listing removed. Restore 7z here, just in case it wasn't cleaned up properly previously.
+            GameLaunching.Restore7z();
+
             string[] fileList = Zip.GetFileList(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
 
             if (fileList.Count() == 0)

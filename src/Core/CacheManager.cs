@@ -61,7 +61,8 @@ namespace ArchiveCacheManager
         /// <returns>True if the archive is cached, False otherwise.</returns>
         public static bool ArchiveInCache()
         {
-            return Directory.Exists(Archive.CachePath);
+            // Use the existence of the game.ini file, as it's only copied to the cache after a successful 7z extract command
+            return File.Exists(PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath));
         }
 
         /// <summary>
@@ -75,11 +76,21 @@ namespace ArchiveCacheManager
 
             if (CreateCache())
             {
+                // Clear anything already in the archive cache path (from bad extract, terminated process, or some other reason)
+                DiskUtils.DeleteDirectory(Archive.CachePath, true);
                 ClearCacheSpace(Archive.DecompressedSize);
                 Logger.Log(string.Format("Extracting archive to \"{0}\".", Archive.CachePath));
                 Zip.Extract(Archive.Path, Archive.CachePath, ref stdout, ref stderr, ref exitCode);
-                File.Copy(PathUtils.GetGameInfoPath(), PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath), true);
-                DiskUtils.SetDirectoryContentsReadOnly(Archive.CachePath);
+                if (exitCode == 0)
+                {
+                    File.Copy(PathUtils.GetGameInfoPath(), PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath), true);
+                    DiskUtils.SetDirectoryContentsReadOnly(Archive.CachePath);
+                }
+                else
+                {
+                    Logger.Log("Extraction error, removing output files from cache.");
+                    DiskUtils.DeleteDirectory(Archive.CachePath);
+                }
             }
             else
             {
