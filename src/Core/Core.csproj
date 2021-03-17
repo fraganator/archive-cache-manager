@@ -51,6 +51,7 @@
     <Compile Include="Archive.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="GameInfo.cs" />
+    <Compile Include="ChildProcessTracker.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Zip.cs" />
     <Compile Include="CacheManager.cs" />

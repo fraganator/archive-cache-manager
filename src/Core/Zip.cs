@@ -218,6 +218,11 @@ namespace ArchiveCacheManager
             process.BeginErrorReadLine();
             process.BeginOutputReadLine();
 
+            // LB allows terminating the extraction process by pressing Esc on the loading screen. If this process is killed,
+            // the child process (the real 7z in this case) will NOT be terminated. Add 7z as a tracked child process, which
+            // will be automatically killed if this process is also killed.
+            ChildProcessTracker.AddProcess(process);
+
             process.WaitForExit();
             exitCode = process.ExitCode;
             stdout = asyncOutput;
