@@ -21,13 +21,31 @@ namespace ArchiveCacheManager
         /// </summary>
         public static void Init()
         {
-            string logPath = PathUtils.GetLogPath();
-
             try
             {
-                if (File.Exists(logPath))
+                string logPath = PathUtils.GetLogPath();
+
+                if (!Directory.Exists(logPath))
                 {
-                    File.Delete(logPath);
+                    Directory.CreateDirectory(logPath);
+                }
+                else
+                {
+                    string[] logs = Directory.GetFiles(PathUtils.GetLogPath(), "*.log");
+
+                    Array.Sort(logs);
+
+                    for (int i = 0; i < logs.Length - 10; i++)
+                    {
+                        File.Delete(logs[i]);
+                    }
+                }
+
+                string oldLogFilePath = Path.Combine(PathUtils.GetPluginRootPath(), "events.log");
+
+                if (File.Exists(oldLogFilePath))
+                {
+                    File.Delete(oldLogFilePath);
                 }
             }
             catch (IOException)
@@ -46,7 +64,7 @@ namespace ArchiveCacheManager
 
             try
             {
-                writer = new StreamWriter(PathUtils.GetLogPath(), true);
+                writer = new StreamWriter(PathUtils.GetLogFilePath(), true);
                 writer.Write(string.Format("{0} - {1}\r\n", GetDateTime(), message));
             }
             catch (IOException)

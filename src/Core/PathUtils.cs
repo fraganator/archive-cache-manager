@@ -24,7 +24,9 @@ namespace ArchiveCacheManager
         private static readonly string alt7zFileName = @"7-zip.exe";
         private static readonly string relativePluginPath = @"Plugins\ArchiveCacheManager";
         private static readonly string relative7zPath = @"ThirdParty\7-Zip";
-        private static readonly string logFileName = @"events.log";
+        private static readonly string relativeLogPath = Path.Combine(relativePluginPath, "Logs");
+        private static readonly DateTime dateTimeNow = DateTime.Now;
+        private static readonly string logFileName = string.Format("events-{0}-{1:00}-{2:00}.log", dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day);
 
         private static string assemblyPath;
         private static string assemblyFileName;
@@ -40,6 +42,19 @@ namespace ArchiveCacheManager
             assemblyFileName = Path.GetFileName(assemblyPath);
             assemblyDirectory = Path.GetDirectoryName(assemblyPath);
             launchBoxRootPath = GetLaunchBoxRootPath();
+        }
+
+        /// <summary>
+        /// Compares two paths if they are equal.
+        /// </summary>
+        /// <param name="path1"></param>
+        /// <param name="path2"></param>
+        /// <returns></returns>
+        public static bool ComparePaths(string path1, string path2)
+        {
+            return string.Equals(Path.GetFullPath(path1).TrimEnd(Path.DirectorySeparatorChar),
+                                 Path.GetFullPath(path2).TrimEnd(Path.DirectorySeparatorChar),
+                                 StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -154,10 +169,16 @@ namespace ArchiveCacheManager
         public static string GetGameInfoPath() => Path.Combine(launchBoxRootPath, relative7zPath, gameInfoFileName);
 
         /// <summary>
+        /// Absolute path to plugin's log folder.
+        /// </summary>
+        /// <returns>Absolute path to plugin's log folder.</returns>
+        public static string GetLogPath() => Path.Combine(launchBoxRootPath, relativeLogPath);
+
+        /// <summary>
         /// Absolute path to plugin's log file.
         /// </summary>
         /// <returns>Absolute path to plugin's log file.</returns>
-        public static string GetLogPath() => Path.Combine(launchBoxRootPath, relativePluginPath, logFileName);
+        public static string GetLogFilePath() => Path.Combine(launchBoxRootPath, relativeLogPath, logFileName);
 
         /// <summary>
         /// Absolute path to plugin root folder.
@@ -184,6 +205,12 @@ namespace ArchiveCacheManager
         /// <param name="archiveCachePath">Location of the cached archive.</param>
         /// <returns>Absolute path to the game info file.</returns>
         public static string GetArchiveCacheGameInfoPath(string archiveCachePath) => Path.Combine(archiveCachePath, gameInfoFileName);
+
+        /// <summary>
+        /// Game info filename.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetGameInfoFileName() => gameInfoFileName;
 
         /// <summary>
         /// Calculates an MD5 hash of the given path.

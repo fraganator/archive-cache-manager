@@ -8,10 +8,10 @@ namespace ArchiveCacheManager
 {
     public class Config
     {
-        public static string mCachePath;
-        public static long mCacheSize;
-        public static long mMinArchiveSize;
-        public static Dictionary<string, string> mExtensionPriority;
+        private static string mCachePath;
+        private static long mCacheSize;
+        private static long mMinArchiveSize;
+        private static Dictionary<string, string> mExtensionPriority;
 
         private static readonly string configSection = "Archive Cache Manager";
         private static readonly string defaultCachePath = "ArchiveCache";
@@ -199,7 +199,7 @@ namespace ArchiveCacheManager
             mCacheSize = defaultCacheSize;
             mMinArchiveSize = defaultMinArchiveSize;
             mExtensionPriority = new Dictionary<string, string>();
-            mExtensionPriority.Add(@"PCSX2 \ Sony Playstation 2", "bin");
+            mExtensionPriority.Add(@"PCSX2 \ Sony Playstation 2", "bin, iso");
         }
     }
 }

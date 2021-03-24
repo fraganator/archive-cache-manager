@@ -9,6 +9,13 @@ namespace ArchiveCacheManager
 {
     public class CacheManager
     {
+        private static GameInfo launchGameInfo;
+
+        static CacheManager()
+        {
+            launchGameInfo = new GameInfo(PathUtils.GetGameInfoPath());
+        }
+
         /// <summary>
         /// Plugin version string, in the form "vX.Y.Z".
         /// </summary>
@@ -78,12 +85,14 @@ namespace ArchiveCacheManager
             {
                 // Clear anything already in the archive cache path (from bad extract, terminated process, or some other reason)
                 DiskUtils.DeleteDirectory(Archive.CachePath, true);
+                launchGameInfo.DecompressedSize = Archive.DecompressedSize;
                 ClearCacheSpace(Archive.DecompressedSize);
                 Logger.Log(string.Format("Extracting archive to \"{0}\".", Archive.CachePath));
                 Zip.Extract(Archive.Path, Archive.CachePath, ref stdout, ref stderr, ref exitCode);
                 if (exitCode == 0)
                 {
-                    File.Copy(PathUtils.GetGameInfoPath(), PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath), true);
+                    launchGameInfo.Save(PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath));
+                    //File.Copy(PathUtils.GetGameInfoPath(), PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath), true);
                     DiskUtils.SetDirectoryContentsReadOnly(Archive.CachePath);
                 }
                 else
@@ -100,6 +109,38 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Verify and fix cache entries. Invalid cache entries are removed, while missing game.ini keys are updated where possible.
+        /// </summary>
+        public static void VerifyCacheIntegrity()
+        {
+            if (Directory.Exists(PathUtils.CachePath()))
+            {
+                Logger.Log("Verifying cache integrity...");
+
+                string[] dirs = Directory.GetDirectories(PathUtils.CachePath());
+
+                foreach (string dir in dirs)
+                {
+                    GameInfo gameInfo = new GameInfo(Path.Combine(dir, PathUtils.GetGameInfoFileName()));
+                    if (!gameInfo.InfoLoaded)
+                    {
+                        Logger.Log(string.Format("Error loading game.ini, deleting cached item \"{0}\".", dir));
+                        DiskUtils.DeleteDirectory(dir);
+                        continue;
+                    }
+
+                    if (gameInfo.DecompressedSize == 0)
+                    {
+                        gameInfo.DecompressedSize = DiskUtils.DirectorySize(new DirectoryInfo(dir));
+                        gameInfo.Save();
+                    }
+                }
+
+                Logger.Log("Verification complete.");
+            }
+        }
+
+        /// <summary>
         /// Lists the content of the archive. If the archive is cached, returns the cached file list (including absolute paths).
         /// Also applies the configured file extension priority for the current emulator and platform.
         /// </summary>
@@ -109,7 +150,7 @@ namespace ArchiveCacheManager
             string stderr = string.Empty;
             int exitCode = 0;
 
-            if (GameInfo.FileInArchive.Equals(string.Empty))
+            if (launchGameInfo.PlayRomInArchive.Equals(string.Empty))
             {
                 if (ArchiveInCache())
                 {
@@ -125,14 +166,14 @@ namespace ArchiveCacheManager
             {
                 if (ArchiveInCache())
                 {
-                    stdout = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), GameInfo.FileInArchive);
+                    stdout = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.PlayRomInArchive);
                 }
                 else
                 {
-                    stdout = "Path = " + GameInfo.FileInArchive;
+                    stdout = "Path = " + launchGameInfo.PlayRomInArchive;
                 }
 
-                Logger.Log(string.Format("Loading individual file from archive \"{0}\".", GameInfo.FileInArchive));
+                Logger.Log(string.Format("Loading individual file from archive \"{0}\".", launchGameInfo.PlayRomInArchive));
             }
 
             Console.Write(stdout);
@@ -161,14 +202,41 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Determine the amount of space used in the cache. Does not include items marked Keep.
+        /// </summary>
+        /// <returns></returns>
+        public static long GetCacheSizeUsed()
+        {
+            long cacheSizeUsed = 0;
+
+            try
+            {
+                foreach (string filePath in Directory.GetFiles(PathUtils.GetAbsolutePath(Config.CachePath), PathUtils.GetGameInfoFileName(), SearchOption.AllDirectories))
+                {
+                    GameInfo gameInfo = new GameInfo(filePath);
+
+                    if (!gameInfo.KeepInCache)
+                    {
+                        cacheSizeUsed += gameInfo.DecompressedSize;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return cacheSizeUsed;
+        }
+
+        /// <summary>
         /// Clear the specified amount of space in the cache. If there is already enough room, no cached archives are removed.
         /// Otherwise cached items are removed in least recently played order until there is enough room. If sizeToFree exceeds
         /// the cache size, everything will be removed from the cache.
         /// </summary>
         /// <param name="sizeToFree">Number of bytes to free in the cache</param>
-        public static void ClearCacheSpace(long sizeToFree)
+        public static void ClearCacheSpace(long sizeToFree, bool deleteKeep = false)
         {
-            long availableCacheSpace = (Config.CacheSize * 1024 * 1024) - DiskUtils.DirectorySize(new DirectoryInfo(PathUtils.CachePath()));
+            long availableCacheSpace = (Config.CacheSize * 1048576) - GetCacheSizeUsed();
 
             if (availableCacheSpace < sizeToFree)
             {
@@ -182,22 +250,26 @@ namespace ArchiveCacheManager
                 // Get a list of directories in the cache, sorted by last played date\time
                 string[] dirs = Directory.GetDirectories(PathUtils.CachePath());
                 long[] lastUpdated = new long[dirs.Count()];
-                for (int i = 0; i < lastUpdated.Length; i++)
+                for (int i = 0; i < lastUpdated.Count(); i++)
                 {
                     lastUpdated[i] = GetArchiveCachePlaytime(dirs[i]);
                 }
                 Array.Sort(lastUpdated, dirs);
 
                 // Progressively delete oldest cached directories until there is enough free space
-                for (int i = 0; i < dirs.Length; i++)
+                for (int i = 0; i < dirs.Count(); i++)
                 {
-                    deletedSize += DiskUtils.DirectorySize(new DirectoryInfo(dirs[i]));
-                    Logger.Log(string.Format("Deleting cached item \"{0}\".", dirs[i]));
-                    DiskUtils.DeleteDirectory(dirs[i]);
-
-                    if (deletedSize > sizeToDelete)
+                    GameInfo gameInfo = new GameInfo(Path.Combine(dirs[i], PathUtils.GetGameInfoFileName()));
+                    if (!gameInfo.KeepInCache || deleteKeep)
                     {
-                        break;
+                        Logger.Log(string.Format("Deleting cached item \"{0}\".", dirs[i]));
+                        DiskUtils.DeleteDirectory(dirs[i]);
+                        deletedSize += gameInfo.DecompressedSize;
+
+                        if (deletedSize > sizeToDelete)
+                        {
+                            break;
+                        }
                     }
                 }
 
@@ -315,7 +387,7 @@ namespace ArchiveCacheManager
 
             try
             {
-                string[] extensionPriority = Config.ExtensionPriority[string.Format(@"{0} \ {1}", GameInfo.Emulator, GameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                string[] extensionPriority = Config.ExtensionPriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
                 // Search the extensions in priority order
                 foreach (string extension in extensionPriority)

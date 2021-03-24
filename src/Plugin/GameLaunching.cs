@@ -9,12 +9,12 @@ namespace ArchiveCacheManager
     class GameLaunching : IGameLaunchingPlugin
     {
         private static bool cacheManagerActive = false;
-        private static string mFileInArchive = string.Empty;
+        private static string mPlayRomInArchive = string.Empty;
 
-        public static string FileInArchive
+        public static string PlayRomInArchive
         {
-            get => mFileInArchive;
-            set => mFileInArchive = value;
+            get => mPlayRomInArchive;
+            set => mPlayRomInArchive = value;
         }
 
         public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
@@ -34,8 +34,16 @@ namespace ArchiveCacheManager
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
 
                 cacheManagerActive = true;
-                GameInfo.SaveInfo(game.ApplicationPath, emulator.Title, game.Platform, game.Title, mFileInArchive);
-                mFileInArchive = string.Empty;
+
+                GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
+                gameInfo.ArchivePath = (app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath;
+                gameInfo.Emulator = emulator.Title;
+                gameInfo.Platform = game.Platform;
+                gameInfo.Title = game.Title;
+                gameInfo.PlayRomInArchive = mPlayRomInArchive;
+                gameInfo.Save();
+
+                mPlayRomInArchive = string.Empty;
 
                 Replace7z();
             }

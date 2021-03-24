@@ -114,7 +114,8 @@ namespace ArchiveCacheManager
             if (outputPath.EndsWith(@"7-Zip\Temp", StringComparison.InvariantCultureIgnoreCase))
             {
                 // MinArchiveSize is megabytes, multiply to convert to bytes
-                if (Archive.DecompressedSize > Config.MinArchiveSize * 1024 * 1024)
+                // TODO: Check if archive in cache first before anything else. Avoids unnecessary calls to 7z.
+                if (Archive.DecompressedSize > Config.MinArchiveSize * 1048576)
                 {
                     CacheManager.ExtractArchive();
                 }

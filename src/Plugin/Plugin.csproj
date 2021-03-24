@@ -66,6 +66,12 @@
     <Compile Include="ArchiveListWindow.Designer.cs">
       <DependentUpon>ArchiveListWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="CacheConfigWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CacheConfigWindow.Designer.cs">
+      <DependentUpon>CacheConfigWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="ConfigWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -96,6 +102,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ArchiveListWindow.resx">
       <DependentUpon>ArchiveListWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CacheConfigWindow.resx">
+      <DependentUpon>CacheConfigWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfigWindow.resx">
       <DependentUpon>ConfigWindow.cs</DependentUpon>
@@ -136,6 +145,42 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon16x16-play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\gear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\broom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-circle-double.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-cd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-gc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-ps1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-ps2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-ps2-cd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-md.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\box-zipper.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-n64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\media-psp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,11 +1,11 @@
 # Archive Cache Manager
 ![Achive Cache Manager logo](images/logo-v2-title.png?raw=true "Achive Cache Manager")
 
-A LaunchBox plugin which extracts and caches ROM archives, letting you play games faster. Also allows playing individual ROMs from merged archives, and setting preferred file type from archive (supporting PCSX2 + bin/cue files, and others).
+A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file type from an archive.
 
 
 ## Description
-When an archived game (in zip, 7z, or other compression format) is first extracted, it is stored in the cache. The next time the game is played, the data is loaded directly from the cache, virtually eliminating wait time.
+When a compressed ROM (in zip, 7z, or other compression format) is first extracted, it is stored in the archive cache. The next time it is played, the data is loaded directly from the cache, virtually eliminating wait time.
 
 ![Launch time comparison video](images/launch-video.gif?raw=true "Side-by-side video comparing launch time of game from zip vs. from cache")
 
@@ -13,8 +13,11 @@ As the cache approaches its maximum size, the least recently played games are de
 
 
 ## Features
+* _NEW FEATURE_ - Keep select ROMs cached and ready to play.
+    * Games marked 'Keep' won't be automatically cleaned from the cache.
+	* Useful for less frequently played games which you still want to load without waiting (party games, favourites, children's games, etc)
 * _NEW FEATURE_ - Select and play individual ROM files from an archive!
-    * Useful for GoodMerged sets.
+    * Useful for GoodMerged sets, or archives with mixed ROMs and cue sheets (MSU).
 * Skip the extraction wait time for recently played games.
 * Configurable cache size and location.
 * Configurable minimum archive size (skip caching small archives).
@@ -52,28 +55,64 @@ A window will popup with a full listing of the archive contents. Select the desi
 
 ![ROM file selection window](images/select-file-window.png?raw=true "ROM file selection window")
 
+### Keeping Games Cached
+Games can be marked 'Keep' so they stay cached and ready to play. To keep a game cached, open the plugin configuration window from the _Tools->Archive Cache Manager_ menu. From there a list of games in the cache is shown. Check the Keep box next to the game, then click OK.
+
 
 ## Configuration
 Configuration can be accessed from the _Tools->Archive Cache Manager_ menu.
 
-![Achive Cache Manager config screen](images/config.png?raw=true "Achive Cache Manager config screen")
+![Achive Cache Manager config screen](images/config-screen.png?raw=true "Achive Cache Manager config screen")
 
 An overview of each of the configuration items is below.
 
-### Cache Path
+### Cache Details
+This section shows a summary of the cache including the _Cache Path_, _Cache Size_, and _Keep Size_. It also displays a list of the items currently in the cache.
+
+#### Cached Items & Keep
+Each item in the cache has a _Keep_ flag, which when set will prevent the item from being removed from the cache when the cache is full. This is useful for less frequently played games which you still want to load without waiting (party games, favourites, children's games, etc).
+
+Items marked _Keep_ are not included in the cache size calculation. The total size of _Keep_ items is listed in the cache details summary.
+
+#### Configure Cache
+Clicking the `Configure Cache...` button opens the cache configuration window.
+
+![Achive Cache Manager cache config screen](images/config-cache.png?raw=true "Achive Cache Manager cache config screen")
+
+##### Configure Cache - Cache Path
 This is the path of the cache on disk. The path can be absolute or relative, where relative paths are to the `LaunchBox` root folder.
 
 Default: _ArchiveCache_
 
-### Cache Size
+If the cache path is set to an invalid location (`LaunchBox` root for example), an error message will be displayed when clicking OK.
+
+![Cache path error](images/config-cache-error.png?raw=true "Cache path error")
+
+If the cache path is set to an existing path that already contains files or folders, a warning will be displayed when clicking OK. Click Yes to proceed, or No to go back and change the path.
+
+![Cache path warning](images/config-cache-warning.png?raw=true "Cache path warning")
+
+##### Configure Cache - Cache Size
 This is the maximum cache size on disk in megabytes. The oldest played games will be deleted from the cache when it reaches this size.
 
 Default: _20,000 MB (20 GB)_
 
-### Minimum Archive Size
+##### Configure Cache - Minimum Archive Size
 This is the minimum size in megabytes of an uncompressed archive to be added to the cache. Archives smaller than this won't be added to the cache.
 
 Default: _100 MB_
+
+#### Open In Explorer
+Clicking the `Open In Explorer` button will open the configured cache path in Windows Explorer. This button is disabled if the cache path does not exist.
+
+#### Refresh
+Refreshes the cache summary and list of cached items from disk.
+
+#### Delete
+Clicking on the `Delete` button will remove the selected items from the cache (including items with the _Keep_ setting).
+
+#### Purge Cache
+Clicking on the `Delete All` button will delete everything from the cache (including items with the _Keep_ setting).
 
 ### File Extension Priority
 This defines the file extension priority for the specified emulator and platform combination. Use the Add / Edit / Delete buttons to manage file extension priorities.
@@ -82,7 +121,7 @@ File extensions are a comma delimited list, where the highest priority is the fi
 
 Note that the extension priority is applied to all archives, even if they are not cached.
 
-Default: _PCSX2 \ Sony Playstation 2 \ bin_
+Default: _PCSX2 \ Sony Playstation 2 \ bin, iso_
 
 
 ## Building

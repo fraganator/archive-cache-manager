@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace ArchiveCacheManager
 {
@@ -13,27 +14,35 @@ namespace ArchiveCacheManager
             InitializeComponent();
 
             Config.LoadConfig();
-            cachePath.Text = Config.CachePath;
-            cacheSize.Value = Config.CacheSize;
-            minArchiveSize.Value = Config.MinArchiveSize;
+
             versionLabel.Text = CacheManager.Version;
 
-            extensionPriorityListView.Items.Clear();
+            extensionPriorityDataGridView.Rows.Clear();
             foreach (KeyValuePair<string, string> priority in Config.ExtensionPriority)
             {
                 string[] priorityInfo = priority.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
 
-                extensionPriorityListView.Items.Add(new ListViewItem(new string[] { priorityInfo[0].Trim(), priorityInfo[1].Trim(), priority.Value }));
+                extensionPriorityDataGridView.Rows.Add(new string[] { priorityInfo[0].Trim(), priorityInfo[1].Trim(), priority.Value });
             }
+            extensionPriorityDataGridView.ClearSelection();
 
+            updateCacheInfo(true);
             updateEnabledState();
         }
 
+        /// <summary>
+        /// Update the enabled state of all controls based on the current configuration and selection.
+        /// </summary>
         private void updateEnabledState()
         {
-            okButton.Enabled = (cachePath.Text != string.Empty);
+            string path = PathUtils.GetAbsolutePath(Config.CachePath);
+            bool cachePathExists = Directory.Exists(path);
 
-            if (extensionPriorityListView.SelectedIndices.Count == 1)
+            openInExplorerButton.Enabled = cachePathExists;
+            deleteAllButton.Enabled = cachePathExists;
+            deleteSelectedButton.Enabled = (cacheDataGridView.SelectedRows.Count > 0);
+
+            if (extensionPriorityDataGridView.SelectedRows.Count == 1)
             {
                 editPriorityButton.Enabled = true;
                 deletePriorityButton.Enabled = true;
@@ -45,6 +54,75 @@ namespace ArchiveCacheManager
             }
         }
 
+        /// <summary>
+        /// Updates the cache summary text and optionally the cached item table.
+        /// </summary>
+        /// <param name="updateDataGrid"></param>
+        private void updateCacheInfo(bool updateDataGrid = false)
+        {
+            if (updateDataGrid)
+            {
+                updateCacheDataGrid();
+            }
+
+            double cacheSizeUsed = 0;
+            double keepSize = 0;
+
+            try
+            {
+                foreach (DataGridViewRow row in cacheDataGridView.Rows)
+                {
+                    double size = Convert.ToDouble(row.Cells["ArchiveSize"].Value);
+                    if (!Convert.ToBoolean(row.Cells["Keep"].Value))
+                    {
+                        cacheSizeUsed += size;
+                    }
+                    else
+                    {
+                        keepSize += size;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+            }
+
+            cacheSummaryTextBox.Text =      string.Format("Cache Path:  {0}", PathUtils.GetAbsolutePath(Config.CachePath));
+            cacheSummaryTextBox.Text += string.Format("\r\nCache Size:  {0:n1} MB / {1:n1} MB ({2:n1}%)", cacheSizeUsed, Config.CacheSize, (cacheSizeUsed / Convert.ToDouble(Config.CacheSize)) * 100.0);
+            cacheSummaryTextBox.Text += string.Format("\r\n Keep Size:  {0:n1} MB", keepSize);
+            //cacheSummaryTextBox.Text += string.Format("\r\nArchives In Cache: {0}", cacheDataGridView.Rows.Count);
+        }
+
+        /// <summary>
+        /// Updates the cache table with data from disk.
+        /// </summary>
+        private void updateCacheDataGrid()
+        {
+            cacheDataGridView.Rows.Clear();
+
+            try
+            {
+                foreach (string directory in Directory.GetDirectories(PathUtils.GetAbsolutePath(Config.CachePath), "*", SearchOption.TopDirectoryOnly))
+                {
+                    GameInfo gameInfo = new GameInfo(Path.Combine(directory, PathUtils.GetGameInfoFileName()));
+
+                    if (gameInfo.InfoLoaded)
+                    {
+                        cacheDataGridView.Rows.Add(new object[] { directory, gameInfo.KeepInCache, Path.GetFileName(gameInfo.ArchivePath),
+                                                   gameInfo.Platform, string.Format("{0:n1}", gameInfo.DecompressedSize / 1048576.0) });
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Opens a URL with the default web browser.
+        /// </summary>
+        /// <param name="url"></param>
         private void OpenURL(string url)
         {
             ProcessStartInfo ps = new ProcessStartInfo(url);
@@ -53,53 +131,33 @@ namespace ArchiveCacheManager
             Process.Start(ps);
         }
 
-        private void cachePathBrowseButton_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            string browsePath = PathUtils.CachePath(cachePath.Text);
-
-            dialog.SelectedPath = Directory.Exists(browsePath) ? browsePath : PathUtils.GetLaunchBoxRootPath();
-            dialog.ShowNewFolderButton = true;
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                cachePath.Text = PathUtils.GetRelativePath(PathUtils.GetLaunchBoxRootPath(), dialog.SelectedPath);
-            }
-
-            updateEnabledState();
-        }
-
         private void okButton_Click(object sender, EventArgs e)
         {
-            if (PathUtils.GetAbsolutePath(cachePath.Text).Equals(PathUtils.GetLaunchBoxRootPath(), StringComparison.InvariantCultureIgnoreCase))
-            {
-                MessageBox.Show(this, "ERROR! The cache path can not be set to the LaunchBox folder. Please change the cache path.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                return;
-            }
-
-            if (!cachePath.Text.Equals(Config.CachePath, StringComparison.InvariantCultureIgnoreCase) &&
-                DiskUtils.DirectorySize(new DirectoryInfo(cachePath.Text)) > 0)
-            {
-                DialogResult result = MessageBox.Show(this, "WARNING! The selected cache path already contains files. These files WILL be deleted when the cache is cleaned. Continue?", "Warning!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (result == DialogResult.No)
-                {
-                    return;
-                }
-            }
-
-            Config.CachePath = cachePath.Text;
-            Config.CacheSize = Convert.ToInt64(cacheSize.Value);
-            Config.MinArchiveSize = Convert.ToInt64(minArchiveSize.Value);
-
             Config.ExtensionPriority.Clear();
-            foreach (ListViewItem item in extensionPriorityListView.Items)
+            foreach (DataGridViewRow row in extensionPriorityDataGridView.Rows)
             {
-                Config.ExtensionPriority.Add(string.Format(@"{0} \ {1}", item.SubItems[0].Text, item.SubItems[1].Text), item.SubItems[2].Text);
+                Config.ExtensionPriority.Add(string.Format(@"{0} \ {1}", row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString()), row.Cells[2].Value.ToString());
             }
 
             Config.SaveConfig();
+
+            try
+            {
+                foreach (DataGridViewRow row in cacheDataGridView.Rows)
+                {
+                    GameInfo gameInfo = new GameInfo(Path.Combine(row.Cells["ArchivePath"].Value.ToString(), PathUtils.GetGameInfoFileName()));
+                    bool keep = Convert.ToBoolean(row.Cells["Keep"].Value);
+                    if (gameInfo.KeepInCache != keep)
+                    {
+                        gameInfo.KeepInCache = keep;
+                        gameInfo.Save();
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.Log(exception.ToString(), Logger.LogLevel.Exception);
+            }
 
             this.Close();
         }
@@ -112,37 +170,34 @@ namespace ArchiveCacheManager
 
             if (window.DialogResult == DialogResult.OK)
             {
-                extensionPriorityListView.Items.Add(new ListViewItem(new string[] { window.Emulator, window.Platform, window.PriorityList }));
+                int index = extensionPriorityDataGridView.Rows.Add(new string[] { window.Emulator, window.Platform, window.PriorityList });
+                extensionPriorityDataGridView.Rows[index].Selected = true;
             }
         }
 
         private void editPriorityButton_Click(object sender, EventArgs e)
         {
-            ListViewItem.ListViewSubItemCollection items = extensionPriorityListView.SelectedItems[0].SubItems;
+            DataGridViewCellCollection cells = extensionPriorityDataGridView.SelectedRows[0].Cells;
 
-            PriorityEditWindow window = new PriorityEditWindow(items[0].Text, items[1].Text, items[2].Text);
+            PriorityEditWindow window = new PriorityEditWindow(cells[0].Value.ToString(), cells[1].Value.ToString(), cells[2].Value.ToString());
 
             window.ShowDialog(this);
 
             if (window.DialogResult == DialogResult.OK)
             {
-                int selectedIndex = extensionPriorityListView.SelectedIndices[0];
-                extensionPriorityListView.SelectedItems[0].Remove();
-                extensionPriorityListView.Items.Insert(selectedIndex, new ListViewItem(new string[] { window.Emulator, window.Platform, window.PriorityList }));
+                extensionPriorityDataGridView.SelectedRows[0].Cells[0].Value = window.Emulator;
+                extensionPriorityDataGridView.SelectedRows[0].Cells[1].Value = window.Platform;
+                extensionPriorityDataGridView.SelectedRows[0].Cells[2].Value = window.PriorityList;
             }
         }
 
         private void deletePriorityButton_Click(object sender, EventArgs e)
         {
-            extensionPriorityListView.SelectedItems[0].Remove();
+            extensionPriorityDataGridView.Rows.Remove(extensionPriorityDataGridView.SelectedRows[0]);
+            extensionPriorityDataGridView.ClearSelection();
         }
 
-        private void cachePath_TextChanged(object sender, EventArgs e)
-        {
-            updateEnabledState();
-        }
-
-        private void extensionPriorityListView_SelectedIndexChanged(object sender, EventArgs e)
+        private void extensionPriorityDataGridView_SelectionChanged(object sender, EventArgs e)
         {
             updateEnabledState();
         }
@@ -163,6 +218,114 @@ namespace ArchiveCacheManager
         {
             sourceLink.LinkVisited = true;
             OpenURL("https://github.com/fraganator/archive-cache-manager");
+        }
+
+        private void configureCacheButton_Click(object sender, EventArgs e)
+        {
+            string cachePath = Config.CachePath;
+
+            CacheConfigWindow window = new CacheConfigWindow();
+
+            window.ShowDialog(this);
+
+            if (window.DialogResult == DialogResult.OK)
+            {
+                updateCacheInfo(!PathUtils.ComparePaths(cachePath, Config.CachePath));
+                updateEnabledState();
+            }
+        }
+
+        private void openInExplorerButton_Click(object sender, EventArgs e)
+        {
+            string path = PathUtils.GetAbsolutePath(Config.CachePath);
+
+            Process.Start("explorer.exe", path);
+        }
+
+        private void refreshButton_Click(object sender, EventArgs e)
+        {
+            updateCacheInfo(true);
+            updateEnabledState();
+        }
+
+        private void clearSelectedButton_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in cacheDataGridView.SelectedRows)
+            {
+                Logger.Log(string.Format("Manually deleting cached item \"{0}\".", row.Cells["ArchivePath"].Value));
+                DiskUtils.DeleteDirectory(row.Cells["ArchivePath"].Value.ToString());
+                cacheDataGridView.Rows.Remove(row);
+            }
+
+            updateCacheInfo();
+            updateEnabledState();
+        }
+
+        private void cacheDataGridView_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (cacheDataGridView.CurrentCell is DataGridViewCheckBoxCell)
+            {
+                cacheDataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
+                updateCacheInfo();
+            }
+        }
+
+        private void purgeCacheButton_Click(object sender, EventArgs e)
+        {
+            Logger.Log("Manually deleting entire cache.");
+
+            CacheManager.ClearCacheSpace(long.MaxValue, true);
+
+            updateCacheInfo(true);
+            updateEnabledState();
+        }
+
+        private void cacheDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex < 0)
+                return;
+
+            if (e.ColumnIndex == cacheDataGridView.Columns["Archive"].Index)
+            {
+                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
+
+                Bitmap mediaIcon = null;
+
+                switch (cacheDataGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString())
+                {
+                    case "Microsoft Xbox": mediaIcon = Resources.media_cd; break;
+                    case "Microsoft Xbox 360": mediaIcon = Resources.media_cd; break;
+                    case "Nintendo 64": mediaIcon = Resources.media_n64; break;
+                    case "Nintendo GameCube": mediaIcon = Resources.media_gc; break;
+                    case "Nintendo Wii": mediaIcon = Resources.media_cd; break;
+                    case "Nintendo Wii U": mediaIcon = Resources.media_cd; break;
+                    case "Sega 32X": mediaIcon = Resources.media_md; break;
+                    case "Sega CD": mediaIcon = Resources.media_cd; break;
+                    case "Sega Dreamcast": mediaIcon = Resources.media_cd; break;
+                    case "Sega Genesis":mediaIcon = Resources.media_md; break;
+                    case "Sega Saturn": mediaIcon = Resources.media_cd; break;
+                    case "Sony Playstation": mediaIcon = Resources.media_ps1; break;
+                    case "Sony Playstation 2":
+                        if (Convert.ToDouble(cacheDataGridView.Rows[e.RowIndex].Cells["ArchiveSize"].Value) > 700.0)
+                            mediaIcon = Resources.media_ps2;
+                        else
+                            mediaIcon = Resources.media_ps2_cd;
+                        break;
+                    case "Sony PSP": mediaIcon = Resources.media_psp; break;
+                    default: mediaIcon = Resources.box_zipper; break;
+                }
+
+                if (mediaIcon != null)
+                {
+                    var w = mediaIcon.Width;
+                    var h = mediaIcon.Height;
+                    var x = e.CellBounds.Left + 1;// + (e.CellBounds.Width - w) / 2;
+                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
+
+                    e.Graphics.DrawImage(mediaIcon, new Rectangle(x, y, w, h));
+                    e.Handled = true;
+                }
+            }
         }
     }
 }

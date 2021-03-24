@@ -35,7 +35,7 @@ namespace ArchiveCacheManager
 
             if (fileList.Count() == 0)
             {
-                MessageBox.Show(string.Format("Error listing contents of {0}.\r\n\r\nCheck {1} for details.", Path.GetFileName(selectedGame.ApplicationPath), Path.GetFileName(PathUtils.GetLogPath())),
+                MessageBox.Show(string.Format("Error listing contents of {0}.\r\n\r\nCheck {1} for details.", Path.GetFileName(selectedGame.ApplicationPath), Path.GetFileName(PathUtils.GetLogFilePath())),
                                 "Archive Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -49,7 +49,7 @@ namespace ArchiveCacheManager
 
             if (window.DialogResult == DialogResult.OK)
             {
-                GameLaunching.FileInArchive = window.SelectedFile;
+                GameLaunching.PlayRomInArchive = window.SelectedFile;
 
                 if (PluginHelper.StateManager.IsBigBox)
                 {

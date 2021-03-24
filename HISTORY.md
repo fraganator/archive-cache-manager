@@ -1,5 +1,16 @@
 # Archive Cache Manager change history
 
+## v2.0.4 (2021-03-24)
+* New feature - 'Keep'
+    * Keep your favourite games cached and ready to play
+	* Games marked 'Keep' will not be removed from the cache, and do not contribute to the used cache size
+* Configuration window updates
+    * Cache info summary
+    * View cached games, toggle the 'Keep' option
+	* Manually remove games from the cache or clear it entirely
+* Events and errors now logged to `LaunchBox\Plugins\ArchiveCacheManager\Logs`
+* Minor bug fixes
+
 ## v2.0.3 (2021-03-17)
 * Aborting game startup process (`Esc` on Startup Screen) now terminates extract operation
 * Cleanup partially extracted archive from cache on 7z error, or previous startup process abort
