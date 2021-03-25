@@ -1,5 +1,8 @@
 # Archive Cache Manager change history
 
+## v2.0.5 (2021-03-25)
+* Fix to ensure cache path valid if config file corrupt
+
 ## v2.0.4 (2021-03-24)
 * New feature - 'Keep'
     * Keep your favourite games cached and ready to play

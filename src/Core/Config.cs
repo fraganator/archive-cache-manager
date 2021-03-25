@@ -8,15 +8,15 @@ namespace ArchiveCacheManager
 {
     public class Config
     {
-        private static string mCachePath;
-        private static long mCacheSize;
-        private static long mMinArchiveSize;
-        private static Dictionary<string, string> mExtensionPriority;
-
         private static readonly string configSection = "Archive Cache Manager";
         private static readonly string defaultCachePath = "ArchiveCache";
         private static readonly long defaultCacheSize = 20000;
         private static readonly long defaultMinArchiveSize = 100;
+
+        private static string mCachePath = defaultCachePath;
+        private static long mCacheSize = defaultCacheSize;
+        private static long mMinArchiveSize = defaultMinArchiveSize;
+        private static Dictionary<string, string> mExtensionPriority;
 
         /// <summary>
         /// Static constructor which loads config from disk into memory.
@@ -94,11 +94,13 @@ namespace ArchiveCacheManager
                         {
                             mCachePath = iniData[configSection][nameof(CachePath)];
                         }
+                        // Older config file version used lower case first letter
                         else if (section.Keys.ContainsKey("cachePath"))
                         {
                             mCachePath = iniData[configSection]["cachePath"];
                         }
-                        else
+                        // Double check cache path
+                        if (string.IsNullOrEmpty(mCachePath.Trim()))
                         {
                             Logger.Log("Config CachePath not found, using default.");
                             mCachePath = defaultCachePath;
@@ -109,11 +111,13 @@ namespace ArchiveCacheManager
                         {
                             mCacheSize = Convert.ToInt64(iniData[configSection][nameof(CacheSize)]);
                         }
+                        // Older config file version used lower case first letter
                         else if (section.Keys.ContainsKey("cacheSize"))
                         {
                             mCacheSize = Convert.ToInt64(iniData[configSection]["cacheSize"]);
                         }
-                        else
+                        // CacheSize must be larger than 0
+                        if (mCacheSize <= 0)
                         {
                             Logger.Log("Config CacheSize not found, using default.");
                             mCacheSize = defaultCacheSize;
@@ -124,11 +128,13 @@ namespace ArchiveCacheManager
                         {
                             mMinArchiveSize = Convert.ToInt64(iniData[configSection][nameof(MinArchiveSize)]);
                         }
+                        // Older config file version used lower case first letter
                         else if (section.Keys.ContainsKey("minArchiveSize"))
                         {
                             mMinArchiveSize = Convert.ToInt64(iniData[configSection]["minArchiveSize"]);
                         }
-                        else
+                        // MinArchiveSize can be zero
+                        if (mMinArchiveSize < 0)
                         {
                             Logger.Log("Config MinArchiveSize not found, using default.");
                             mMinArchiveSize = defaultMinArchiveSize;
