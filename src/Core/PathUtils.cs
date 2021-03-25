@@ -271,5 +271,72 @@ namespace ArchiveCacheManager
         {
             return Path.Combine(CachePath(), FilenameWithHash(archivePath));
         }
+
+        /// <summary>
+        /// Check that the given path is safe to use as a cache location.
+        /// Unsafe paths include empty or null, LaunchBox and its default subfolders, c:\, Windows, Program Files.
+        /// </summary>
+        /// <param name="path">The path to check.</param>
+        /// <returns>True if the path is safe to use, false otherwise.</returns>
+        public static bool IsPathSafe(string path)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(path.Trim()))
+                {
+                    return false;
+                }
+
+                path = GetAbsolutePath(path);
+
+                string[] unsafePaths = new string[] {
+                    launchBoxRootPath,
+                    Path.Combine(launchBoxRootPath, "Backups"),
+                    Path.Combine(launchBoxRootPath, "Core"),
+                    Path.Combine(launchBoxRootPath, "Data"),
+                    Path.Combine(launchBoxRootPath, "Images"),
+                    Path.Combine(launchBoxRootPath, "LBThemes"),
+                    Path.Combine(launchBoxRootPath, "Logs"),
+                    Path.Combine(launchBoxRootPath, "Manuals"),
+                    Path.Combine(launchBoxRootPath, "Metadata"),
+                    Path.Combine(launchBoxRootPath, "Music"),
+                    Path.Combine(launchBoxRootPath, "PauseThemes"),
+                    Path.Combine(launchBoxRootPath, "Plugins"),
+                    Path.Combine(launchBoxRootPath, "Sounds"),
+                    Path.Combine(launchBoxRootPath, "StartupThemes"),
+                    Path.Combine(launchBoxRootPath, "Themes"),
+                    Path.Combine(launchBoxRootPath, "ThirdParty"),
+                    Path.Combine(launchBoxRootPath, "Updates"),
+                    Path.Combine(launchBoxRootPath, "Videos"),
+                    @"C:\",
+                    @"C:\Windows",
+                    @"C:\Program Files",
+                    @"C:\Program Files (x86)"
+                };
+
+                foreach (string unsafePath in unsafePaths)
+                {
+                    if (ComparePaths(path, unsafePath))
+                    {
+                        return false;
+                    }
+                }
+
+                // Will throw an exception if the path is poorly formatted or permissions errors
+                Directory.EnumerateFiles(path);
+            }
+            // Path may not exist, but is still valid
+            catch (DirectoryNotFoundException)
+            {
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

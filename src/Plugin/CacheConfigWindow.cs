@@ -31,13 +31,7 @@ namespace ArchiveCacheManager
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            // TODO
-            // More checks for forbidden directories - c:\, c:\windows, c:\program files, etc
-            if (PathUtils.ComparePaths(cachePath.Text, PathUtils.GetLaunchBoxRootPath()) ||
-                PathUtils.ComparePaths(cachePath.Text, @"C:\") ||
-                PathUtils.ComparePaths(cachePath.Text, @"C:\Windows") ||
-                PathUtils.ComparePaths(cachePath.Text, @"C:\Program Files") ||
-                PathUtils.ComparePaths(cachePath.Text, @"C:\Program Files (x86)"))
+            if (!PathUtils.IsPathSafe(cachePath.Text))
             {
                 MessageBox.Show(this, string.Format("ERROR! The cache path can not be set to {0}.\r\nPlease change the cache path.", Path.GetFullPath(cachePath.Text)), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -46,6 +40,7 @@ namespace ArchiveCacheManager
 
             try
             {
+                // Don't warn if path is unchanged, as it probably already has files in it.
                 if (!PathUtils.ComparePaths(cachePath.Text, Config.CachePath) &&
                     (Directory.EnumerateFiles(cachePath.Text, "*", SearchOption.AllDirectories).Any() || Directory.EnumerateDirectories(cachePath.Text).Any()))
                 {

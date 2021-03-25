@@ -78,82 +78,85 @@ namespace ArchiveCacheManager
                 try
                 {
                     iniData = parser.ReadFile(PathUtils.GetPluginConfigPath());
+
+                    ExtensionPriority.Clear();
+                    foreach (SectionData section in iniData.Sections)
+                    {
+                        if (section.SectionName == configSection)
+                        {
+                            if (section.Keys.ContainsKey(nameof(CachePath)))
+                            {
+                                mCachePath = iniData[configSection][nameof(CachePath)];
+                            }
+                            // Older config file version used lower case first letter
+                            else if (section.Keys.ContainsKey("cachePath"))
+                            {
+                                mCachePath = iniData[configSection]["cachePath"];
+                            }
+
+                            if (section.Keys.ContainsKey(nameof(CacheSize)))
+                            {
+                                mCacheSize = Convert.ToInt64(iniData[configSection][nameof(CacheSize)]);
+                            }
+                            // Older config file version used lower case first letter
+                            else if (section.Keys.ContainsKey("cacheSize"))
+                            {
+                                mCacheSize = Convert.ToInt64(iniData[configSection]["cacheSize"]);
+                            }
+
+
+                            if (section.Keys.ContainsKey(nameof(MinArchiveSize)))
+                            {
+                                mMinArchiveSize = Convert.ToInt64(iniData[configSection][nameof(MinArchiveSize)]);
+                            }
+                            // Older config file version used lower case first letter
+                            else if (section.Keys.ContainsKey("minArchiveSize"))
+                            {
+                                mMinArchiveSize = Convert.ToInt64(iniData[configSection]["minArchiveSize"]);
+                            }
+                        }
+                        else
+                        {
+                            if (section.Keys.ContainsKey(nameof(ExtensionPriority)))
+                            {
+                                ExtensionPriority.Add(section.SectionName, iniData[section.SectionName][nameof(ExtensionPriority)]);
+                            }
+                            else if (section.Keys.ContainsKey("extensionPriority"))
+                            {
+                                ExtensionPriority.Add(section.SectionName, iniData[section.SectionName]["extensionPriority"]);
+                            }
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
-                    Logger.Log(string.Format("Error reading config file from {0}.", PathUtils.GetPluginConfigPath()));
+                    Logger.Log(string.Format("Error parsing config file from {0}. Using default config.", PathUtils.GetPluginConfigPath()));
                     Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+                    SetDefaultConfig();
+                    configMissing |= true;
                 }
 
-                ExtensionPriority.Clear();
-                foreach (SectionData section in iniData.Sections)
+                if (!PathUtils.IsPathSafe(mCachePath))
                 {
-                    if (section.SectionName == configSection)
-                    {
-                        if (section.Keys.ContainsKey(nameof(CachePath)))
-                        {
-                            mCachePath = iniData[configSection][nameof(CachePath)];
-                        }
-                        // Older config file version used lower case first letter
-                        else if (section.Keys.ContainsKey("cachePath"))
-                        {
-                            mCachePath = iniData[configSection]["cachePath"];
-                        }
-                        // Double check cache path
-                        if (string.IsNullOrEmpty(mCachePath.Trim()))
-                        {
-                            Logger.Log("Config CachePath not found, using default.");
-                            mCachePath = defaultCachePath;
-                            configMissing |= true;
-                        }
-
-                        if (section.Keys.ContainsKey(nameof(CacheSize)))
-                        {
-                            mCacheSize = Convert.ToInt64(iniData[configSection][nameof(CacheSize)]);
-                        }
-                        // Older config file version used lower case first letter
-                        else if (section.Keys.ContainsKey("cacheSize"))
-                        {
-                            mCacheSize = Convert.ToInt64(iniData[configSection]["cacheSize"]);
-                        }
-                        // CacheSize must be larger than 0
-                        if (mCacheSize <= 0)
-                        {
-                            Logger.Log("Config CacheSize not found, using default.");
-                            mCacheSize = defaultCacheSize;
-                            configMissing |= true;
-                        }
-
-                        if (section.Keys.ContainsKey(nameof(MinArchiveSize)))
-                        {
-                            mMinArchiveSize = Convert.ToInt64(iniData[configSection][nameof(MinArchiveSize)]);
-                        }
-                        // Older config file version used lower case first letter
-                        else if (section.Keys.ContainsKey("minArchiveSize"))
-                        {
-                            mMinArchiveSize = Convert.ToInt64(iniData[configSection]["minArchiveSize"]);
-                        }
-                        // MinArchiveSize can be zero
-                        if (mMinArchiveSize < 0)
-                        {
-                            Logger.Log("Config MinArchiveSize not found, using default.");
-                            mMinArchiveSize = defaultMinArchiveSize;
-                            configMissing |= true;
-                        }
-                    }
-                    else
-                    {
-                        if (section.Keys.ContainsKey(nameof(ExtensionPriority)))
-                        {
-                            ExtensionPriority.Add(section.SectionName, iniData[section.SectionName][nameof(ExtensionPriority)]);
-                        }
-                        else if (section.Keys.ContainsKey("extensionPriority"))
-                        {
-                            ExtensionPriority.Add(section.SectionName, iniData[section.SectionName]["extensionPriority"]);
-                        }
-                    }
+                    Logger.Log(string.Format("Config CachePath can not be set to \"{0}\", using default ({1}).", mCachePath, defaultCachePath));
+                    mCachePath = defaultCachePath;
+                    configMissing |= true;
                 }
-                
+                // CacheSize must be larger than 0
+                if (mCacheSize <= 0)
+                {
+                    Logger.Log(string.Format("Config CacheSize can not be less than or equal 0, using default ({0:n0}).", defaultCacheSize));
+                    mCacheSize = defaultCacheSize;
+                    configMissing |= true;
+                }
+                // MinArchiveSize can be zero
+                if (mMinArchiveSize < 0)
+                {
+                    Logger.Log(string.Format("Config MinArchiveSize can not be less than 0, using default ({0:n0}).", defaultMinArchiveSize));
+                    mMinArchiveSize = defaultMinArchiveSize;
+                    configMissing |= true;
+                }
+
             }
             else
             {
