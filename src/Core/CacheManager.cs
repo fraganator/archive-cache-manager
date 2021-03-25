@@ -122,7 +122,11 @@ namespace ArchiveCacheManager
                 foreach (string dir in dirs)
                 {
                     GameInfo gameInfo = new GameInfo(Path.Combine(dir, PathUtils.GetGameInfoFileName()));
-                    if (!gameInfo.InfoLoaded)
+                    if (!gameInfo.InfoLoaded ||
+                        string.IsNullOrEmpty(gameInfo.ArchivePath) ||
+                        string.IsNullOrEmpty(gameInfo.Emulator) ||
+                        string.IsNullOrEmpty(gameInfo.Platform) ||
+                        string.IsNullOrEmpty(gameInfo.Title))
                     {
                         Logger.Log(string.Format("Error loading game.ini, deleting cached item \"{0}\".", dir));
                         DiskUtils.DeleteDirectory(dir);

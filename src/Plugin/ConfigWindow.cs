@@ -110,7 +110,7 @@ namespace ArchiveCacheManager
                     if (gameInfo.InfoLoaded)
                     {
                         cacheDataGridView.Rows.Add(new object[] { directory, gameInfo.KeepInCache, Path.GetFileName(gameInfo.ArchivePath),
-                                                   gameInfo.Platform, string.Format("{0:n1}", gameInfo.DecompressedSize / 1048576.0) });
+                                                   gameInfo.Platform, gameInfo.DecompressedSize / 1048576.0 });
                     }
                 }
             }
@@ -248,7 +248,7 @@ namespace ArchiveCacheManager
             updateEnabledState();
         }
 
-        private void clearSelectedButton_Click(object sender, EventArgs e)
+        private void deleteSelectedButton_Click(object sender, EventArgs e)
         {
             foreach (DataGridViewRow row in cacheDataGridView.SelectedRows)
             {
@@ -270,7 +270,7 @@ namespace ArchiveCacheManager
             }
         }
 
-        private void purgeCacheButton_Click(object sender, EventArgs e)
+        private void deleteAllButton_Click(object sender, EventArgs e)
         {
             Logger.Log("Manually deleting entire cache.");
 

@@ -52,15 +52,15 @@ namespace ArchiveCacheManager
             this.editPriorityButton = new System.Windows.Forms.Button();
             this.addPriorityButton = new System.Windows.Forms.Button();
             this.cacheDataGridView = new System.Windows.Forms.DataGridView();
+            this.cacheDetailsGroupBox = new System.Windows.Forms.GroupBox();
+            this.cacheSummaryTextBox = new System.Windows.Forms.TextBox();
+            this.okButton = new System.Windows.Forms.Button();
+            this.cancelButton = new System.Windows.Forms.Button();
             this.ArchivePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Keep = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Archive = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ArchivePlatform = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ArchiveSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cacheDetailsGroupBox = new System.Windows.Forms.GroupBox();
-            this.cacheSummaryTextBox = new System.Windows.Forms.TextBox();
-            this.okButton = new System.Windows.Forms.Button();
-            this.cancelButton = new System.Windows.Forms.Button();
             this.fileExtensionPriorityGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
@@ -81,7 +81,7 @@ namespace ArchiveCacheManager
             this.deleteAllButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.toolTip.SetToolTip(this.deleteAllButton, "Delete everything from the cache. The cache folder is not removed.");
             this.deleteAllButton.UseVisualStyleBackColor = true;
-            this.deleteAllButton.Click += new System.EventHandler(this.purgeCacheButton_Click);
+            this.deleteAllButton.Click += new System.EventHandler(this.deleteAllButton_Click);
             // 
             // refreshButton
             // 
@@ -127,7 +127,7 @@ namespace ArchiveCacheManager
             this.deleteSelectedButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.toolTip.SetToolTip(this.deleteSelectedButton, "Clear the selected items from the cache.");
             this.deleteSelectedButton.UseVisualStyleBackColor = true;
-            this.deleteSelectedButton.Click += new System.EventHandler(this.clearSelectedButton_Click);
+            this.deleteSelectedButton.Click += new System.EventHandler(this.deleteSelectedButton_Click);
             // 
             // configureCacheButton
             // 
@@ -311,42 +311,6 @@ namespace ArchiveCacheManager
             this.cacheDataGridView.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.cacheDataGridView_CellPainting);
             this.cacheDataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.cacheDataGridView_CurrentCellDirtyStateChanged);
             // 
-            // ArchivePath
-            // 
-            this.ArchivePath.HeaderText = "ArchivePath";
-            this.ArchivePath.Name = "ArchivePath";
-            this.ArchivePath.Visible = false;
-            // 
-            // Keep
-            // 
-            this.Keep.FillWeight = 12F;
-            this.Keep.HeaderText = "Keep";
-            this.Keep.Name = "Keep";
-            this.Keep.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // Archive
-            // 
-            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(18, 0, 0, 0);
-            this.Archive.DefaultCellStyle = dataGridViewCellStyle1;
-            this.Archive.HeaderText = "Archive";
-            this.Archive.Name = "Archive";
-            this.Archive.ReadOnly = true;
-            // 
-            // ArchivePlatform
-            // 
-            this.ArchivePlatform.FillWeight = 60F;
-            this.ArchivePlatform.HeaderText = "Platform";
-            this.ArchivePlatform.Name = "ArchivePlatform";
-            // 
-            // ArchiveSize
-            // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.ArchiveSize.DefaultCellStyle = dataGridViewCellStyle2;
-            this.ArchiveSize.FillWeight = 25F;
-            this.ArchiveSize.HeaderText = "Size (MB)";
-            this.ArchiveSize.Name = "ArchiveSize";
-            this.ArchiveSize.ReadOnly = true;
-            // 
             // cacheDetailsGroupBox
             // 
             this.cacheDetailsGroupBox.Controls.Add(this.deleteAllButton);
@@ -402,6 +366,43 @@ namespace ArchiveCacheManager
             this.cancelButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.cancelButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.cancelButton.UseVisualStyleBackColor = true;
+            // 
+            // ArchivePath
+            // 
+            this.ArchivePath.HeaderText = "ArchivePath";
+            this.ArchivePath.Name = "ArchivePath";
+            this.ArchivePath.Visible = false;
+            // 
+            // Keep
+            // 
+            this.Keep.FillWeight = 12F;
+            this.Keep.HeaderText = "Keep";
+            this.Keep.Name = "Keep";
+            this.Keep.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // Archive
+            // 
+            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(18, 0, 0, 0);
+            this.Archive.DefaultCellStyle = dataGridViewCellStyle1;
+            this.Archive.HeaderText = "Archive";
+            this.Archive.Name = "Archive";
+            this.Archive.ReadOnly = true;
+            // 
+            // ArchivePlatform
+            // 
+            this.ArchivePlatform.FillWeight = 60F;
+            this.ArchivePlatform.HeaderText = "Platform";
+            this.ArchivePlatform.Name = "ArchivePlatform";
+            // 
+            // ArchiveSize
+            // 
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle2.Format = "N1";
+            this.ArchiveSize.DefaultCellStyle = dataGridViewCellStyle2;
+            this.ArchiveSize.FillWeight = 25F;
+            this.ArchiveSize.HeaderText = "Size (MB)";
+            this.ArchiveSize.Name = "ArchiveSize";
+            this.ArchiveSize.ReadOnly = true;
             // 
             // ConfigWindow
             // 
