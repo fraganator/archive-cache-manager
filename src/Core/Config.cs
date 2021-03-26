@@ -24,7 +24,7 @@ namespace ArchiveCacheManager
         static Config()
         {
             SetDefaultConfig();
-            LoadConfig();
+            Load();
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace ArchiveCacheManager
         /// <summary>
         /// Load the config into memory from the config file on disk. Will save new config file to disk if there was a error loading the config.
         /// </summary>
-        public static void LoadConfig()
+        public static void Load()
         {
             bool configMissing = false;
 
@@ -167,14 +167,14 @@ namespace ArchiveCacheManager
 
             if (configMissing)
             {
-                SaveConfig();
+                Save();
             }
         }
 
         /// <summary>
         /// Save current config to config file on disk.
         /// </summary>
-        public static void SaveConfig()
+        public static void Save()
         {
             var parser = new FileIniDataParser();
             IniData iniData = new IniData();

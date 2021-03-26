@@ -35,6 +35,9 @@ namespace ArchiveCacheManager
 
                 cacheManagerActive = true;
 
+                // Ensure config in memory is up to date and valid
+                Config.Load();
+
                 GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
                 gameInfo.ArchivePath = (app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath;
                 gameInfo.Emulator = emulator.Title;
@@ -42,6 +45,19 @@ namespace ArchiveCacheManager
                 gameInfo.Title = game.Title;
                 gameInfo.PlayRomInArchive = mPlayRomInArchive;
                 gameInfo.Save();
+
+                if (CacheManager.CreateCache())
+                {
+                    string archiveCachePath = PathUtils.ArchiveCachePath(PathUtils.GetAbsolutePath(gameInfo.ArchivePath));
+                    string archiveCacheGameInfoPath = PathUtils.GetArchiveCacheGameInfoPath(archiveCachePath);
+
+                    // Only create the extracting flag file if the game info file doesn't exist. If it does exist, that means
+                    // the game is already cached and no extraction is needed.
+                    if (!File.Exists(archiveCacheGameInfoPath))
+                    {
+                        DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(archiveCachePath));
+                    }
+                }
 
                 mPlayRomInArchive = string.Empty;
 

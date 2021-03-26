@@ -207,6 +207,13 @@ namespace ArchiveCacheManager
         public static string GetArchiveCacheGameInfoPath(string archiveCachePath) => Path.Combine(archiveCachePath, gameInfoFileName);
 
         /// <summary>
+        /// Absolute path to the extracting flag file for the given archive cache path.
+        /// </summary>
+        /// <param name="archiveCachePath">Location of the cached archive.</param>
+        /// <returns>Absolute path to the extracting flag file.</returns>
+        public static string GetArchiveCacheExtractingFlagPath(string archiveCachePath) => Path.Combine(archiveCachePath, "extracting");
+
+        /// <summary>
         /// Game info filename.
         /// </summary>
         /// <returns></returns>

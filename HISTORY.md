@@ -1,16 +1,20 @@
 # Archive Cache Manager change history
 
+## v2.0.6 (2021-03-26)
+* Only remove items from cache path originally extracted by plugin
+* Additional checks for invalid cache paths
+
 ## v2.0.5 (2021-03-25)
 * Fix to ensure cache path valid if config file corrupt
 
 ## v2.0.4 (2021-03-24)
 * New feature - 'Keep'
     * Keep your favourite games cached and ready to play
-	* Games marked 'Keep' will not be removed from the cache, and do not contribute to the used cache size
+    * Games marked 'Keep' will not be removed from the cache, and do not contribute to the used cache size
 * Configuration window updates
     * Cache info summary
     * View cached games, toggle the 'Keep' option
-	* Manually remove games from the cache or clear it entirely
+    * Manually remove games from the cache or clear it entirely
 * Events and errors now logged to `LaunchBox\Plugins\ArchiveCacheManager\Logs`
 * Minor bug fixes
 

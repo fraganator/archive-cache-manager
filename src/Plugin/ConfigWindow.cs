@@ -13,7 +13,7 @@ namespace ArchiveCacheManager
         {
             InitializeComponent();
 
-            Config.LoadConfig();
+            Config.Load();
 
             versionLabel.Text = CacheManager.Version;
 
@@ -39,7 +39,7 @@ namespace ArchiveCacheManager
             bool cachePathExists = Directory.Exists(path);
 
             openInExplorerButton.Enabled = cachePathExists;
-            deleteAllButton.Enabled = cachePathExists;
+            deleteAllButton.Enabled = (cacheDataGridView.Rows.Count > 0);
             deleteSelectedButton.Enabled = (cacheDataGridView.SelectedRows.Count > 0);
 
             if (extensionPriorityDataGridView.SelectedRows.Count == 1)
@@ -139,7 +139,7 @@ namespace ArchiveCacheManager
                 Config.ExtensionPriority.Add(string.Format(@"{0} \ {1}", row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString()), row.Cells[2].Value.ToString());
             }
 
-            Config.SaveConfig();
+            Config.Save();
 
             try
             {

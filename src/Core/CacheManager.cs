@@ -83,8 +83,6 @@ namespace ArchiveCacheManager
 
             if (CreateCache())
             {
-                // Clear anything already in the archive cache path (from bad extract, terminated process, or some other reason)
-                DiskUtils.DeleteDirectory(Archive.CachePath, true);
                 launchGameInfo.DecompressedSize = Archive.DecompressedSize;
                 ClearCacheSpace(Archive.DecompressedSize);
                 Logger.Log(string.Format("Extracting archive to \"{0}\".", Archive.CachePath));
@@ -94,6 +92,7 @@ namespace ArchiveCacheManager
                     launchGameInfo.Save(PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath));
                     //File.Copy(PathUtils.GetGameInfoPath(), PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath), true);
                     DiskUtils.SetDirectoryContentsReadOnly(Archive.CachePath);
+                    File.Delete(PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath));
                 }
                 else
                 {
@@ -115,28 +114,41 @@ namespace ArchiveCacheManager
         {
             if (Directory.Exists(PathUtils.CachePath()))
             {
-                Logger.Log("Verifying cache integrity...");
+                Logger.Log(string.Format("Verifying cache integrity... ({0})", PathUtils.CachePath()));
 
                 string[] dirs = Directory.GetDirectories(PathUtils.CachePath());
 
                 foreach (string dir in dirs)
                 {
-                    GameInfo gameInfo = new GameInfo(Path.Combine(dir, PathUtils.GetGameInfoFileName()));
-                    if (!gameInfo.InfoLoaded ||
-                        string.IsNullOrEmpty(gameInfo.ArchivePath) ||
-                        string.IsNullOrEmpty(gameInfo.Emulator) ||
-                        string.IsNullOrEmpty(gameInfo.Platform) ||
-                        string.IsNullOrEmpty(gameInfo.Title))
+                    string extractingFlagPath = PathUtils.GetArchiveCacheExtractingFlagPath(dir);
+                    string gameInfoPath = Path.Combine(dir, PathUtils.GetGameInfoFileName());
+
+                    if (File.Exists(extractingFlagPath))
                     {
-                        Logger.Log(string.Format("Error loading game.ini, deleting cached item \"{0}\".", dir));
+                        Logger.Log(string.Format("Found partially extracted archive, deleting cached item \"{0}\".", dir));
                         DiskUtils.DeleteDirectory(dir);
                         continue;
                     }
-
-                    if (gameInfo.DecompressedSize == 0)
+                    else if (File.Exists(gameInfoPath))
                     {
-                        gameInfo.DecompressedSize = DiskUtils.DirectorySize(new DirectoryInfo(dir));
-                        gameInfo.Save();
+                        GameInfo gameInfo = new GameInfo(Path.Combine(dir, PathUtils.GetGameInfoFileName()));
+                        if (!gameInfo.InfoLoaded ||
+                            string.IsNullOrEmpty(gameInfo.ArchivePath) ||
+                            string.IsNullOrEmpty(gameInfo.Emulator) ||
+                            string.IsNullOrEmpty(gameInfo.Platform) ||
+                            string.IsNullOrEmpty(gameInfo.Title))
+                        {
+                            Logger.Log(string.Format("Error loading game.ini, deleting cached item \"{0}\".", dir));
+                            DiskUtils.DeleteDirectory(dir);
+                            continue;
+                        }
+
+
+                        if (gameInfo.DecompressedSize == 0)
+                        {
+                            gameInfo.DecompressedSize = DiskUtils.DirectorySize(new DirectoryInfo(dir));
+                            gameInfo.Save();
+                        }
                     }
                 }
 
@@ -192,7 +204,9 @@ namespace ArchiveCacheManager
         public static string ListCacheArchive()
         {
             string fileList = string.Empty;
-            string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(Archive.CachePath), PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath) };
+            string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(Archive.CachePath),
+                                              PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath),
+                                              PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath) };
 
             foreach (string filePath in Directory.EnumerateFiles(Archive.CachePath, "*", SearchOption.AllDirectories))
             {
@@ -263,16 +277,21 @@ namespace ArchiveCacheManager
                 // Progressively delete oldest cached directories until there is enough free space
                 for (int i = 0; i < dirs.Count(); i++)
                 {
-                    GameInfo gameInfo = new GameInfo(Path.Combine(dirs[i], PathUtils.GetGameInfoFileName()));
-                    if (!gameInfo.KeepInCache || deleteKeep)
-                    {
-                        Logger.Log(string.Format("Deleting cached item \"{0}\".", dirs[i]));
-                        DiskUtils.DeleteDirectory(dirs[i]);
-                        deletedSize += gameInfo.DecompressedSize;
+                    string gameInfoPath = Path.Combine(dirs[i], PathUtils.GetGameInfoFileName());
 
-                        if (deletedSize > sizeToDelete)
+                    if (File.Exists(gameInfoPath))
+                    {
+                        GameInfo gameInfo = new GameInfo(gameInfoPath);
+                        if (!gameInfo.KeepInCache || deleteKeep)
                         {
-                            break;
+                            Logger.Log(string.Format("Deleting cached item \"{0}\".", dirs[i]));
+                            DiskUtils.DeleteDirectory(dirs[i]);
+                            deletedSize += gameInfo.DecompressedSize;
+
+                            if (deletedSize > sizeToDelete)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
@@ -289,18 +308,22 @@ namespace ArchiveCacheManager
         static long GetArchiveCachePlaytime(string archiveCachePath)
         {
             long lastPlayTime = 0;
+            string playTimePath = PathUtils.GetArchiveCachePlaytimePath(archiveCachePath);
 
-            try
+            if (File.Exists(playTimePath))
             {
-                StreamReader reader = new StreamReader(PathUtils.GetArchiveCachePlaytimePath(archiveCachePath));
-                lastPlayTime = long.Parse(reader.ReadToEnd());
-                reader.Close();
-            }
-            catch (Exception e)
-            {
-                Logger.Log("Error reading last played time from cache, using 0 default.");
-                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
-                lastPlayTime = 0;
+                try
+                {
+                    StreamReader reader = new StreamReader(playTimePath);
+                    lastPlayTime = long.Parse(reader.ReadToEnd());
+                    reader.Close();
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("Error reading last played time from cache, using 0 default.");
+                    Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+                    lastPlayTime = 0;
+                }
             }
 
             return lastPlayTime;

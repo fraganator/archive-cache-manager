@@ -82,7 +82,9 @@ namespace ArchiveCacheManager
         public static void SetDirectoryContentsReadOnly(string path)
         {
             // These files will not be set read-only, as they are written by Archive Cache Manager.
-            string[] managerFiles = { PathUtils.GetArchiveCachePlaytimePath(path), PathUtils.GetArchiveCacheGameInfoPath(path) };
+            string[] managerFiles = { PathUtils.GetArchiveCachePlaytimePath(path),
+                                      PathUtils.GetArchiveCacheGameInfoPath(path),
+                                      PathUtils.GetArchiveCacheExtractingFlagPath(path) };
 
             try
             {
@@ -100,5 +102,33 @@ namespace ArchiveCacheManager
                 Logger.Log(e.ToString(), Logger.LogLevel.Exception);
             }
         }
+
+        /// <summary>
+        /// Create an empty file. If the path does not exist, it will be created.
+        /// </summary>
+        /// <param name="path"></param>
+        public static bool CreateFile(string path)
+        {
+            StreamWriter writer = null;
+            bool success = false;
+
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                writer = new StreamWriter(path, true);
+                success = true;
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+            }
+            finally
+            {
+                writer.Close();
+            }
+
+            return success;
+        }
     }
+
 }
