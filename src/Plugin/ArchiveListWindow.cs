@@ -22,13 +22,14 @@ namespace ArchiveCacheManager
 
             fileListBox.Items.Clear();
             fileListBox.Items.AddRange(fileList);
-            if (selection == string.Empty)
-            {
-                fileListBox.SelectedIndex = 0;
-            }
-            else
+            if (selection != string.Empty)
             {
                 fileListBox.SelectedItem = selection;
+            }
+            // Check that setting the selected item above actually worked. If not, set it to the first item.
+            if (fileListBox.SelectedItems.Count == 0)
+            {
+                fileListBox.SelectedIndex = 0;
             }
             SelectedFile = string.Empty;
         }

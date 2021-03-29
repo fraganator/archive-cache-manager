@@ -13,7 +13,7 @@ namespace ArchiveCacheManager
         private string mEmulator = string.Empty;
         private string mPlatform = string.Empty;
         private string mTitle = string.Empty;
-        private string mPlayRomInArchive = string.Empty;
+        private string mSelectedFile = string.Empty;
         private long mDecompressedSize = 0;
         private bool mKeepInCache = false;
 
@@ -43,10 +43,10 @@ namespace ArchiveCacheManager
             get => mTitle;
             set => mTitle = value;
         }
-        public string PlayRomInArchive
+        public string SelectedFile
         {
-            get => mPlayRomInArchive;
-            set => mPlayRomInArchive = value;
+            get => mSelectedFile;
+            set => mSelectedFile = value;
         }
         public long DecompressedSize
         {
@@ -82,7 +82,7 @@ namespace ArchiveCacheManager
                     mEmulator = iniData[section][nameof(Emulator)];
                     mPlatform = iniData[section][nameof(Platform)];
                     mTitle = iniData[section][nameof(Title)];
-                    mPlayRomInArchive = iniData[section][nameof(PlayRomInArchive)];
+                    mSelectedFile = iniData[section][nameof(SelectedFile)];
                     mDecompressedSize = Convert.ToInt64(iniData[section][nameof(DecompressedSize)]);
                     mKeepInCache = Convert.ToBoolean(iniData[section][nameof(KeepInCache)]);
 
@@ -114,7 +114,7 @@ namespace ArchiveCacheManager
                 iniData[section][nameof(Emulator)] = mEmulator;
                 iniData[section][nameof(Platform)] = mPlatform;
                 iniData[section][nameof(Title)] = mTitle;
-                iniData[section][nameof(PlayRomInArchive)] = mPlayRomInArchive;
+                iniData[section][nameof(SelectedFile)] = mSelectedFile;
                 iniData[section][nameof(DecompressedSize)] = mDecompressedSize.ToString();
                 iniData[section][nameof(KeepInCache)] = mKeepInCache.ToString();
 

@@ -33,7 +33,7 @@ namespace ArchiveCacheManager
                 gameInfo.Emulator = emulator.Title;
                 gameInfo.Platform = game.Platform;
                 gameInfo.Title = game.Title;
-                gameInfo.PlayRomInArchive = GameIndex.GetPlayRomInArchive(game.Id);
+                gameInfo.SelectedFile = GameIndex.GetSelectedFile(game.Id);
                 gameInfo.Save();
 
                 Replace7z();

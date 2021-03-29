@@ -165,31 +165,27 @@ namespace ArchiveCacheManager
             string stdout = string.Empty;
             string stderr = string.Empty;
             int exitCode = 0;
+            string selectedFilePath = string.Empty;
 
-            if (launchGameInfo.PlayRomInArchive.Equals(string.Empty))
+            if (ArchiveInCache())
             {
-                if (ArchiveInCache())
-                {
-                    stdout = ListCacheArchive();
-                }
-                else
-                {
-                    Zip.List(Archive.Path, ref stdout, ref stderr, ref exitCode);
-                }
-                stdout = ApplyExtensionPriority(stdout);
+                stdout = ListCacheArchive();
+                selectedFilePath = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.SelectedFile);
             }
             else
             {
-                if (ArchiveInCache())
-                {
-                    stdout = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.PlayRomInArchive);
-                }
-                else
-                {
-                    stdout = "Path = " + launchGameInfo.PlayRomInArchive;
-                }
+                Zip.List(Archive.Path, ref stdout, ref stderr, ref exitCode);
+                selectedFilePath = "Path = " + launchGameInfo.SelectedFile;
+            }
 
-                Logger.Log(string.Format("Loading individual file from archive \"{0}\".", launchGameInfo.PlayRomInArchive));
+            if (!launchGameInfo.SelectedFile.Equals(string.Empty) && stdout.Contains(selectedFilePath))
+            {
+                stdout = selectedFilePath;
+                Logger.Log(string.Format("Selected individual file from archive \"{0}\".", launchGameInfo.SelectedFile));
+            }
+            else
+            {
+                stdout = ApplyExtensionPriority(stdout);
             }
 
             Console.Write(stdout);
@@ -427,7 +423,7 @@ namespace ArchiveCacheManager
                         priorityStdout = string.Empty;
                         extensionFound = true;
 
-                        Logger.Log(string.Format("Applying extension priority \"{0}\".", extension));
+                        Logger.Log(string.Format("Applying extension priority \"{0}\".", extension.Trim()));
                     }
 
                     // Loop through all of the matches, building up a string of files with the priority extension

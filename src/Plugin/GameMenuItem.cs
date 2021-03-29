@@ -40,7 +40,7 @@ namespace ArchiveCacheManager
                 return;
             }
 
-            ArchiveListWindow window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetPlayRomInArchive(selectedGame.Id));
+            ArchiveListWindow window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
             NativeWindow parent = new NativeWindow();
 
             // Glue between the main app window (WPF) and this window (WinForms)
@@ -49,7 +49,7 @@ namespace ArchiveCacheManager
 
             if (window.DialogResult == DialogResult.OK)
             {
-                GameIndex.SetPlayRomInArchive(selectedGame.Id, window.SelectedFile);
+                GameIndex.SetSelectedFile(selectedGame.Id, window.SelectedFile);
 
                 if (PluginHelper.StateManager.IsBigBox)
                 {

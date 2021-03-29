@@ -11,7 +11,7 @@ namespace ArchiveCacheManager
 {
     public class GameIndex
     {
-        private readonly string PlayRomInArchive = "PlayRomInArchive";
+        private readonly string SelectedFile = "SelectedFile";
 
         private static IniData mGameIndex = null;
 
@@ -64,26 +64,26 @@ namespace ArchiveCacheManager
             }
         }
 
-        public static string GetPlayRomInArchive(string gameId)
+        public static string GetSelectedFile(string gameId)
         {
-            string playRomInArchive = string.Empty;
+            string selectedFile = string.Empty;
 
             if (mGameIndex != null)
             {
-                playRomInArchive = mGameIndex[gameId][nameof(PlayRomInArchive)];
+                selectedFile = mGameIndex[gameId][nameof(SelectedFile)];
             }
 
-            return playRomInArchive;
+            return selectedFile;
         }
 
-        public static void SetPlayRomInArchive(string gameId, string playRomInArchive)
+        public static void SetSelectedFile(string gameId, string selectedFile)
         {
             if (mGameIndex == null)
             {
                 mGameIndex = new IniData();
             }
 
-            mGameIndex[gameId][nameof(PlayRomInArchive)] = playRomInArchive;
+            mGameIndex[gameId][nameof(SelectedFile)] = selectedFile;
 
             Save();
         }
