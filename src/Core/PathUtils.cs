@@ -19,6 +19,7 @@ namespace ArchiveCacheManager
         public static readonly int MAX_PATH = 260;
 
         private static readonly string configFileName = @"config.ini";
+        private static readonly string gameIndexFileName = @"game-index.ini";
         private static readonly string gameInfoFileName = @"game.ini";
         private static readonly string default7zFileName = @"7z.exe";
         private static readonly string alt7zFileName = @"7-zip.exe";
@@ -127,6 +128,12 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <returns>Absolute path to plugin config file.</returns>
         public static string GetPluginConfigPath() => Path.Combine(launchBoxRootPath, relativePluginPath, configFileName);
+
+        /// <summary>
+        /// Absolute path to game index info file.
+        /// </summary>
+        /// <returns>Absolute path to plugin game index info file.</returns>
+        public static string GetPluginGameIndexPath() => Path.Combine(launchBoxRootPath, relativePluginPath, gameIndexFileName);
 
         /// <summary>
         /// Absolute path to 7z.exe.

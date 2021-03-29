@@ -14,7 +14,7 @@ namespace ArchiveCacheManager
     {
         public string SelectedFile;
 
-        public ArchiveListWindow(string archiveName, string[] fileList)
+        public ArchiveListWindow(string archiveName, string[] fileList, string selection = "")
         {
             InitializeComponent();
 
@@ -22,7 +22,14 @@ namespace ArchiveCacheManager
 
             fileListBox.Items.Clear();
             fileListBox.Items.AddRange(fileList);
-            fileListBox.SelectedIndex = 0;
+            if (selection == string.Empty)
+            {
+                fileListBox.SelectedIndex = 0;
+            }
+            else
+            {
+                fileListBox.SelectedItem = selection;
+            }
             SelectedFile = string.Empty;
         }
 

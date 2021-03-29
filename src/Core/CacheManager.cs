@@ -83,6 +83,7 @@ namespace ArchiveCacheManager
 
             if (CreateCache())
             {
+                DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath));
                 launchGameInfo.DecompressedSize = Archive.DecompressedSize;
                 ClearCacheSpace(Archive.DecompressedSize);
                 Logger.Log(string.Format("Extracting archive to \"{0}\".", Archive.CachePath));
@@ -90,7 +91,6 @@ namespace ArchiveCacheManager
                 if (exitCode == 0)
                 {
                     launchGameInfo.Save(PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath));
-                    //File.Copy(PathUtils.GetGameInfoPath(), PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath), true);
                     DiskUtils.SetDirectoryContentsReadOnly(Archive.CachePath);
                     File.Delete(PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath));
                 }

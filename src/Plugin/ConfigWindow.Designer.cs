@@ -427,6 +427,7 @@ namespace ArchiveCacheManager
             this.Name = "ConfigWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Archive Cache Manager";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ConfigWindow_FormClosed);
             this.fileExtensionPriorityGroupBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).EndInit();
