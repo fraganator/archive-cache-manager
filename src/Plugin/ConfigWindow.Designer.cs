@@ -125,7 +125,7 @@ namespace ArchiveCacheManager
             this.deleteSelectedButton.Text = "Delete";
             this.deleteSelectedButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.deleteSelectedButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip.SetToolTip(this.deleteSelectedButton, "Clear the selected items from the cache.");
+            this.toolTip.SetToolTip(this.deleteSelectedButton, "Delete the selected items from the cache.");
             this.deleteSelectedButton.UseVisualStyleBackColor = true;
             this.deleteSelectedButton.Click += new System.EventHandler(this.deleteSelectedButton_Click);
             // 

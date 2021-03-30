@@ -86,44 +86,44 @@ namespace ArchiveCacheManager
                         {
                             if (section.Keys.ContainsKey(nameof(CachePath)))
                             {
-                                mCachePath = iniData[configSection][nameof(CachePath)];
+                                mCachePath = section.Keys[nameof(CachePath)];
                             }
                             // Older config file version used lower case first letter
                             else if (section.Keys.ContainsKey("cachePath"))
                             {
-                                mCachePath = iniData[configSection]["cachePath"];
+                                mCachePath = section.Keys["cachePath"];
                             }
 
                             if (section.Keys.ContainsKey(nameof(CacheSize)))
                             {
-                                mCacheSize = Convert.ToInt64(iniData[configSection][nameof(CacheSize)]);
+                                mCacheSize = Convert.ToInt64(section.Keys[nameof(CacheSize)]);
                             }
                             // Older config file version used lower case first letter
                             else if (section.Keys.ContainsKey("cacheSize"))
                             {
-                                mCacheSize = Convert.ToInt64(iniData[configSection]["cacheSize"]);
+                                mCacheSize = Convert.ToInt64(section.Keys["cacheSize"]);
                             }
 
 
                             if (section.Keys.ContainsKey(nameof(MinArchiveSize)))
                             {
-                                mMinArchiveSize = Convert.ToInt64(iniData[configSection][nameof(MinArchiveSize)]);
+                                mMinArchiveSize = Convert.ToInt64(section.Keys[nameof(MinArchiveSize)]);
                             }
                             // Older config file version used lower case first letter
                             else if (section.Keys.ContainsKey("minArchiveSize"))
                             {
-                                mMinArchiveSize = Convert.ToInt64(iniData[configSection]["minArchiveSize"]);
+                                mMinArchiveSize = Convert.ToInt64(section.Keys["minArchiveSize"]);
                             }
                         }
                         else
                         {
                             if (section.Keys.ContainsKey(nameof(ExtensionPriority)))
                             {
-                                ExtensionPriority.Add(section.SectionName, iniData[section.SectionName][nameof(ExtensionPriority)]);
+                                ExtensionPriority.Add(section.SectionName, section.Keys[nameof(ExtensionPriority)]);
                             }
                             else if (section.Keys.ContainsKey("extensionPriority"))
                             {
-                                ExtensionPriority.Add(section.SectionName, iniData[section.SectionName]["extensionPriority"]);
+                                ExtensionPriority.Add(section.SectionName, section.Keys["extensionPriority"]);
                             }
                         }
                     }

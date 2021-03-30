@@ -68,9 +68,9 @@ namespace ArchiveCacheManager
         {
             string selectedFile = string.Empty;
 
-            if (mGameIndex != null)
+            if (mGameIndex != null && mGameIndex.Sections.ContainsSection(gameId))
             {
-                selectedFile = mGameIndex[gameId][nameof(SelectedFile)];
+                selectedFile = mGameIndex[gameId][nameof(SelectedFile)] ?? string.Empty;
             }
 
             return selectedFile;
