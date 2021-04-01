@@ -3,9 +3,13 @@
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file type from an archive.
 
+## New in v2.0.7
+* Badge for cached games. Also includes Simple White and Neon style badges to match your theme.
+    * ![Badge icon to indicate if a game is cached](images/badges.png?raw=true "Badge icon to indicate if a game is cached")
+* ROMs previously selected using the "Select ROM In Archive..." menu are automatically loaded the next time a game is played.
 
 ## Description
-When a compressed ROM (in zip, 7z, or other compression format) is first extracted, it is stored in the archive cache. The next time it is played, the data is loaded directly from the cache, virtually eliminating wait time.
+When a compressed ROM (in zip, 7z, or rar format) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.
 
 ![Launch time comparison video](images/launch-video.gif?raw=true "Side-by-side video comparing launch time of game from zip vs. from cache")
 
@@ -13,17 +17,14 @@ As the cache approaches its maximum size, the least recently played games are de
 
 
 ## Features
-* _NEW FEATURE_ - Keep select ROMs cached and ready to play.
-    * Games marked 'Keep' won't be automatically cleaned from the cache.
-	* Useful for less frequently played games which you still want to load without waiting (party games, favourites, children's games, etc)
-* _NEW FEATURE_ - Select and play individual ROM files from an archive!
-    * Useful for GoodMerged sets, or archives with mixed ROMs and cue sheets (MSU).
 * Skip the extraction wait time for recently played games.
 * Configurable cache size and location.
 * Configurable minimum archive size (skip caching small archives).
+* Option to keep select ROMs cached and ready to play.
+* Select and play individual ROM files from an archive.
 * File extension priorities per emulator and platform (cue, bin, iso, etc).
 
-### Example Usage
+### Example Use Cases
 Why use Archive Cache Manager? Here's some example use cases.
 
 * Zipped ROMs located on network server or cloud drive, where disk read or network transfer time is slow.
@@ -53,10 +54,17 @@ To play an individual ROM from an archive containing multiple ROMs (different re
 
 A window will popup with a full listing of the archive contents. Select the desired ROM file, then click Play. That ROM will now launch with the configured emulator.
 
+The next time the game is launched via the normal Play option, the previous ROM selection will be automatically applied. To select another ROM, use the same "Select ROM In Archive..." menu.
+
 ![ROM file selection window](images/select-file-window.png?raw=true "ROM file selection window")
 
 ### Keeping Games Cached
 Games can be marked 'Keep' so they stay cached and ready to play. To keep a game cached, open the plugin configuration window from the _Tools->Archive Cache Manager_ menu. From there a list of games in the cache is shown. Check the Keep box next to the game, then click OK.
+
+### Badge
+The plugin includes a badge to indicate if a game is currently in the cache. It is available under the _Badges->Enable Archive Cached_ menu. There are additional Simple White and Neon style badges, which can be found in the `LaunchBox\Plugins\ArchiveCacheManager\Badges` folder.
+
+![Badge icon to indicate if a game is cached](images/badges.png?raw=true "Badge icon to indicate if a game is cached")
 
 
 ## Configuration
@@ -127,7 +135,7 @@ Default: _PCSX2 \ Sony Playstation 2 \ bin, iso_
 ## Building
 The project is built with Visual Studio Community 2019 and .NET Framework 4.7.2.
 
-An older version of the `Unbroken.LaunchBox.Plugins` assembly is preferred when building, to maintain compatibility across LaunchBox versions. The plugin is currently built against version 1.0.0.0 included with LaunchBox 10.10. It can be built with the latest version, but will not be backwards compatible.
+An older version of the `Unbroken.LaunchBox.Plugins` assembly is preferred when building, to maintain compatibility across LaunchBox versions. The plugin is currently built against version 1.0.0.0 included with LaunchBox 10.14. It can be built with the latest version, but will not be backwards compatible. The minimum LaunchBox version supported is 10.11, required for _Badge_ support.
 
 ### Dependencies
 Dependencies are listed below, and can be installed using Visual Studio's Package Manager Console with the command shown.

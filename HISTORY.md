@@ -1,5 +1,11 @@
 # Archive Cache Manager change history
 
+## v2.0.7 (2021-03-30)
+* Badge to indicate if game is in cache
+    * Available under Badges -> Enable Archive Cached menu
+* Remember previous selection made in "Select Rom In Archive..." right-click menu
+    * Previous selection automatically applied when game started normally
+
 ## v2.0.6 (2021-03-26)
 * Only remove items from cache path originally extracted by plugin
 * Additional checks for invalid cache paths

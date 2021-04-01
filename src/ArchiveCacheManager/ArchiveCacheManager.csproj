@@ -66,7 +66,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y $(TargetPath) c:\LaunchBox\Plugins\ArchiveCacheManager
+    <PostBuildEvent>mkdir c:\LaunchBox\Plugins\ArchiveCacheManager
+copy /Y $(TargetPath) c:\LaunchBox\Plugins\ArchiveCacheManager
 mkdir $(SolutionDir)..\release\ArchiveCacheManager
 copy /Y $(TargetPath) $(SolutionDir)..\release\ArchiveCacheManager
 copy /Y  $(SolutionDir)..\README.md $(SolutionDir)..\release\ArchiveCacheManager\readme.txt
@@ -75,6 +76,8 @@ mkdir $(SolutionDir)..\release\ArchiveCacheManager\7-Zip
 copy /Y  $(SolutionDir)..\thirdparty\7-Zip\* $(SolutionDir)..\release\ArchiveCacheManager\7-Zip
 move /Y $(SolutionDir)..\release\ArchiveCacheManager\7-Zip\7z.exe $(SolutionDir)..\release\ArchiveCacheManager\7-Zip\7z.exe.original
 move /Y $(SolutionDir)..\release\ArchiveCacheManager\7-Zip\7z.dll $(SolutionDir)..\release\ArchiveCacheManager\7-Zip\7z.dll.original
+mkdir $(SolutionDir)..\release\ArchiveCacheManager\Badges
+copy /Y $(SolutionDir)Plugin\Resources\Badges $(SolutionDir)..\release\ArchiveCacheManager\Badges
 del $(SolutionDir)..\release\*.zip
 $(SolutionDir)..\thirdparty\7-Zip\7z.exe a $(SolutionDir)..\release\ArchiveCacheManager.zip $(SolutionDir)..\release\*</PostBuildEvent>
   </PropertyGroup>
