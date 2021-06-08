@@ -15,10 +15,10 @@ namespace ArchiveCacheManager
     class GameMenuItem : IGameMenuItemPlugin
     {
         public bool SupportsMultipleGames => false;
-        public string Caption => "Select ROM In Archive...";
+        public string Caption => PluginHelper.StateManager.IsBigBox ? "Select ROM In Archive" : "Select ROM In Archive...";
         public Image IconImage => Resources.icon16x16_play;
         public bool ShowInLaunchBox => true;
-        public bool ShowInBigBox => false;
+        public bool ShowInBigBox => true;
 
         public bool GetIsValidForGame(IGame selectedGame) => PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId).AutoExtract;
         public bool GetIsValidForGames(IGame[] selectedGames) => false;
@@ -35,28 +35,46 @@ namespace ArchiveCacheManager
 
             if (fileList.Count() == 0)
             {
-                MessageBox.Show(string.Format("Error listing contents of {0}.\r\n\r\nCheck {1} for details.", Path.GetFileName(selectedGame.ApplicationPath), Path.GetFileName(PathUtils.GetLogFilePath())),
-                                "Archive Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            ArchiveListWindow window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
-            NativeWindow parent = new NativeWindow();
-
-            // Glue between the main app window (WPF) and this window (WinForms)
-            parent.AssignHandle(new WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle);
-            window.ShowDialog(parent);
-
-            if (window.DialogResult == DialogResult.OK)
-            {
-                GameIndex.SetSelectedFile(selectedGame.Id, window.SelectedFile);
+                string errorMessage = string.Format("Error listing contents of {0}.\r\n\r\nCheck {1} for details.", Path.GetFileName(selectedGame.ApplicationPath), Path.GetFileName(PathUtils.GetLogFilePath()));
 
                 if (PluginHelper.StateManager.IsBigBox)
                 {
+                    MessageBoxBigBox messageBox = new MessageBoxBigBox(errorMessage);
+                    messageBox.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show(errorMessage, "Archive Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                
+                return;
+            }
+
+            Form window;
+            if (PluginHelper.StateManager.IsBigBox)
+            {
+                window = new ArchiveListWindowBigBox(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
+            }
+            else
+            {
+                window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
+            }
+            //NativeWindow parent = new NativeWindow();
+
+            // Glue between the main app window (WPF) and this window (WinForms)
+            //parent.AssignHandle(new WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle);
+            window.ShowDialog();// parent);
+
+            if (window.DialogResult == DialogResult.OK)
+            {
+                if (PluginHelper.StateManager.IsBigBox)
+                {
+                    GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindowBigBox).SelectedFile);
                     PluginHelper.BigBoxMainViewModel.PlayGame(selectedGame, null, PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId), null);
                 }
                 else
                 {
+                    GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindow).SelectedFile);
                     PluginHelper.LaunchBoxMainViewModel.PlayGame(selectedGame, null, PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId), null);
                 }
             }
