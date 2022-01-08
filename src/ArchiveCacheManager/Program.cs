@@ -113,16 +113,27 @@ namespace ArchiveCacheManager
             // Any other path is likely to be either Metadata, or some other non-game archive
             if (outputPath.EndsWith(@"7-Zip\Temp", StringComparison.InvariantCultureIgnoreCase))
             {
-                // MinArchiveSize is megabytes, multiply to convert to bytes
-                // TODO: Check if archive in cache first before anything else. Avoids unnecessary calls to 7z.
-                if (Archive.DecompressedSize > Config.MinArchiveSize * 1048576)
+                // Check if already cached to avoid calculating the decompressed archive size
+                if (CacheManager.ArchiveInCache())
                 {
+                    // Calling this function won't actually extract archive as it will check if archive is cached, but will update last play time.
                     CacheManager.ExtractArchive();
                 }
+                // MinArchiveSize is megabytes, multiply to convert to bytes
+                // TODO: Check if archive in cache first before anything else. Avoids unnecessary calls to 7z.
                 else
                 {
-                    Logger.Log("Archive smaller than MinArchiveSize, bypassing extraction to cache.");
-                    Zip.Call7z(args);
+                    // Only called when required, as can be very time consuming when large number of files in archive.
+                    Archive.UpdateDecompressedSize();
+                    if (Archive.DecompressedSize > Config.MinArchiveSize * 1048576)
+                    {
+                        CacheManager.ExtractArchive();
+                    }
+                    else
+                    {
+                        Logger.Log("Archive smaller than MinArchiveSize, bypassing extraction to cache.");
+                        Zip.Call7z(args);
+                    }
                 }
             }
             else

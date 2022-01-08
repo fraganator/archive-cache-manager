@@ -162,35 +162,48 @@ namespace ArchiveCacheManager
         /// </summary>
         public static void ListArchive()
         {
-            string stdout = string.Empty;
             string stderr = string.Empty;
             int exitCode = 0;
-            string selectedFilePath = string.Empty;
+            string fileList = string.Empty;
 
             if (ArchiveInCache())
             {
-                stdout = ListCacheArchive();
-                selectedFilePath = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.SelectedFile);
+                fileList = ListCacheArchive();
             }
             else
             {
-                Zip.List(Archive.Path, ref stdout, ref stderr, ref exitCode);
-                selectedFilePath = "Path = " + launchGameInfo.SelectedFile;
+                fileList = ListFileArchive(ref stderr, ref exitCode);
             }
+
+            Console.Write(fileList);
+            Console.Write(stderr);
+            Environment.ExitCode = exitCode;
+        }
+
+        /// <summary>
+        /// Lists all of the files in the archive.
+        /// </summary>
+        /// <returns>The file list for the archive in "Path = absolute\file\path.ext" format, with one entry per line.</returns>
+        public static string ListFileArchive(ref string stderr, ref int exitCode)
+        {
+            string stdout = string.Empty;
+            string selectedFilePath = string.Empty;
+            string fileList = string.Empty;
+
+            Zip.ListVerbose(Archive.Path, ref stdout, ref stderr, ref exitCode);
+            selectedFilePath = "Path = " + launchGameInfo.SelectedFile;
 
             if (!launchGameInfo.SelectedFile.Equals(string.Empty) && stdout.Contains(selectedFilePath))
             {
-                stdout = selectedFilePath;
+                fileList = selectedFilePath;
                 Logger.Log(string.Format("Selected individual file from archive \"{0}\".", launchGameInfo.SelectedFile));
             }
             else
             {
-                stdout = ApplyExtensionPriority(stdout);
+                fileList = ApplyExtensionPriority(stdout);
             }
 
-            Console.Write(stdout);
-            Console.Write(stderr);
-            Environment.ExitCode = exitCode;
+            return fileList;
         }
 
         /// <summary>
@@ -203,13 +216,54 @@ namespace ArchiveCacheManager
             string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(Archive.CachePath),
                                               PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath),
                                               PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath) };
+            string selectedFilePath = string.Empty;
 
-            foreach (string filePath in Directory.EnumerateFiles(Archive.CachePath, "*", SearchOption.AllDirectories))
+            if (!launchGameInfo.SelectedFile.Equals(string.Empty))
             {
-                if (!exclude.Contains(filePath))
+                if (Directory.GetFiles(Archive.CachePath, launchGameInfo.SelectedFile, SearchOption.AllDirectories).Length > 0)
                 {
-                    fileList = string.Format("{0}Path = {1}\r\n", fileList, filePath);
+                    fileList = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.SelectedFile);
+                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", launchGameInfo.SelectedFile));
                 }
+            }
+
+            if (fileList == string.Empty)
+            {
+                try
+                {
+                    string[] extensionPriority = Config.ExtensionPriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                    // Search the extensions in priority order
+                    foreach (string extension in extensionPriority)
+                    {
+                        List<string> filePaths = Directory.GetFiles(Archive.CachePath, string.Format("*{0}", extension.Trim()), SearchOption.AllDirectories).ToList();
+
+                        foreach (string ex in exclude)
+                        {
+                            filePaths.Remove(ex);
+                        }
+
+                        fileList = string.Join("\r\nPath = ", filePaths);
+                        fileList = string.Format("Path = {0}\r\n", fileList);
+                    }
+                }
+                catch (KeyNotFoundException)
+                {
+
+                }
+            }
+
+            if (fileList == string.Empty)
+            {
+                List<string> filePaths = Directory.GetFiles(Archive.CachePath, "*", SearchOption.AllDirectories).ToList();
+
+                foreach (string ex in exclude)
+                {
+                    filePaths.Remove(ex);
+                }
+
+                fileList = string.Join("\r\nPath = ", filePaths);
+                fileList = string.Format("Path = {0}\r\n", fileList);
             }
 
             return fileList;

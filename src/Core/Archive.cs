@@ -23,10 +23,14 @@ namespace ArchiveCacheManager
         {
             mPath = archivePath;
             mCachePath = PathUtils.ArchiveCachePath(archivePath);
-            mDecompressedSize = Zip.GetDecompressedSize(archivePath);
 
             Logger.Log(string.Format("Archive path set to \"{0}\".", mPath));
             Logger.Log(string.Format("Archive cache path set to \"{0}\".", mCachePath));
+        }
+
+        public static void UpdateDecompressedSize()
+        {
+            mDecompressedSize = Zip.GetDecompressedSize(Path);
             Logger.Log(string.Format("Decompressed archive size is {0} bytes.", mDecompressedSize));
         }
 

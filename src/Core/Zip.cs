@@ -56,6 +56,22 @@ namespace ArchiveCacheManager
         /// <param name="exitCode"></param>
         public static void List(string archivePath, ref string stdout, ref string stderr, ref int exitCode)
         {
+            // l = list
+            // {0} = archive path
+            string args = string.Format("l \"{0}\"", archivePath);
+
+            run7z(args, ref stdout, ref stderr, ref exitCode);
+        }
+
+        /// <summary>
+        /// Run the 7z list command on the specified archive. Listing contains technical data on every file.
+        /// </summary>
+        /// <param name="archivePath"></param>
+        /// <param name="stdout"></param>
+        /// <param name="stderr"></param>
+        /// <param name="exitCode"></param>
+        public static void ListVerbose(string archivePath, ref string stdout, ref string stderr, ref int exitCode)
+        {
             // This command is a duplicate of that used by LaunchBox.
             // l = list
             // {0} = archive path
@@ -81,7 +97,7 @@ namespace ArchiveCacheManager
             List<string> fileList = new List<string>();
             bool foundFirstPath = false;
 
-            List(archivePath, ref stdout, ref stderr, ref exitCode);
+            ListVerbose(archivePath, ref stdout, ref stderr, ref exitCode);
 
             if (exitCode == 0)
             {
@@ -134,15 +150,11 @@ namespace ArchiveCacheManager
             if (exitCode == 0)
             {
                 // TODO: Replace logic with regex?
-                string[] stdoutArray = stdout.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] stdoutArray = stdout.Split(new string[] { "------------------------" }, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (string line in stdoutArray)
-                {
-                    if (line.StartsWith("Size ="))
-                    {
-                        size += Convert.ToInt64(line.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[2]);
-                    }
-                }
+                string summary = stdoutArray[stdoutArray.Length - 1];
+
+                size = Convert.ToInt64(summary.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[2]);
             }
 
             return size;
