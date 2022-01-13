@@ -190,6 +190,55 @@ namespace ArchiveCacheManager
             string selectedFilePath = string.Empty;
             string fileList = string.Empty;
 
+            if (!launchGameInfo.SelectedFile.Equals(string.Empty))
+            {
+                if (Zip.GetFileList(Archive.Path, launchGameInfo.SelectedFile).Length > 0)
+                {
+                    fileList = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.SelectedFile);
+                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", launchGameInfo.SelectedFile));
+                }
+            }
+
+            if (fileList == string.Empty)
+            {
+                try
+                {
+                    string[] extensionPriority = Config.FilenamePriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                    // Search the extensions in priority order
+                    foreach (string extension in extensionPriority)
+                    {
+                        List<string> filePaths = Zip.GetFileList(Archive.Path, string.Format("*{0}", extension.Trim())).ToList();
+
+                        if (filePaths.Count > 0)
+                        {
+                            fileList = string.Join("\r\nPath = ", filePaths);
+                            fileList = string.Format("Path = {0}\r\n", fileList);
+                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension.Trim()));
+                            break;
+                        }
+                    }
+                }
+                catch (KeyNotFoundException)
+                {
+
+                }
+            }
+
+            if (fileList == string.Empty)
+            {
+                List<string> filePaths = Zip.GetFileList(Archive.Path).ToList();
+
+                if (filePaths.Count > 0)
+                {
+                    fileList = string.Join("\r\nPath = ", filePaths);
+                    fileList = string.Format("Path = {0}\r\n", fileList);
+                }
+            }
+
+            return fileList;
+
+            /*
             Zip.ListVerbose(Archive.Path, ref stdout, ref stderr, ref exitCode);
             selectedFilePath = "Path = " + launchGameInfo.SelectedFile;
 
@@ -202,8 +251,8 @@ namespace ArchiveCacheManager
             {
                 fileList = ApplyExtensionPriority(stdout);
             }
-
-            return fileList;
+            
+            return fileList;*/
         }
 
         /// <summary>
@@ -231,7 +280,7 @@ namespace ArchiveCacheManager
             {
                 try
                 {
-                    string[] extensionPriority = Config.ExtensionPriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] extensionPriority = Config.FilenamePriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
@@ -243,8 +292,13 @@ namespace ArchiveCacheManager
                             filePaths.Remove(ex);
                         }
 
-                        fileList = string.Join("\r\nPath = ", filePaths);
-                        fileList = string.Format("Path = {0}\r\n", fileList);
+                        if (filePaths.Count > 0)
+                        {
+                            fileList = string.Join("\r\nPath = ", filePaths);
+                            fileList = string.Format("Path = {0}\r\n", fileList);
+                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension.Trim()));
+                            break;
+                        }
                     }
                 }
                 catch (KeyNotFoundException)
@@ -262,8 +316,11 @@ namespace ArchiveCacheManager
                     filePaths.Remove(ex);
                 }
 
-                fileList = string.Join("\r\nPath = ", filePaths);
-                fileList = string.Format("Path = {0}\r\n", fileList);
+                if (filePaths.Count > 0)
+                {
+                    fileList = string.Join("\r\nPath = ", filePaths);
+                    fileList = string.Format("Path = {0}\r\n", fileList);
+                }
             }
 
             return fileList;
@@ -416,90 +473,6 @@ namespace ArchiveCacheManager
                 AddArchiveToCache();
             }
             UpdateArchiveCachePlaytime(Archive.CachePath);
-        }
-
-        /// <summary>
-        /// DEPRECATED. Use ListCacheArchive() instead.
-        /// Generates an absolute path list of files in the archive cache based on the file list from 7z.
-        /// </summary>
-        /// <param name="listStdout"></param>
-        /// <returns></returns>
-        static string MakeArchiveListAbsolute(string listStdout)
-        {
-            string absoluteStdout = listStdout;
-            Match match = null;
-
-            // Find the first "Path = " entry in the 7z list stdout, then skip to the next match (the first file within the archive)
-            match = Regex.Match(listStdout, @"Path = .*", RegexOptions.IgnoreCase).NextMatch();
-
-            if (match.Success)
-            {
-                absoluteStdout = string.Empty;
-            }
-
-            // Loop through all of the matches, building up a string of files with the absolute path
-            while (match.Success)
-            {
-                // Remove the leading "Path = " portion of the result
-                // Remove any white space from the result (namely a trailing \r)
-                // LB only seems to check for "Path = X" strings in 7z list stdout, so we only need to build a string containing "Path = "
-                absoluteStdout = string.Format("{0}\r\nPath = {1}", absoluteStdout, Path.Combine(Archive.CachePath, match.Value.Replace("Path = ", string.Empty).Trim()));
-                match = match.NextMatch();
-            }
-
-            return absoluteStdout;
-        }
-
-        /// <summary>
-        /// Applies the current file entension priority to the input file list by filtering out any files where the file extensions do not match the priority list.
-        /// If there is no file priority list, or no files match, the file list will be unchanged.
-        /// </summary>
-        /// <param name="listStdout">Current file list.</param>
-        /// <returns>Modified file list, or identical file list if no file priority applied.</returns>
-        static string ApplyExtensionPriority(string listStdout)
-        {
-            string priorityStdout = listStdout;
-            Match match = null;
-            bool extensionFound = false;
-
-            try
-            {
-                string[] extensionPriority = Config.ExtensionPriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-
-                // Search the extensions in priority order
-                foreach (string extension in extensionPriority)
-                {
-                    // Find the first "Path = " entry in the 7z list stdout with the specified extension
-                    match = Regex.Match(listStdout, string.Format(@"Path = .*\.{0}", extension.Trim()), RegexOptions.IgnoreCase);
-
-                    if (match.Success)
-                    {
-                        priorityStdout = string.Empty;
-                        extensionFound = true;
-
-                        Logger.Log(string.Format("Applying extension priority \"{0}\".", extension.Trim()));
-                    }
-
-                    // Loop through all of the matches, building up a string of files with the priority extension
-                    while (match.Success)
-                    {
-                        priorityStdout = string.Format("{0}\r\n{1}", priorityStdout, match.Value.Trim());
-                        match = match.NextMatch();
-                    }
-
-                    // Stop looking for extensions if we found one already
-                    if (extensionFound)
-                    {
-                        break;
-                    }
-                }
-            }
-            catch (KeyNotFoundException)
-            {
-
-            }
-
-            return priorityStdout;
         }
     }
 }

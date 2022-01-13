@@ -16,7 +16,7 @@ namespace ArchiveCacheManager
         private static string mCachePath = defaultCachePath;
         private static long mCacheSize = defaultCacheSize;
         private static long mMinArchiveSize = defaultMinArchiveSize;
-        private static Dictionary<string, string> mExtensionPriority;
+        private static Dictionary<string, string> mFilenamePriority;
 
         /// <summary>
         /// Static constructor which loads config from disk into memory.
@@ -57,10 +57,10 @@ namespace ArchiveCacheManager
         /// <summary>
         /// Configured extension priorities. Default is "PCSX2 \ Sony Playstaion 2", "bin"
         /// </summary>
-        public static Dictionary<string, string> ExtensionPriority
+        public static Dictionary<string, string> FilenamePriority
         {
-            get => mExtensionPriority;
-            set => mExtensionPriority = value;
+            get => mFilenamePriority;
+            set => mFilenamePriority = value;
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ArchiveCacheManager
                 {
                     iniData = parser.ReadFile(PathUtils.GetPluginConfigPath());
 
-                    ExtensionPriority.Clear();
+                    FilenamePriority.Clear();
                     foreach (SectionData section in iniData.Sections)
                     {
                         if (section.SectionName == configSection)
@@ -117,13 +117,17 @@ namespace ArchiveCacheManager
                         }
                         else
                         {
-                            if (section.Keys.ContainsKey(nameof(ExtensionPriority)))
+                            if (section.Keys.ContainsKey(nameof(FilenamePriority)))
                             {
-                                ExtensionPriority.Add(section.SectionName, section.Keys[nameof(ExtensionPriority)]);
+                                FilenamePriority.Add(section.SectionName, section.Keys[nameof(FilenamePriority)]);
+                            }
+                            else if (section.Keys.ContainsKey("ExtensionPriority"))
+                            {
+                                FilenamePriority.Add(section.SectionName, section.Keys["ExtensionPriority"]);
                             }
                             else if (section.Keys.ContainsKey("extensionPriority"))
                             {
-                                ExtensionPriority.Add(section.SectionName, section.Keys["extensionPriority"]);
+                                FilenamePriority.Add(section.SectionName, section.Keys["extensionPriority"]);
                             }
                         }
                     }
@@ -183,9 +187,9 @@ namespace ArchiveCacheManager
             iniData[configSection][nameof(CacheSize)] = mCacheSize.ToString();
             iniData[configSection][nameof(MinArchiveSize)] = mMinArchiveSize.ToString();
 
-            foreach (KeyValuePair<string, string> priority in mExtensionPriority)
+            foreach (KeyValuePair<string, string> priority in mFilenamePriority)
             {
-                iniData[priority.Key][nameof(ExtensionPriority)] = priority.Value;
+                iniData[priority.Key][nameof(FilenamePriority)] = priority.Value;
             }
 
             try
@@ -207,8 +211,8 @@ namespace ArchiveCacheManager
             mCachePath = defaultCachePath;
             mCacheSize = defaultCacheSize;
             mMinArchiveSize = defaultMinArchiveSize;
-            mExtensionPriority = new Dictionary<string, string>();
-            mExtensionPriority.Add(@"PCSX2 \ Sony Playstation 2", "bin, iso");
+            mFilenamePriority = new Dictionary<string, string>();
+            mFilenamePriority.Add(@"PCSX2 \ Sony Playstation 2", "bin, iso");
         }
     }
 }

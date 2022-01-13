@@ -23,7 +23,7 @@ namespace ArchiveCacheManager
             versionLabel.Text = CacheManager.Version;
 
             extensionPriorityDataGridView.Rows.Clear();
-            foreach (KeyValuePair<string, string> priority in Config.ExtensionPriority)
+            foreach (KeyValuePair<string, string> priority in Config.FilenamePriority)
             {
                 string[] priorityInfo = priority.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -138,10 +138,10 @@ namespace ArchiveCacheManager
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            Config.ExtensionPriority.Clear();
+            Config.FilenamePriority.Clear();
             foreach (DataGridViewRow row in extensionPriorityDataGridView.Rows)
             {
-                Config.ExtensionPriority.Add(string.Format(@"{0} \ {1}", row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString()), row.Cells[2].Value.ToString());
+                Config.FilenamePriority.Add(string.Format(@"{0} \ {1}", row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString()), row.Cells[2].Value.ToString());
             }
 
             Config.Save();

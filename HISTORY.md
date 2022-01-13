@@ -1,5 +1,12 @@
 # Archive Cache Manager change history
 
+## v2.0.8 (2022-01-13)
+* Wildcard based filename matching for file priorities in archive
+    * Prioritize a file extension, filename, or combination
+    * Create priorities to automatically play preferred ROM region from GoodMerged archives
+* Performance improvements, especially for archives with many hundreds or thousands files
+* [BigBox] "Select ROM In Archive" menu option (accepts keyboard input only)
+
 ## v2.0.7 (2021-03-30)
 * Badge to indicate if game is in cache
     * Available under Badges -> Enable Archive Cached menu

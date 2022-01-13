@@ -48,7 +48,7 @@ namespace ArchiveCacheManager
             this.platformComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.platformComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.platformComboBox.FormattingEnabled = true;
-            this.platformComboBox.Location = new System.Drawing.Point(12, 225);
+            this.platformComboBox.Location = new System.Drawing.Point(12, 384);
             this.platformComboBox.Name = "platformComboBox";
             this.platformComboBox.Size = new System.Drawing.Size(428, 21);
             this.platformComboBox.TabIndex = 3;
@@ -59,7 +59,7 @@ namespace ArchiveCacheManager
             this.emulatorComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.emulatorComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.emulatorComboBox.FormattingEnabled = true;
-            this.emulatorComboBox.Location = new System.Drawing.Point(12, 176);
+            this.emulatorComboBox.Location = new System.Drawing.Point(12, 335);
             this.emulatorComboBox.Name = "emulatorComboBox";
             this.emulatorComboBox.Size = new System.Drawing.Size(428, 21);
             this.emulatorComboBox.TabIndex = 2;
@@ -68,7 +68,7 @@ namespace ArchiveCacheManager
             // 
             // extensionPriorityTextBox
             // 
-            this.extensionPriorityTextBox.Location = new System.Drawing.Point(12, 274);
+            this.extensionPriorityTextBox.Location = new System.Drawing.Point(12, 433);
             this.extensionPriorityTextBox.Name = "extensionPriorityTextBox";
             this.extensionPriorityTextBox.Size = new System.Drawing.Size(428, 20);
             this.extensionPriorityTextBox.TabIndex = 4;
@@ -79,7 +79,7 @@ namespace ArchiveCacheManager
             // emulatorComboBoxLabel
             // 
             this.emulatorComboBoxLabel.AutoSize = true;
-            this.emulatorComboBoxLabel.Location = new System.Drawing.Point(9, 160);
+            this.emulatorComboBoxLabel.Location = new System.Drawing.Point(9, 319);
             this.emulatorComboBoxLabel.Name = "emulatorComboBoxLabel";
             this.emulatorComboBoxLabel.Size = new System.Drawing.Size(51, 13);
             this.emulatorComboBoxLabel.TabIndex = 5;
@@ -88,7 +88,7 @@ namespace ArchiveCacheManager
             // platformComboBoxLabel
             // 
             this.platformComboBoxLabel.AutoSize = true;
-            this.platformComboBoxLabel.Location = new System.Drawing.Point(9, 209);
+            this.platformComboBoxLabel.Location = new System.Drawing.Point(9, 368);
             this.platformComboBoxLabel.Name = "platformComboBoxLabel";
             this.platformComboBoxLabel.Size = new System.Drawing.Size(48, 13);
             this.platformComboBoxLabel.TabIndex = 6;
@@ -97,18 +97,18 @@ namespace ArchiveCacheManager
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 258);
+            this.label1.Location = new System.Drawing.Point(9, 417);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(153, 13);
+            this.label1.Size = new System.Drawing.Size(149, 13);
             this.label1.TabIndex = 7;
-            this.label1.Text = "Extension Priority (e.g. bin, iso):";
+            this.label1.Text = "Filename Priority (e.g. bin, iso):";
             // 
             // cancelButton
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cancelButton.Image = global::ArchiveCacheManager.Resources.cross_script;
-            this.cancelButton.Location = new System.Drawing.Point(93, 323);
+            this.cancelButton.Location = new System.Drawing.Point(93, 484);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 1;
@@ -122,7 +122,7 @@ namespace ArchiveCacheManager
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.okButton.Image = global::ArchiveCacheManager.Resources.tick;
-            this.okButton.Location = new System.Drawing.Point(12, 323);
+            this.okButton.Location = new System.Drawing.Point(12, 484);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 0;
@@ -136,7 +136,7 @@ namespace ArchiveCacheManager
             // 
             this.infoLabel.Location = new System.Drawing.Point(9, 9);
             this.infoLabel.Name = "infoLabel";
-            this.infoLabel.Size = new System.Drawing.Size(431, 151);
+            this.infoLabel.Size = new System.Drawing.Size(431, 310);
             this.infoLabel.TabIndex = 10;
             this.infoLabel.Text = resources.GetString("infoLabel.Text");
             // 
@@ -146,7 +146,7 @@ namespace ArchiveCacheManager
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(452, 358);
+            this.ClientSize = new System.Drawing.Size(452, 519);
             this.Controls.Add(this.infoLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);

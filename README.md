@@ -1,12 +1,14 @@
 # Archive Cache Manager
 ![Achive Cache Manager logo](images/logo-v2-title.png?raw=true "Achive Cache Manager")
 
-A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file type from an archive.
+A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred files from an archive.
 
-## New in v2.0.7
-* Badge for cached games. Also includes Simple White and Neon style badges to match your theme.
-    * ![Badge icon to indicate if a game is cached](images/badges.png?raw=true "Badge icon to indicate if a game is cached")
-* ROMs previously selected using the "Select ROM In Archive..." menu are automatically loaded the next time a game is played.
+## New in v2.0.8
+* Wildcard based filename matching for file priorities in archive
+    * Prioritize a file extension, filename, or combination
+    * Create priorities to automatically play preferred ROM region from GoodMerged archives
+* Performance improvements, especially for archives with many hundreds or thousands files
+* [BigBox] "Select ROM In Archive" menu option (accepts keyboard input only)
 
 ## Description
 When a compressed ROM (in zip, 7z, or rar format) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.
@@ -22,7 +24,7 @@ As the cache approaches its maximum size, the least recently played games are de
 * Configurable minimum archive size (skip caching small archives).
 * Option to keep select ROMs cached and ready to play.
 * Select and play individual ROM files from an archive.
-* File extension priorities per emulator and platform (cue, bin, iso, etc).
+* Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
 
 ### Example Use Cases
 Why use Archive Cache Manager? Here's some example use cases.
@@ -58,11 +60,15 @@ The next time the game is launched via the normal Play option, the previous ROM 
 
 ![ROM file selection window](images/select-file-window.png?raw=true "ROM file selection window")
 
+The same menu is also available in BigBox, though currently only supports keyboard input.
+
+![ROM file selection window](images/select-file-window-bigbox.png?raw=true "ROM file selection window")
+
 ### Keeping Games Cached
 Games can be marked 'Keep' so they stay cached and ready to play. To keep a game cached, open the plugin configuration window from the _Tools->Archive Cache Manager_ menu. From there a list of games in the cache is shown. Check the Keep box next to the game, then click OK.
 
 ### Badge
-The plugin includes a badge to indicate if a game is currently in the cache. It is available under the _Badges->Enable Archive Cached_ menu. There are additional Simple White and Neon style badges, which can be found in the `LaunchBox\Plugins\ArchiveCacheManager\Badges` folder.
+The plugin includes a badge to indicate if a game is currently in the cache. It is available under the _Badges->Plugin Badges->Enable Archive Cached_ menu. There are additional Simple White and Neon style badges, which can be found in the `LaunchBox\Plugins\ArchiveCacheManager\Badges` folder. Copy your preferred icon to the `LaunchBox\Images\Badges` folder and rename it `Archive Cached.png`.
 
 ![Badge icon to indicate if a game is cached](images/badges.png?raw=true "Badge icon to indicate if a game is cached")
 
@@ -78,7 +84,7 @@ An overview of each of the configuration items is below.
 This section shows a summary of the cache including the _Cache Path_, _Cache Size_, and _Keep Size_. It also displays a list of the items currently in the cache.
 
 #### Cached Items & Keep
-Each item in the cache has a _Keep_ flag, which when set will prevent the item from being removed from the cache when the cache is full. This is useful for less frequently played games which you still want to load without waiting (party games, favourites, children's games, etc).
+Each item in the cache has a _Keep_ flag, which when set will prevent the item from being removed from the cache when the cache is full. This is useful for less frequently played games which you still want to load without waiting (very large games, party games, favourites, children's games, etc).
 
 Items marked _Keep_ are not included in the cache size calculation. The total size of _Keep_ items is listed in the cache details summary.
 
@@ -106,7 +112,7 @@ This is the maximum cache size on disk in megabytes. The oldest played games wil
 Default: _20,000 MB (20 GB)_
 
 ##### Configure Cache - Minimum Archive Size
-This is the minimum size in megabytes of an uncompressed archive to be added to the cache. Archives smaller than this won't be added to the cache.
+This is the minimum size in megabytes of an uncompressed archive before it will be added to the cache. Archives smaller than this won't be added to the cache.
 
 Default: _100 MB_
 
@@ -122,12 +128,20 @@ Clicking on the `Delete` button will remove the selected items from the cache (i
 #### Purge Cache
 Clicking on the `Delete All` button will delete everything from the cache (including items with the _Keep_ setting).
 
-### File Extension Priority
-This defines the file extension priority for the specified emulator and platform combination. Use the Add / Edit / Delete buttons to manage file extension priorities.
+### Filename Priority
+Files from an archive can be prioritized in cases where an emulator requires a certain filename or file type. This option defines the filename and/or extension priority for the specified emulator and platform combination. Use the Add / Edit / Delete buttons to manage priorities.
 
-File extensions are a comma delimited list, where the highest priority is the first extension, the next highest priority is the second extension, and so on. If the file extension is not found in the archive when a game is loaded, the default LaunchBox priority is used.
+A wildcard (*) can be used to perform partial filename matches. Examples include:
 
-Note that the extension priority is applied to all archives, even if they are not cached.
+* *Files ending with bin, then files ending in iso, then all other files:* `bin, iso`
+
+* *Files named eboot.bin, then all other files:* `eboot.bin`
+
+* *GoodMerged style - European 'good' ROM dumps, then USA 'good' ROM dumps, then other region 'good' ROM dumps, then all other files:* `*(*E*)*[!].*, *(*U*)*[!].*, *[!].*`
+
+The priorities are a comma delimited list, where the highest priority is the first entry, the next highest priority is the second entry, and so on. If the filename extension is not found in the archive when a game is loaded, the default LaunchBox priority is used.
+
+Note that the priority is applied to all archives, even if they are not cached.
 
 Default: _PCSX2 \ Sony Playstation 2 \ bin, iso_
 

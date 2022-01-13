@@ -198,7 +198,7 @@ namespace ArchiveCacheManager
             this.fileExtensionPriorityGroupBox.Size = new System.Drawing.Size(760, 210);
             this.fileExtensionPriorityGroupBox.TabIndex = 12;
             this.fileExtensionPriorityGroupBox.TabStop = false;
-            this.fileExtensionPriorityGroupBox.Text = "File Extension Priority";
+            this.fileExtensionPriorityGroupBox.Text = "Filename Priority";
             // 
             // deletePriorityButton
             // 

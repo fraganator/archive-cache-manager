@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace ArchiveCacheManager
 {
@@ -82,11 +83,29 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Run the 7z list command on the specified archive.
+        /// </summary>
+        /// <param name="archivePath"></param>
+        /// <param name="stdout"></param>
+        /// <param name="stderr"></param>
+        /// <param name="exitCode"></param>
+        public static void ListWildcard(string archivePath, string wildcard, ref string stdout, ref string stderr, ref int exitCode)
+        {
+            // l = list
+            // {0} = archive path
+            // -i! = wildcard match filename
+            // {1} = wildcard to match
+            string args = string.Format("l \"{0}\" -i!{1}", archivePath, wildcard);
+
+            run7z(args, ref stdout, ref stderr, ref exitCode);
+        }
+
+        /// <summary>
         /// Get an undecorated file list for the specified archive.
         /// </summary>
         /// <param name="archivePath"></param>
         /// <returns>A simple file list of archive contents.</returns>
-        public static string[] GetFileList(string archivePath)
+        public static string[] GetFileList(string archivePath, string wildcard = null)
         {
             // Run List command
             // Parse stdout for all "Path = " entries
@@ -94,30 +113,66 @@ namespace ArchiveCacheManager
             string stdout = string.Empty;
             string stderr = string.Empty;
             int exitCode = 0;
-            List<string> fileList = new List<string>();
-            bool foundFirstPath = false;
+            string[] fileList = { };
 
-            ListVerbose(archivePath, ref stdout, ref stderr, ref exitCode);
+            if (!string.IsNullOrEmpty(wildcard))
+            {
+                ListWildcard(archivePath, wildcard, ref stdout, ref stderr, ref exitCode);
+            }
+            else
+            {
+                List(archivePath, ref stdout, ref stderr, ref exitCode);
+            }
+
+            /*
+            stdout will be in the format below:
+            --------
+            c:\LaunchBox\ThirdParty\7-Zip>7z l "c:\Emulation\ROMs\Doom (USA).zip"
+
+            7-Zip 19.00 (x64) : Copyright (c) 1999-2018 Igor Pavlov : 2019-02-21
+
+            Scanning the drive for archives:
+            1 file, 260733247 bytes (249 MiB)
+
+            Listing archive: c:\Emulation\ROMs\Doom (USA).zip
+
+            --
+            Path = c:\Emulation\ROMs\Doom (USA).zip
+            Type = zip
+            Physical Size = 260733247
+            Comment = TORRENTZIPPED-9F8E0391
+
+               Date      Time    Attr         Size   Compressed  Name
+            ------------------- ----- ------------ ------------  ------------------------
+            1996-12-24 23:32:00 .....     84175728     69019477  Doom (USA) (Track 1).bin
+            1996-12-24 23:32:00 .....     33737088     31332352  Doom (USA) (Track 2).bin
+            1996-12-24 23:32:00 .....     20801088     19163186  Doom (USA) (Track 3).bin
+            1996-12-24 23:32:00 .....     41992608     38498123  Doom (USA) (Track 4).bin
+            1996-12-24 23:32:00 .....     36717072     34627868  Doom (USA) (Track 5).bin
+            1996-12-24 23:32:00 .....     22936704     21946175  Doom (USA) (Track 6).bin
+            1996-12-24 23:32:00 .....      9847824      8577248  Doom (USA) (Track 7).bin
+            1996-12-24 23:32:00 .....     40560240     37567531  Doom (USA) (Track 8).bin
+            1996-12-24 23:32:00 .....          814          147  Doom (USA).cue
+            ------------------- ----- ------------ ------------  ------------------------
+            1996-12-24 23:32:00          290769166    260732107  9 files
+
+            c:\LaunchBox\ThirdParty\7-Zip>
+            --------
+            */
 
             if (exitCode == 0)
             {
-                string[] stdoutArray = stdout.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                // Split on the "----" dividers (see above). There will then be three sections, the header info, the files, and the summary.
+                string[] stdoutArray = stdout.Split(new string[] { "------------------- ----- ------------ ------------  ------------------------" }, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (string line in stdoutArray)
+                if (stdoutArray.Length > 2)
                 {
-                    if (line.StartsWith("Path ="))
+                    // Split the files on "\r\n", so we have an array with one element per filename + info
+                    fileList = stdoutArray[1].Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < fileList.Length; i++)
                     {
-                        if (foundFirstPath)
-                        {
-                            // Format of line is "Path = Filename.xyz"
-                            // Split on '=' and get second element
-                            fileList.Add(line.Split("=".ToCharArray())[1].Trim());
-                        }
-                        else
-                        {
-                            // The first "Path = " entry from 7z is the archive name itself, so skip adding it to the list
-                            foundFirstPath = true;
-                        }
+                        // Split the string at the 53rd char, after the date/time/attr/size/compressed info.
+                        fileList[i] = fileList[i].Substring(53).Trim();
                     }
                 }
             }
@@ -126,7 +181,7 @@ namespace ArchiveCacheManager
                 Logger.Log(string.Format("Error listing archive {0}.", archivePath));
             }
 
-            return fileList.ToArray();
+            return fileList;
         }
 
         /// <summary>
@@ -207,15 +262,15 @@ namespace ArchiveCacheManager
             process.StartInfo.CreateNoWindow = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
-            string asyncError = "";
-            string asyncOutput = "";
+            StringBuilder asyncError = new StringBuilder();
+            StringBuilder asyncOutput = new StringBuilder();
             process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
             {
                 if (redirectOutput)
                 {
                     Console.Out.WriteLine(e.Data);
                 }
-                asyncOutput = string.Format("{0}\r\n{1}", asyncOutput, e.Data);
+                asyncOutput.Append("\r\n" + e.Data);
             });
             process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
             {
@@ -223,7 +278,7 @@ namespace ArchiveCacheManager
                 {
                     Console.Error.WriteLine(e.Data);
                 }
-                asyncError = string.Format("{0}\r\n{1}", asyncError, e.Data);
+                asyncError.Append("\r\n" + e.Data);
             });
 
             try
@@ -246,8 +301,8 @@ namespace ArchiveCacheManager
                 Logger.Log(e.ToString(), Logger.LogLevel.Exception);
             }
 
-            stdout = asyncOutput;
-            stderr = asyncError;
+            stdout = asyncOutput.ToString();
+            stderr = asyncError.ToString();
 
             if (exitCode != 0)
             {
