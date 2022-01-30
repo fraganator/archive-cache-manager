@@ -1,4 +1,7 @@
 # Archive Cache Manager change history
+## v2.0.9 (2022-01-31)
+* Fix file priority for files in subfolder of archive when not in cache
+* Fix launching individual file from archive when not in cache
 
 ## v2.0.8 (2022-01-13)
 * Wildcard based filename matching for file priorities in archive

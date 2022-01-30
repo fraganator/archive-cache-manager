@@ -95,7 +95,7 @@ namespace ArchiveCacheManager
             // {0} = archive path
             // -i! = wildcard match filename
             // {1} = wildcard to match
-            string args = string.Format("l \"{0}\" -i!{1}", archivePath, wildcard);
+            string args = string.Format("l \"{0}\" -i!\"{1}\" -r", archivePath, wildcard);
 
             run7z(args, ref stdout, ref stderr, ref exitCode);
         }

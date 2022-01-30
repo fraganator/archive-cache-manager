@@ -194,7 +194,7 @@ namespace ArchiveCacheManager
             {
                 if (Zip.GetFileList(Archive.Path, launchGameInfo.SelectedFile).Length > 0)
                 {
-                    fileList = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.SelectedFile);
+                    fileList = "Path = " + launchGameInfo.SelectedFile;
                     Logger.Log(string.Format("Selected individual file from archive \"{0}\".", launchGameInfo.SelectedFile));
                 }
             }
