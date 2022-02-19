@@ -21,7 +21,7 @@ namespace ArchiveCacheManager
 
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
-            if (emulator.AutoExtract)
+            if (PluginUtils.GetEmulatorPlatformAutoExtract(game.EmulatorId, game.Platform))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));

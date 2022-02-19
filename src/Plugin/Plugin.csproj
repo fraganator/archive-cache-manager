@@ -56,7 +56,7 @@
     <Reference Include="UIAutomationProvider" />
     <Reference Include="Unbroken.LaunchBox.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=558191e84f56affc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\thirdparty\Unbroken.LaunchBox.Plugins\10.14\Unbroken.LaunchBox.Plugins.dll</HintPath>
+      <HintPath>..\..\thirdparty\Unbroken.LaunchBox.Plugins\12.8\Unbroken.LaunchBox.Plugins.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
@@ -96,6 +96,7 @@
     <Compile Include="MessageBoxBigBox.Designer.cs">
       <DependentUpon>MessageBoxBigBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="PluginUtils.cs" />
     <Compile Include="PriorityEditWindow.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -20,7 +20,7 @@ namespace ArchiveCacheManager
         public bool ShowInLaunchBox => true;
         public bool ShowInBigBox => true;
 
-        public bool GetIsValidForGame(IGame selectedGame) => PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId).AutoExtract;
+        public bool GetIsValidForGame(IGame selectedGame) => PluginUtils.GetEmulatorPlatformAutoExtract(selectedGame.EmulatorId, selectedGame.Platform);
         public bool GetIsValidForGames(IGame[] selectedGames) => false;
 
         public void OnSelected(IGame selectedGame)
