@@ -29,11 +29,25 @@ namespace ArchiveCacheManager
                 cacheManagerActive = true;
 
                 GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
+                gameInfo.GameId = game.Id;
                 gameInfo.ArchivePath = (app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath;
                 gameInfo.Emulator = emulator.Title;
                 gameInfo.Platform = game.Platform;
                 gameInfo.Title = game.Title;
                 gameInfo.SelectedFile = GameIndex.GetSelectedFile(game.Id);
+                gameInfo.EmulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(game.EmulatorId, game.Platform);
+                gameInfo.MultiDisc = PluginUtils.IsLaunchedGameMultiDisc(game, app);
+                if (gameInfo.MultiDisc)
+                {
+                    int totalDiscs = 0;
+                    int selectedDisc = 0;
+                    List<DiscInfo> discs = new List<DiscInfo>();
+                    PluginUtils.GetMultiDiscInfo(game, app, ref totalDiscs, ref selectedDisc, ref discs);
+
+                    gameInfo.TotalDiscs = totalDiscs;
+                    gameInfo.SelectedDisc = selectedDisc;
+                    gameInfo.Discs = discs;
+                }
                 gameInfo.Save();
 
                 Replace7z();

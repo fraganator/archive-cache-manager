@@ -12,11 +12,13 @@ namespace ArchiveCacheManager
         private static readonly string defaultCachePath = "ArchiveCache";
         private static readonly long defaultCacheSize = 20000;
         private static readonly long defaultMinArchiveSize = 100;
+        private static readonly bool defaultMultiDiscSupport = true;
 
         private static string mCachePath = defaultCachePath;
         private static long mCacheSize = defaultCacheSize;
         private static long mMinArchiveSize = defaultMinArchiveSize;
         private static Dictionary<string, string> mFilenamePriority;
+        private static bool mMultiDiscSupport = defaultMultiDiscSupport;
 
         /// <summary>
         /// Static constructor which loads config from disk into memory.
@@ -61,6 +63,15 @@ namespace ArchiveCacheManager
         {
             get => mFilenamePriority;
             set => mFilenamePriority = value;
+        }
+
+        /// <summary>
+        /// Configured multi-disc support. Default is True.
+        /// </summary>
+        public static bool MultiDiscSupport
+        {
+            get => mMultiDiscSupport;
+            set => mMultiDiscSupport = value;
         }
 
         /// <summary>
@@ -113,6 +124,11 @@ namespace ArchiveCacheManager
                             else if (section.Keys.ContainsKey("minArchiveSize"))
                             {
                                 mMinArchiveSize = Convert.ToInt64(section.Keys["minArchiveSize"]);
+                            }
+
+                            if (section.Keys.ContainsKey(nameof(MultiDiscSupport)))
+                            {
+                                mMultiDiscSupport = Convert.ToBoolean(section.Keys[nameof(MultiDiscSupport)]);
                             }
                         }
                         else
@@ -186,6 +202,7 @@ namespace ArchiveCacheManager
             iniData[configSection][nameof(CachePath)] = mCachePath;
             iniData[configSection][nameof(CacheSize)] = mCacheSize.ToString();
             iniData[configSection][nameof(MinArchiveSize)] = mMinArchiveSize.ToString();
+            iniData[configSection][nameof(MultiDiscSupport)] = mMultiDiscSupport.ToString();
 
             foreach (KeyValuePair<string, string> priority in mFilenamePriority)
             {
@@ -213,6 +230,7 @@ namespace ArchiveCacheManager
             mMinArchiveSize = defaultMinArchiveSize;
             mFilenamePriority = new Dictionary<string, string>();
             mFilenamePriority.Add(@"PCSX2 \ Sony Playstation 2", "bin, iso");
+            mMultiDiscSupport = defaultMultiDiscSupport;
         }
     }
 }

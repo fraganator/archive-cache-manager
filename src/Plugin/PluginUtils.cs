@@ -35,5 +35,82 @@ namespace ArchiveCacheManager
 
             emulatorPlatform.M3uDiscLoadEnabled = enabled;
         }
+
+        /// <summary>
+        /// Checks if a game is a multi-disc game. Game must have additional apps with Disc property set, and game path must be one of the additional app paths.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns>True is game is multi-disc, False otherwise.</returns>
+        public static bool IsGameMultiDisc(IGame game)
+        {
+            var additionalApps = game.GetAllAdditionalApplications();
+
+            return Array.Exists(additionalApps, a => a.Disc != null && a.ApplicationPath == game.ApplicationPath);
+        }
+
+        /// <summary>
+        /// Check if the selected additional app is a disc from a multi-disc game.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns>True if app is from multi-disc game, False otherwise.</returns>
+        public static bool IsAdditionalAppMultiDisc(IAdditionalApplication app)
+        {
+            return IsGameMultiDisc(PluginHelper.DataManager.GetGameById(app.GameId)) && app.Disc != null;
+        }
+
+        /// <summary>
+        /// Check if the launched game or additional application is a multi-disc game.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="app"></param>
+        /// <returns>True if launched game is multi-disc, False otherwise.</returns>
+        public static bool IsLaunchedGameMultiDisc(IGame game, IAdditionalApplication app)
+        {
+            return (app != null && IsAdditionalAppMultiDisc(app)) || (app == null && IsGameMultiDisc(game));
+        }
+
+        /// <summary>
+        /// Get info on a multi-disc game.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="app"></param>
+        /// <param name="totalDiscs">The total number of discs in a game. Determined by counting additional apps with Disc property set. Will be 0 if not a multi-dsc game.</param>
+        /// <param name="selectedDisc">The selected disc, based on the additional app Disc property. Will be 1 if additional app is null, and 0 if not a multi-disc game.</param>
+        /// <param name="discs">List of discs and associated info in disc order. Will be empty if not a multi-disc game.</param>
+        /// <returns>True if multi-disc info populated, False otherwise.</returns>
+        public static bool GetMultiDiscInfo(IGame game, IAdditionalApplication app, ref int totalDiscs, ref int selectedDisc, ref List<DiscInfo> discs)
+        {
+            if (!IsLaunchedGameMultiDisc(game, app))
+            {
+                totalDiscs = 0;
+                selectedDisc = 0;
+                discs.Clear();
+                return false;
+            }
+
+            var additionalApps = game.GetAllAdditionalApplications();
+            var discApps = Array.FindAll(additionalApps, a => a.Disc != null);
+            foreach (var discApp in discApps)
+            {
+                DiscInfo discInfo = new DiscInfo();
+                discInfo.ApplicationId = discApp.Id;
+                discInfo.ArchivePath = discApp.ApplicationPath;
+                discInfo.Disc = (int)discApp.Disc;
+                discs.Add(discInfo);
+            }
+            discs.Sort((a, b) => a.Disc - b.Disc);
+
+            if (app != null)
+            {
+                selectedDisc = (int)app.Disc;
+            }
+            else
+            {
+                selectedDisc = discs.Find(a => a.ArchivePath == game.ApplicationPath).Disc;
+            }
+
+            totalDiscs = discs.Count;
+            return true;
+        }
     }
 }
