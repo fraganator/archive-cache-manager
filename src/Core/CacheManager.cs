@@ -9,13 +9,6 @@ namespace ArchiveCacheManager
 {
     public class CacheManager
     {
-        private static GameInfo launchGameInfo;
-
-        static CacheManager()
-        {
-            launchGameInfo = new GameInfo(PathUtils.GetGameInfoPath());
-        }
-
         /// <summary>
         /// Plugin version string, in the form "vX.Y.Z".
         /// </summary>
@@ -69,7 +62,7 @@ namespace ArchiveCacheManager
         public static bool ArchiveInCache()
         {
             // Use the existence of the game.ini file, as it's only copied to the cache after a successful 7z extract command
-            return File.Exists(PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath));
+            return File.Exists(PathUtils.GetArchiveCacheGameInfoPath(LaunchGameInfo.ArchiveCachePath));
         }
 
         /// <summary>
@@ -83,27 +76,26 @@ namespace ArchiveCacheManager
 
             if (CreateCache())
             {
-                DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath));
-                launchGameInfo.DecompressedSize = Archive.DecompressedSize;
-                ClearCacheSpace(Archive.DecompressedSize);
-                Logger.Log(string.Format("Extracting archive to \"{0}\".", Archive.CachePath));
-                Zip.Extract(Archive.Path, Archive.CachePath, ref stdout, ref stderr, ref exitCode);
+                DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.ArchiveCachePath));
+                ClearCacheSpace(LaunchGameInfo.DecompressedSize);
+                Logger.Log(string.Format("Extracting archive to \"{0}\".", LaunchGameInfo.ArchiveCachePath));
+                Zip.Extract(LaunchGameInfo.ArchivePath, LaunchGameInfo.ArchiveCachePath, ref stdout, ref stderr, ref exitCode);
                 if (exitCode == 0)
                 {
-                    launchGameInfo.Save(PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath));
-                    DiskUtils.SetDirectoryContentsReadOnly(Archive.CachePath);
-                    File.Delete(PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath));
+                    LaunchGameInfo.Game.Save(PathUtils.GetArchiveCacheGameInfoPath(LaunchGameInfo.ArchiveCachePath));
+                    DiskUtils.SetDirectoryContentsReadOnly(LaunchGameInfo.ArchiveCachePath);
+                    File.Delete(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.ArchiveCachePath));
                 }
                 else
                 {
                     Logger.Log("Extraction error, removing output files from cache.");
-                    DiskUtils.DeleteDirectory(Archive.CachePath);
+                    DiskUtils.DeleteDirectory(LaunchGameInfo.ArchiveCachePath);
                 }
             }
             else
             {
                 Logger.Log(@"Error creating or accessing cache location. Archive will be extracted to LaunchBox\ThirdParty\7-Zip\Temp.");
-                Zip.Extract(Archive.Path, PathUtils.GetLaunchBox7zTempPath(), ref stdout, ref stderr, ref exitCode);
+                Zip.Extract(LaunchGameInfo.ArchivePath, PathUtils.GetLaunchBox7zTempPath(), ref stdout, ref stderr, ref exitCode);
             }
         }
 
@@ -129,7 +121,7 @@ namespace ArchiveCacheManager
                         DiskUtils.DeleteDirectory(dir);
                         continue;
                     }
-                    else if (File.Exists(gameInfoPath))
+                    else
                     {
                         GameInfo gameInfo = new GameInfo(Path.Combine(dir, PathUtils.GetGameInfoFileName()));
                         if (!gameInfo.InfoLoaded)
@@ -185,12 +177,12 @@ namespace ArchiveCacheManager
             string selectedFilePath = string.Empty;
             string fileList = string.Empty;
 
-            if (!launchGameInfo.SelectedFile.Equals(string.Empty))
+            if (!LaunchGameInfo.Game.SelectedFile.Equals(string.Empty))
             {
-                if (Zip.GetFileList(Archive.Path, launchGameInfo.SelectedFile).Length > 0)
+                if (Zip.GetFileList(LaunchGameInfo.ArchivePath, LaunchGameInfo.Game.SelectedFile).Length > 0)
                 {
-                    fileList = "Path = " + launchGameInfo.SelectedFile;
-                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", launchGameInfo.SelectedFile));
+                    fileList = "Path = " + LaunchGameInfo.Game.SelectedFile;
+                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchGameInfo.Game.SelectedFile));
                 }
             }
 
@@ -198,12 +190,12 @@ namespace ArchiveCacheManager
             {
                 try
                 {
-                    string[] extensionPriority = Config.FilenamePriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] extensionPriority = Config.FilenamePriority[string.Format(@"{0} \ {1}", LaunchGameInfo.Game.Emulator, LaunchGameInfo.Game.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
                     {
-                        List<string> filePaths = Zip.GetFileList(Archive.Path, string.Format("*{0}", extension.Trim())).ToList();
+                        List<string> filePaths = Zip.GetFileList(LaunchGameInfo.ArchivePath, string.Format("*{0}", extension.Trim())).ToList();
 
                         if (filePaths.Count > 0)
                         {
@@ -222,7 +214,7 @@ namespace ArchiveCacheManager
 
             if (fileList == string.Empty)
             {
-                List<string> filePaths = Zip.GetFileList(Archive.Path).ToList();
+                List<string> filePaths = Zip.GetFileList(LaunchGameInfo.ArchivePath).ToList();
 
                 if (filePaths.Count > 0)
                 {
@@ -257,17 +249,17 @@ namespace ArchiveCacheManager
         public static string ListCacheArchive()
         {
             string fileList = string.Empty;
-            string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(Archive.CachePath),
-                                              PathUtils.GetArchiveCacheGameInfoPath(Archive.CachePath),
-                                              PathUtils.GetArchiveCacheExtractingFlagPath(Archive.CachePath) };
+            string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(LaunchGameInfo.ArchiveCachePath),
+                                              PathUtils.GetArchiveCacheGameInfoPath(LaunchGameInfo.ArchiveCachePath),
+                                              PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.ArchiveCachePath) };
             string selectedFilePath = string.Empty;
 
-            if (!launchGameInfo.SelectedFile.Equals(string.Empty))
+            if (!LaunchGameInfo.Game.SelectedFile.Equals(string.Empty))
             {
-                if (Directory.GetFiles(Archive.CachePath, launchGameInfo.SelectedFile, SearchOption.AllDirectories).Length > 0)
+                if (Directory.GetFiles(LaunchGameInfo.ArchiveCachePath, LaunchGameInfo.Game.SelectedFile, SearchOption.AllDirectories).Length > 0)
                 {
-                    fileList = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(Archive.Path), launchGameInfo.SelectedFile);
-                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", launchGameInfo.SelectedFile));
+                    fileList = "Path = " + Path.Combine(PathUtils.ArchiveCachePath(LaunchGameInfo.ArchivePath), LaunchGameInfo.Game.SelectedFile);
+                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchGameInfo.Game.SelectedFile));
                 }
             }
 
@@ -275,12 +267,12 @@ namespace ArchiveCacheManager
             {
                 try
                 {
-                    string[] extensionPriority = Config.FilenamePriority[string.Format(@"{0} \ {1}", launchGameInfo.Emulator, launchGameInfo.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] extensionPriority = Config.FilenamePriority[string.Format(@"{0} \ {1}", LaunchGameInfo.Game.Emulator, LaunchGameInfo.Game.Platform)].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
                     {
-                        List<string> filePaths = Directory.GetFiles(Archive.CachePath, string.Format("*{0}", extension.Trim()), SearchOption.AllDirectories).ToList();
+                        List<string> filePaths = Directory.GetFiles(LaunchGameInfo.ArchiveCachePath, string.Format("*{0}", extension.Trim()), SearchOption.AllDirectories).ToList();
 
                         foreach (string ex in exclude)
                         {
@@ -304,7 +296,7 @@ namespace ArchiveCacheManager
 
             if (fileList == string.Empty)
             {
-                List<string> filePaths = Directory.GetFiles(Archive.CachePath, "*", SearchOption.AllDirectories).ToList();
+                List<string> filePaths = Directory.GetFiles(LaunchGameInfo.ArchiveCachePath, "*", SearchOption.AllDirectories).ToList();
 
                 foreach (string ex in exclude)
                 {
@@ -435,7 +427,7 @@ namespace ArchiveCacheManager
         /// Updates the last played time of the given archive cache to now (in ticks)
         /// </summary>
         /// <param name="archiveCachePath">The path of the cached archive.</param>
-        static void UpdateArchiveCachePlaytime(string archiveCachePath)
+        public static void UpdateArchiveCachePlaytime(string archiveCachePath)
         {
             string lastPlayedPath = PathUtils.GetArchiveCachePlaytimePath(archiveCachePath);
 
@@ -457,17 +449,29 @@ namespace ArchiveCacheManager
         /// <summary>
         /// Checks for and extracts an archive to the archive cache if it is not already in there. Updates the last played time of the cached archive.
         /// </summary>
-        public static void ExtractArchive()
+        public static void ExtractArchive(string[] args)
         {
             if (ArchiveInCache())
             {
                 Logger.Log("Archive found in cache, bypassing extraction.");
+                UpdateArchiveCachePlaytime(LaunchGameInfo.ArchiveCachePath);
             }
             else
             {
-                AddArchiveToCache();
+                // Only now do we calculate the decompressed size, as can be very time consuming when large number of files in archive.
+                LaunchGameInfo.UpdateDecompressedSize();
+                // MinArchiveSize is megabytes, multiply to convert to bytes
+                if (LaunchGameInfo.DecompressedSize > Config.MinArchiveSize * 1048576)
+                {
+                    AddArchiveToCache();
+                    UpdateArchiveCachePlaytime(LaunchGameInfo.ArchiveCachePath);
+                }
+                else
+                {
+                    Logger.Log("Archive smaller than MinArchiveSize, bypassing extraction to cache.");
+                    Zip.Call7z(args);
+                }
             }
-            UpdateArchiveCachePlaytime(Archive.CachePath);
         }
     }
 }

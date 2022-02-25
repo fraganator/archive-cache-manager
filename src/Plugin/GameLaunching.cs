@@ -30,7 +30,7 @@ namespace ArchiveCacheManager
 
                 GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
                 gameInfo.GameId = game.Id;
-                gameInfo.ArchivePath = (app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath;
+                gameInfo.ArchivePath = PathUtils.GetAbsolutePath((app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath);
                 gameInfo.Emulator = emulator.Title;
                 gameInfo.Platform = game.Platform;
                 gameInfo.Title = game.Title;

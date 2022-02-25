@@ -48,7 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Archive.cs" />
+    <Compile Include="LaunchGameInfo.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="GameIndex.cs" />
     <Compile Include="GameInfo.cs" />

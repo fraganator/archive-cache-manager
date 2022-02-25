@@ -94,7 +94,7 @@ namespace ArchiveCacheManager
             {
                 DiscInfo discInfo = new DiscInfo();
                 discInfo.ApplicationId = discApp.Id;
-                discInfo.ArchivePath = discApp.ApplicationPath;
+                discInfo.ArchivePath = PathUtils.GetAbsolutePath(discApp.ApplicationPath);
                 discInfo.Disc = (int)discApp.Disc;
                 discs.Add(discInfo);
             }
@@ -106,7 +106,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                selectedDisc = discs.Find(a => a.ArchivePath == game.ApplicationPath).Disc;
+                selectedDisc = (int)Array.Find(discApps, a => a.ApplicationPath == game.ApplicationPath).Disc;
             }
 
             totalDiscs = discs.Count;
