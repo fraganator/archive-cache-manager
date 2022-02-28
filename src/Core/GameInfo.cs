@@ -107,6 +107,25 @@ namespace ArchiveCacheManager
             Load();
         }
 
+        public GameInfo(GameInfo game)
+        {
+            mInfoLoaded = game.mInfoLoaded;
+            mGameInfoPath = game.mGameInfoPath;
+            mGameId = game.mGameId;
+            mArchivePath = game.mArchivePath;
+            mEmulator = game.mEmulator;
+            mPlatform = game.mPlatform;
+            mTitle = game.mTitle;
+            mSelectedFile = game.mSelectedFile;
+            mDecompressedSize = game.mDecompressedSize;
+            mKeepInCache = game.mKeepInCache;
+            mEmulatorPlatformM3u = game.mEmulatorPlatformM3u;
+            mMultiDisc = game.mMultiDisc;
+            mTotalDiscs = game.mTotalDiscs;
+            mSelectedDisc = game.mSelectedDisc;
+            mDiscs = new List<DiscInfo>(game.mDiscs);
+        }
+
         /// <summary>
         /// Loads some basic information about the game being launched.
         /// </summary>
@@ -251,6 +270,13 @@ namespace ArchiveCacheManager
 
         public DiscInfo()
         {
+        }
+
+        public DiscInfo(DiscInfo disc)
+        {
+            mApplicationId = disc.mApplicationId;
+            mArchivePath = disc.mArchivePath;
+            mDisc = disc.mDisc;
         }
     }
 }
