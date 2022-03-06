@@ -221,6 +221,14 @@ namespace ArchiveCacheManager
         public static string GetArchiveCacheExtractingFlagPath(string archiveCachePath) => Path.Combine(archiveCachePath, "extracting");
 
         /// <summary>
+        /// Absolute path to the m3u file for the given archive cache path.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public static string GetArchiveCacheM3uPath(string archiveCachePath, string gameId) => Path.Combine(archiveCachePath, string.Format("{0}.m3u", gameId));
+
+        /// <summary>
         /// Game info filename.
         /// </summary>
         /// <returns></returns>

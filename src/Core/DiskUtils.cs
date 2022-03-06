@@ -104,6 +104,22 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Sets the read-only attribute on the specified file.
+        /// </summary>
+        /// <param name="filePath">The path of the file to set read-only.</param>
+        public static void SetFileReadOnly(string filePath)
+        {
+            try
+            {
+                File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.ReadOnly);
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+            }
+        }
+
+        /// <summary>
         /// Create an empty file. If the path does not exist, it will be created.
         /// </summary>
         /// <param name="path"></param>

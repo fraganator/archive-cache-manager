@@ -9,6 +9,7 @@ namespace ArchiveCacheManager
     class GameLaunching : IGameLaunchingPlugin
     {
         private static bool cacheManagerActive = false;
+        private static bool emulatorPlatformM3u = false;
 
         public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
@@ -16,17 +17,23 @@ namespace ArchiveCacheManager
             {
                 Logger.Log("Game started, cleaning up 7-Zip folder.");
                 Restore7z();
+
+                if (emulatorPlatformM3u)
+                {
+                    PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform, emulatorPlatformM3u);
+                }
             }
         }
 
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
-            if (PluginUtils.GetEmulatorPlatformAutoExtract(game.EmulatorId, game.Platform))
+            if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
 
                 cacheManagerActive = true;
+                emulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform);
 
                 GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
                 gameInfo.GameId = game.Id;
@@ -35,7 +42,8 @@ namespace ArchiveCacheManager
                 gameInfo.Platform = game.Platform;
                 gameInfo.Title = game.Title;
                 gameInfo.SelectedFile = GameIndex.GetSelectedFile(game.Id);
-                gameInfo.EmulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(game.EmulatorId, game.Platform);
+                emulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform);
+                gameInfo.EmulatorPlatformM3u = emulatorPlatformM3u;
                 gameInfo.MultiDisc = PluginUtils.IsLaunchedGameMultiDisc(game, app);
                 if (gameInfo.MultiDisc)
                 {
@@ -49,6 +57,11 @@ namespace ArchiveCacheManager
                     gameInfo.Discs = discs;
                 }
                 gameInfo.Save();
+
+                if (emulatorPlatformM3u)
+                {
+                    PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform, false);
+                }
 
                 Replace7z();
             }
@@ -88,7 +101,7 @@ namespace ArchiveCacheManager
             paths.Add(Path.Combine(pluginRootPath, "ArchiveCacheManager.exe"),      Path.Combine(launchBox7zRootPath, "7z.exe"));
             paths.Add(Path.Combine(plugin7zRootPath, "7z.exe.original"),            Path.Combine(launchBox7zRootPath, "7-zip.exe"));
 
-            foreach (KeyValuePair<string, string> path in paths)
+            foreach (var path in paths)
             {
                 try
                 {

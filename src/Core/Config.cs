@@ -13,6 +13,8 @@ namespace ArchiveCacheManager
         private static readonly long defaultCacheSize = 20000;
         private static readonly long defaultMinArchiveSize = 100;
         private static readonly bool defaultMultiDiscSupport = true;
+        private static readonly string defaultFilenamePrioritySection = @"All \ All";
+        private static readonly string defaultFilenamePriority = @"cue, gdi, toc, nrg, ccd, mds, cdr, iso, eboot.bin, bin, img, mdf, chd, pbp";
 
         private static string mCachePath = defaultCachePath;
         private static long mCacheSize = defaultCacheSize;
@@ -147,6 +149,13 @@ namespace ArchiveCacheManager
                             }
                         }
                     }
+
+                    // Check if the [All \ All] section exists.
+                    if (!iniData.Sections.ContainsSection(defaultFilenamePrioritySection))
+                    {
+                        FilenamePriority.Add(defaultFilenamePrioritySection, defaultFilenamePriority);
+                        configMissing |= true;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -229,6 +238,7 @@ namespace ArchiveCacheManager
             mCacheSize = defaultCacheSize;
             mMinArchiveSize = defaultMinArchiveSize;
             mFilenamePriority = new Dictionary<string, string>();
+            mFilenamePriority.Add(defaultFilenamePrioritySection, defaultFilenamePriority);
             mFilenamePriority.Add(@"PCSX2 \ Sony Playstation 2", "bin, iso");
             mMultiDiscSupport = defaultMultiDiscSupport;
         }
