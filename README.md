@@ -3,16 +3,9 @@
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred files from an archive.
 
-## New in v2.0.9
-* Fix file priority for files in subfolder of archive when not in cache
-* Fix launching individual file from archive when not in cache
-
-## New in v2.0.8
-* Wildcard based filename matching for file priorities in archive
-    * Prioritize a file extension, filename, or combination
-    * Create priorities to automatically play preferred ROM region from GoodMerged archives
-* Performance improvements, especially for archives with many hundreds or thousands files
-* [BigBox] "Select ROM In Archive" menu option (accepts keyboard input only)
+## New in v2.0.10
+* Support for LaunchBox 12.8 Extract ROM per platform setting.
+    * *Note this release is for LaunchBox 12.8 and above only.*
 
 ## Description
 When a compressed ROM (in zip, 7z, or rar format) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.

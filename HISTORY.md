@@ -1,4 +1,7 @@
 # Archive Cache Manager change history
+## v2.0.10 (2022-03-08)
+* Support for LaunchBox 12.8 Extract ROM per platform setting
+
 ## v2.0.9 (2022-01-31)
 * Fix file priority for files in subfolder of archive when not in cache
 * Fix launching individual file from archive when not in cache
