@@ -23,13 +23,15 @@ namespace ArchiveCacheManager
             versionLabel.Text = CacheManager.Version;
 
             extensionPriorityDataGridView.Rows.Clear();
-            foreach (KeyValuePair<string, string> priority in Config.FilenamePriority)
+            foreach (var priority in Config.FilenamePriority)
             {
                 string[] priorityInfo = priority.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
 
                 extensionPriorityDataGridView.Rows.Add(new string[] { priorityInfo[0].Trim(), priorityInfo[1].Trim(), priority.Value });
             }
             extensionPriorityDataGridView.ClearSelection();
+
+            multiDiscSupportCheckBox.Checked = Config.MultiDiscSupport;
 
             updateCacheInfo(true);
             updateEnabledState();
@@ -50,7 +52,17 @@ namespace ArchiveCacheManager
             if (extensionPriorityDataGridView.SelectedRows.Count == 1)
             {
                 editPriorityButton.Enabled = true;
-                deletePriorityButton.Enabled = true;
+
+                // Don't allow deletion of the default All / All file priority.
+                if (string.Equals(extensionPriorityDataGridView.SelectedRows[0].Cells[0].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(extensionPriorityDataGridView.SelectedRows[0].Cells[1].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    deletePriorityButton.Enabled = false;
+                }
+                else
+                {
+                    deletePriorityButton.Enabled = true;
+                }
             }
             else
             {
@@ -143,6 +155,8 @@ namespace ArchiveCacheManager
             {
                 Config.FilenamePriority.Add(string.Format(@"{0} \ {1}", row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString()), row.Cells[2].Value.ToString());
             }
+
+            Config.MultiDiscSupport = multiDiscSupportCheckBox.Checked;
 
             Config.Save();
 

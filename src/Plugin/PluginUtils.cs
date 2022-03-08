@@ -15,9 +15,13 @@ namespace ArchiveCacheManager
             var emulator = PluginHelper.DataManager.GetEmulatorById(emulatorId);
             var emulatorPlatform = Array.Find(emulator.GetAllEmulatorPlatforms(), p => p.Platform.Equals(platformName));
 
+#if LAUNCHBOX_PRE_12_8
+            return emulator.AutoExtract;
+#else
             // emulatorPlatform.AutoExtract will be null if the Emulator settings haven't been changed since updating to LaunchBox 12.8
             // So perform two checks to determine if AutoExtract is true, one at the emulator level, and one at the emulatorPlatform level
             return (emulator.AutoExtract && emulatorPlatform.AutoExtract == null) || (emulatorPlatform.AutoExtract == true);
+#endif
         }
 
         public static bool GetEmulatorPlatformM3uDiscLoadEnabled(string emulatorId, string platformName)

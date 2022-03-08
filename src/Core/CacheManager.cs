@@ -62,11 +62,16 @@ namespace ArchiveCacheManager
         {
             if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport && disc == null)
             {
+                Zip.ProgressDivisor = LaunchGameInfo.Game.TotalDiscs - LaunchGameInfo.GetDiscCountInCache();
+
+                int discCount = 0;
                 foreach (var discInfo in LaunchGameInfo.Game.Discs)
                 {
                     if (!LaunchGameInfo.GetArchiveInCache(discInfo.Disc))
                     {
+                        Zip.ProgressOffset = (100 / Zip.ProgressDivisor) * discCount;
                         AddArchiveToCache(discInfo.Disc);
+                        discCount++;
                     }
                 }
 
@@ -401,6 +406,11 @@ namespace ArchiveCacheManager
                 // Subtract the available space to get the minimum number of bytes to delete from the cache.
                 // Also handles case where available space is negative (configured cache size smaller than what's in the cache right now)
                 long sizeToDelete = sizeToFree - availableCacheSpace;
+                // Check if the sizeToDelete has wrapped (above sum overflowed and is now negative)
+                if (sizeToDelete < 0)
+                {
+                    sizeToDelete = long.MaxValue;
+                }
 
                 Logger.Log("Clearing space in cache.");
                 long deletedSize = 0;

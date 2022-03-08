@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ArchiveCacheManager
 {
@@ -11,6 +12,21 @@ namespace ArchiveCacheManager
     /// </summary>
     public class Zip
     {
+        private static int mProgressDivisor = 1;
+        private static int mProgressOffset = 0;
+
+        public static int ProgressDivisor
+        {
+            get => mProgressDivisor;
+            set => mProgressDivisor = Math.Max(value, 1);
+        }
+
+        public static int ProgressOffset
+        {
+            get => mProgressOffset;
+            set => mProgressOffset = Math.Max(value, 0);
+        }
+
         public static string Get7zVersion()
         {
             string stdout = string.Empty;
@@ -264,11 +280,13 @@ namespace ArchiveCacheManager
             process.StartInfo.RedirectStandardError = true;
             StringBuilder asyncError = new StringBuilder();
             StringBuilder asyncOutput = new StringBuilder();
+            string processedStdout = string.Empty;
             process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
             {
                 if (redirectOutput)
                 {
-                    Console.Out.WriteLine(e.Data);
+                    processedStdout = CalculateProgress(e.Data);
+                    Console.Out.WriteLine(processedStdout);
                 }
                 asyncOutput.Append("\r\n" + e.Data);
             });
@@ -310,6 +328,23 @@ namespace ArchiveCacheManager
             }
 
             return true;
+        }
+
+        private static string CalculateProgress(string stdout)
+        {
+            string progress = string.Empty;
+            string regex = "(\\d+)%(.*)"; // String format is " 15% - File being extracted.ext"
+
+            if (stdout != null)
+            {
+                Match match = Regex.Match(stdout, regex);
+                if (match.Success)
+                {
+                    progress = string.Format("{0,3}%{1}", (int.Parse(match.Groups[1].Value) / mProgressDivisor) + mProgressOffset, match.Groups[2].Value);
+                }
+            }
+
+            return progress;
         }
     }
 }

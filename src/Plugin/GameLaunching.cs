@@ -21,6 +21,7 @@ namespace ArchiveCacheManager
                 if (emulatorPlatformM3u)
                 {
                     PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform, emulatorPlatformM3u);
+                    emulatorPlatformM3u = false;
                 }
             }
         }

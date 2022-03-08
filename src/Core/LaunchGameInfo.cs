@@ -230,6 +230,13 @@ namespace ArchiveCacheManager
             {
                 savedGameInfo.DecompressedSize = GetDecompressedSize(disc);
             }
+
+            if (disc != null)
+            {
+                savedGameInfo.ArchivePath = mGame.Discs.Find(d => d.Disc == (int)disc).ArchivePath;
+                savedGameInfo.SelectedDisc = (int)disc;
+            }
+
             savedGameInfo.Save(archiveCacheGameInfoPath);
         }
     }
