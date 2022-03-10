@@ -1,4 +1,10 @@
 # Archive Cache Manager change history
+## v2.11 (2022-03-xx)
+* Multi-disc support and automatic M3U generation
+* General file priority for all emulators / platforms
+    * Defaults based on LaunchBox's own file priority
+* Fix bug when manually clearing entire cache, and cached items already exceed cache size
+
 ## v2.0.10 (2022-03-08)
 * Support for LaunchBox 12.8 Extract ROM per platform setting
 
