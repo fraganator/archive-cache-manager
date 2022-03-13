@@ -21,6 +21,7 @@ namespace ArchiveCacheManager
         private static readonly string configFileName = @"config.ini";
         private static readonly string gameIndexFileName = @"game-index.ini";
         private static readonly string gameInfoFileName = @"game.ini";
+        private static readonly string settingsOverrideFileName = @"settings-override.ini";
         private static readonly string default7zFileName = @"7z.exe";
         private static readonly string alt7zFileName = @"7-zip.exe";
         private static readonly string relativePluginPath = @"Plugins\ArchiveCacheManager";
@@ -100,6 +101,16 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Returns lower case file extension with leading period removed.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetExtension(string path)
+        {
+            return Path.GetExtension(path).Trim(new char[] { '.' }).ToLower();
+        }
+
+        /// <summary>
         /// Determine the LaunchBox root path based on whether this function was called by the plugin, or the Archive Cache Manager exe.
         /// </summary>
         /// <returns></returns>
@@ -134,6 +145,12 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <returns>Absolute path to plugin game index info file.</returns>
         public static string GetPluginGameIndexPath() => Path.Combine(launchBoxRootPath, relativePluginPath, gameIndexFileName);
+
+        /// <summary>
+        /// Absolute path to file which stores temporary settings changes.
+        /// </summary>
+        /// <returns>Absolute path to temporary settings file.</returns>
+        public static string GetPluginSettingsFilenamePath() => Path.Combine(launchBoxRootPath, relativePluginPath, settingsOverrideFileName);
 
         /// <summary>
         /// Absolute path to 7z.exe.

@@ -135,6 +135,7 @@ namespace ArchiveCacheManager
                 string m3uPath = PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.GameId);
                 try
                 {
+                    DiskUtils.DeleteFile(m3uPath);
                     File.WriteAllLines(m3uPath, multiDiscPaths);
                     DiskUtils.SetFileReadOnly(m3uPath);
                 }

@@ -74,6 +74,19 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Check if the launched game is a compressed archive based on the file extension.
+        /// Extensions checked are zip, 7z, rar.
+        /// </summary>
+        /// <param name="applicationPath"></param>
+        /// <returns></returns>
+        public static bool IsApplicationPathCompressedArchive(string applicationPath)
+        {
+            string[] archiveExtensions = { "zip", "7z", "rar" };
+            string extension = PathUtils.GetExtension(applicationPath);
+            return archiveExtensions.Contains(extension);
+        }
+
+        /// <summary>
         /// Get info on a multi-disc game.
         /// </summary>
         /// <param name="game"></param>
