@@ -4,8 +4,6 @@ using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 using System.IO;
 using System.Threading.Tasks;
-using IniParser;
-using IniParser.Model;
 
 namespace ArchiveCacheManager
 {
@@ -24,9 +22,9 @@ namespace ArchiveCacheManager
 
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
-            if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform)
-                && (app != null && PluginUtils.IsApplicationPathCompressedArchive(app.ApplicationPath)
-                || PluginUtils.IsApplicationPathCompressedArchive(game.ApplicationPath)))
+            if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform))
+                // && (app != null && PluginUtils.IsApplicationPathCompressedArchive(app.ApplicationPath)
+                // || PluginUtils.IsApplicationPathCompressedArchive(game.ApplicationPath)))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));

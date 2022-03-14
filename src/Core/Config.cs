@@ -14,7 +14,12 @@ namespace ArchiveCacheManager
         private static readonly long defaultMinArchiveSize = 100;
         private static readonly bool defaultMultiDiscSupport = true;
         private static readonly string defaultFilenamePrioritySection = @"All \ All";
-        private static readonly string defaultFilenamePriority = @"cue, gdi, toc, nrg, ccd, mds, cdr, iso, eboot.bin, bin, img, mdf, chd, pbp";
+        // Priorities determined by launching zip game from LaunchBox, where zip contains common rom and disc file types.
+        // As matches were found, those file types were removed from the zip and the process repeated.
+        // LaunchBox's priority list isn't documented anywhere, so this is a best guess. A more exhaustive list might look like:
+        // cue, gdi, toc, nrg, ccd, mds, cdr, iso, eboot.bin, bin, img, mdf, chd, pbp
+        // where disc metadata / table-of-contents types take priority over disc data types.
+        private static readonly string defaultFilenamePriority = @"mds, gdi, cue, eboot.bin";
 
         private static string mCachePath = defaultCachePath;
         private static long mCacheSize = defaultCacheSize;

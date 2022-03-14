@@ -17,6 +17,7 @@ namespace ArchiveCacheManager
     static class LaunchBoxDataBackup
     {
         private static readonly string launchInfoSection = "LaunchInfo";
+        private static readonly string valueKey = "Value";
 
         private static string mSettingsPath = PathUtils.GetPluginSettingsFilenamePath();
         private static string mGameId = string.Empty;
@@ -122,7 +123,7 @@ namespace ArchiveCacheManager
 
             foreach (var setting in mSettings)
             {
-                iniData[setting.Key.ToString()]["Value"] = setting.Value.ToString();
+                iniData[setting.Key.ToString()][valueKey] = setting.Value.ToString();
             }
 
             try
@@ -162,7 +163,7 @@ namespace ArchiveCacheManager
                             SettingName settingName;
                             if (Enum.TryParse(section.SectionName, out settingName))
                             {
-                                mSettings.Add(settingName, section.Keys["Value"]);
+                                mSettings.Add(settingName, section.Keys[valueKey]);
                             }
                         }
                     }

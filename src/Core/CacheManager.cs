@@ -10,7 +10,7 @@ namespace ArchiveCacheManager
     public class CacheManager
     {
         /// <summary>
-        /// Plugin version string, in the form "vX.Y.Z".
+        /// Plugin version string, in the form "vMajor.Minor".
         /// </summary>
         public static string Version
         {
@@ -18,7 +18,7 @@ namespace ArchiveCacheManager
             {
                 Version version = Assembly.GetExecutingAssembly().GetName().Version;
 
-                return string.Format("v{0}.{1}.{2}", version.Major, version.Minor, version.Build);
+                return string.Format("v{0}.{1}", version.Major, version.Minor);
             }
         }
 
@@ -64,14 +64,14 @@ namespace ArchiveCacheManager
             {
                 Zip.ProgressDivisor = LaunchGameInfo.Game.TotalDiscs - LaunchGameInfo.GetDiscCountInCache();
 
-                int discCount = 0;
+                int discIndex = 0;
                 foreach (var discInfo in LaunchGameInfo.Game.Discs)
                 {
                     if (!LaunchGameInfo.GetArchiveInCache(discInfo.Disc))
                     {
-                        Zip.ProgressOffset = (100 / Zip.ProgressDivisor) * discCount;
+                        Zip.ProgressOffset = (100 / Zip.ProgressDivisor) * discIndex;
                         AddArchiveToCache(discInfo.Disc);
-                        discCount++;
+                        discIndex++;
                     }
                 }
 
@@ -206,6 +206,7 @@ namespace ArchiveCacheManager
             {
                 if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport && LaunchGameInfo.Game.EmulatorPlatformM3u)
                 {
+                    // This is a multi-disc game, and the emulator supports m3u files. Set the file list to the generated m3u file.
                     fileList.Add(PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), LaunchGameInfo.Game.GameId));
                 }
                 else

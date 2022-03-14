@@ -26,8 +26,18 @@ namespace ArchiveCacheManager
             foreach (var priority in Config.FilenamePriority)
             {
                 string[] priorityInfo = priority.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
+                string priorityEmulator = priorityInfo[0].Trim();
+                string priorityPlatform = priorityInfo[1].Trim();
 
-                extensionPriorityDataGridView.Rows.Add(new string[] { priorityInfo[0].Trim(), priorityInfo[1].Trim(), priority.Value });
+                if (string.Equals(priorityEmulator, "All", StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(priorityPlatform, "All", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extensionPriorityDataGridView.Rows.Insert(0, new string[] { priorityEmulator, priorityPlatform, priority.Value });
+                }
+                else
+                {
+                    extensionPriorityDataGridView.Rows.Add(new string[] { priorityEmulator, priorityPlatform, priority.Value });
+                }
             }
             extensionPriorityDataGridView.ClearSelection();
 

@@ -223,9 +223,9 @@ namespace ArchiveCacheManager
                 // TODO: Replace logic with regex?
                 string[] stdoutArray = stdout.Split(new string[] { "------------------------" }, StringSplitOptions.RemoveEmptyEntries);
 
-                string summary = stdoutArray[stdoutArray.Length - 1];
-
-                size = Convert.ToInt64(summary.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[2]);
+                // Take substring at 25th char, after date/time/attr details and before file sizes
+                string summary = stdoutArray[stdoutArray.Length - 1].Substring(25);
+                size = Convert.ToInt64(summary.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0]);
             }
 
             return size;

@@ -3,9 +3,12 @@
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred files from an archive.
 
-## New in v2.0.10
-* Support for LaunchBox 12.8 Extract ROM per platform setting.
-    * *Note this release is for LaunchBox 12.8 and above only.*
+## New in v2.11
+* Multi-disc support and automatic M3U generation!
+    * Extract and cache all discs in a multi-disc game
+    * Generate and use M3U where supported by emulator / platform
+* Custom filename priority for all emulators / platforms
+* Minor bug fixes
 
 ## Description
 When a compressed ROM (in zip, 7z, or rar format) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.
@@ -140,13 +143,27 @@ The priorities are a comma delimited list, where the highest priority is the fir
 
 Note that the priority is applied to all archives, even if they are not cached.
 
-Default: _PCSX2 \ Sony Playstation 2 \ bin, iso_
+If a specific emulator \ priority doesn't exist when launching a game, a special _`All` \ `All`_ entry is used to set the global file priority for all files in an archive. Use this for common file priorities, such as disc table-of-contents types (mds, gdi, cue). The _`All` \ `All`_ priority is only applied when specific emulator \ platform priority matches aren't found.
 
+*Note that the _`All` \ `All`_ priority is the basis for the contents of the multi-disc M3U file generation. Be careful removing entries such as `cue`, unless a specific emulator \ platform is used to handle `cue` and similar file types.*
+
+Default:
+* _`All` \ `All` \ `mds, gdi, cue, eboot.bin`_
+* _`PCSX2` \ `Sony Playstation 2` \ `bin, iso`_
+
+### Additional Options
+
+#### Multi-Disc Support
+Check this option to enable multi-disc support. When enabled, the following actions occur when playing a multi-disc game:
+* All disc archives from a multi-disc game will be extracted and added to the archive cache.
+* M3U files will be generated, with the name based on LaunchBox's Game ID (this is LaunchBox's M3U naming convention).
+* The M3U contents will list the absolute path to one cached file per disc, where the file is chosen based on the associated emulator \ platform file priority (see above), or the special _All \ All_ priority.
+* If the emulator / platform supports M3U files, the generated M3U file will be used when launching the game.
 
 ## Building
 The project is built with Visual Studio Community 2019 and .NET Framework 4.7.2.
 
-An older version of the `Unbroken.LaunchBox.Plugins` assembly is preferred when building, to maintain compatibility across LaunchBox versions. The plugin is currently built against version 1.0.0.0 included with LaunchBox 10.14. It can be built with the latest version, but will not be backwards compatible. The minimum LaunchBox version supported is 10.11, required for _Badge_ support.
+The plugin references version 12.8 of `Unbroken.LaunchBox.Plugins` assembly, to handle certain newer features (per emulator/platform ROM extraction). If building for an older version of LaunchBox (pre 12.8), you can define the `LAUNCHBOX_PRE_12_8` conditional compilation symbol. The oldest minimum version of the `Unbroken.LaunchBox.Plugins` assembly supported is 1.0.0.0 included with LaunchBox 10.11, required for _Badge_ support.
 
 ### Dependencies
 Dependencies are listed below, and can be installed using Visual Studio's Package Manager Console with the command shown.
@@ -155,6 +172,7 @@ Package               | Version | PM Command
 ----------------------|---------|--------------------------
 System.Drawing.Common | 4.7.2   | `Install-Package System.Drawing.Common -Version 4.7.2 -ProjectName Plugin`
 ini-parser            | latest  | `Install-Package ini-parser -ProjectName Core`
+ini-parser            | latest  | `Install-Package ini-parser -ProjectName Plugin`
 
 
 ## Acknowledgements
