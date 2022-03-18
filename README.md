@@ -160,6 +160,16 @@ Check this option to enable multi-disc support. When enabled, the following acti
 * The M3U contents will list the absolute path to one cached file per disc, where the file is chosen based on the associated emulator \ platform file priority (see above), or the special _All \ All_ priority.
 * If the emulator / platform supports M3U files, the generated M3U file will be used when launching the game.
 
+Default: _Checked_
+
+#### Use Game ID As M3U Filename
+Check this option to use the game's ID (GUID) when creating an M3U file for a multi-disc game (this is the same convention used by LaunchBox). When unchecked, the M3U file will be named after the game's title.
+
+*Note: The name of the M3U file is used by emulators to automatically name game save files. Using the game ID guarantees the save game files will be unique, but can be difficult to manually manage.*
+
+Default: _Checked_
+
+
 ## Building
 The project is built with Visual Studio Community 2019 and .NET Framework 4.7.2.
 

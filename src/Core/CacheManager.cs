@@ -75,8 +75,6 @@ namespace ArchiveCacheManager
                     }
                 }
 
-                GenerateM3u();
-
                 return;
             }
 
@@ -111,38 +109,44 @@ namespace ArchiveCacheManager
 
         public static void GenerateM3u()
         {
-            Dictionary<int,string> filePaths = new Dictionary<int,string>();
-            foreach (var discInfo in LaunchGameInfo.Game.Discs)
+            if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport)
             {
-                filePaths.Add(discInfo.Disc, ListCacheArchive(discInfo.Disc).FirstOrDefault());
-            }
-
-            foreach (var discInfo in LaunchGameInfo.Game.Discs)
-            {
-                List<string> multiDiscPaths = new List<string>();
-                foreach (var path in filePaths)
+                Dictionary<int, string> filePaths = new Dictionary<int, string>();
+                foreach (var discInfo in LaunchGameInfo.Game.Discs)
                 {
-                    if (discInfo.Disc == path.Key)
-                    {
-                        multiDiscPaths.Insert(0, path.Value);
-                    }
-                    else
-                    {
-                        multiDiscPaths.Add(path.Value);
-                    }
+                    filePaths.Add(discInfo.Disc, ListCacheArchive(discInfo.Disc).FirstOrDefault());
                 }
 
-                string m3uPath = PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.GameId);
-                try
+                foreach (var discInfo in LaunchGameInfo.Game.Discs)
                 {
-                    DiskUtils.DeleteFile(m3uPath);
-                    File.WriteAllLines(m3uPath, multiDiscPaths);
-                    DiskUtils.SetFileReadOnly(m3uPath);
-                }
-                catch (Exception e)
-                {
-                    Logger.Log(string.Format("Failed to save m3u file \"{0}\".", m3uPath), Logger.LogLevel.Exception);
-                    Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+                    List<string> multiDiscPaths = new List<string>();
+                    foreach (var path in filePaths)
+                    {
+                        if (discInfo.Disc == path.Key)
+                        {
+                            multiDiscPaths.Insert(0, path.Value);
+                        }
+                        else
+                        {
+                            multiDiscPaths.Add(path.Value);
+                        }
+                    }
+
+                    string m3uPathGameId = PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.GameId);
+                    string m3uPathGameTitle = PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.Title);
+                    string m3uPath = Config.UseGameIdAsM3uFilename ? m3uPathGameId : m3uPathGameTitle;
+                    try
+                    {
+                        DiskUtils.DeleteFile(m3uPathGameId);
+                        DiskUtils.DeleteFile(m3uPathGameTitle);
+                        File.WriteAllLines(m3uPath, multiDiscPaths);
+                        DiskUtils.SetFileReadOnly(m3uPath);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log(string.Format("Failed to save m3u file \"{0}\".", m3uPath), Logger.LogLevel.Exception);
+                        Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+                    }
                 }
             }
         }
@@ -207,7 +211,7 @@ namespace ArchiveCacheManager
                 if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport && LaunchGameInfo.Game.EmulatorPlatformM3u)
                 {
                     // This is a multi-disc game, and the emulator supports m3u files. Set the file list to the generated m3u file.
-                    fileList.Add(PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), LaunchGameInfo.Game.GameId));
+                    fileList.Add(PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), (Config.UseGameIdAsM3uFilename ? LaunchGameInfo.Game.GameId : LaunchGameInfo.Game.Title)));
                 }
                 else
                 {
@@ -297,7 +301,8 @@ namespace ArchiveCacheManager
             string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(LaunchGameInfo.GetArchiveCachePath(disc)),
                                               PathUtils.GetArchiveCacheGameInfoPath(LaunchGameInfo.GetArchiveCachePath(disc)),
                                               PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.GetArchiveCachePath(disc)),
-                                              PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.GameId) };
+                                              PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.GameId),
+                                              PathUtils.GetArchiveCacheM3uPath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.Title) };
 
             if (!LaunchGameInfo.Game.SelectedFile.Equals(string.Empty) && disc == null)
             {
@@ -538,6 +543,7 @@ namespace ArchiveCacheManager
             {
                 Logger.Log("Archive found in cache, bypassing extraction.");
                 LaunchGameInfo.SaveToCache();
+                GenerateM3u();
                 UpdateArchiveCachePlaytime();
             }
             else
@@ -548,6 +554,7 @@ namespace ArchiveCacheManager
                 if ((LaunchGameInfo.GetDecompressedSize() > Config.MinArchiveSize * 1048576) || (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport))
                 {
                     AddArchiveToCache();
+                    GenerateM3u();
                     UpdateArchiveCachePlaytime();
                 }
                 else

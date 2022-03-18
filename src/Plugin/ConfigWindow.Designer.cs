@@ -39,6 +39,8 @@ namespace ArchiveCacheManager
             this.openInExplorerButton = new System.Windows.Forms.Button();
             this.deleteSelectedButton = new System.Windows.Forms.Button();
             this.configureCacheButton = new System.Windows.Forms.Button();
+            this.multiDiscSupportCheckBox = new System.Windows.Forms.CheckBox();
+            this.useGameIdM3uFilenameCheckBox = new System.Windows.Forms.CheckBox();
             this.versionLabel = new System.Windows.Forms.Label();
             this.forumLink = new System.Windows.Forms.LinkLabel();
             this.sourceLink = new System.Windows.Forms.LinkLabel();
@@ -46,6 +48,9 @@ namespace ArchiveCacheManager
             this.fileExtensionPriorityGroupBox = new System.Windows.Forms.GroupBox();
             this.deletePriorityButton = new System.Windows.Forms.Button();
             this.extensionPriorityDataGridView = new System.Windows.Forms.DataGridView();
+            this.Emulator = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Platform = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.editPriorityButton = new System.Windows.Forms.Button();
             this.addPriorityButton = new System.Windows.Forms.Button();
             this.cacheDataGridView = new System.Windows.Forms.DataGridView();
@@ -58,11 +63,7 @@ namespace ArchiveCacheManager
             this.cacheSummaryTextBox = new System.Windows.Forms.TextBox();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
-            this.Emulator = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Platform = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.additionalOptionsGroupBox = new System.Windows.Forms.GroupBox();
-            this.multiDiscSupportCheckBox = new System.Windows.Forms.CheckBox();
             this.fileExtensionPriorityGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
@@ -146,6 +147,30 @@ namespace ArchiveCacheManager
             this.toolTip.SetToolTip(this.configureCacheButton, "Edit the cache configuration.");
             this.configureCacheButton.UseVisualStyleBackColor = true;
             this.configureCacheButton.Click += new System.EventHandler(this.configureCacheButton_Click);
+            // 
+            // multiDiscSupportCheckBox
+            // 
+            this.multiDiscSupportCheckBox.AutoSize = true;
+            this.multiDiscSupportCheckBox.Location = new System.Drawing.Point(15, 25);
+            this.multiDiscSupportCheckBox.Name = "multiDiscSupportCheckBox";
+            this.multiDiscSupportCheckBox.Size = new System.Drawing.Size(110, 17);
+            this.multiDiscSupportCheckBox.TabIndex = 0;
+            this.multiDiscSupportCheckBox.Text = "Multi-disc Support";
+            this.toolTip.SetToolTip(this.multiDiscSupportCheckBox, "Enable multi-disc support to extract all discs in a multi-disc game to the cache." +
+        "\r\nIt will also generate and use an M3U file if supported by the emulator.");
+            this.multiDiscSupportCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // useGameIdM3uFilenameCheckBox
+            // 
+            this.useGameIdM3uFilenameCheckBox.AutoSize = true;
+            this.useGameIdM3uFilenameCheckBox.Location = new System.Drawing.Point(131, 25);
+            this.useGameIdM3uFilenameCheckBox.Name = "useGameIdM3uFilenameCheckBox";
+            this.useGameIdM3uFilenameCheckBox.Size = new System.Drawing.Size(176, 17);
+            this.useGameIdM3uFilenameCheckBox.TabIndex = 0;
+            this.useGameIdM3uFilenameCheckBox.Text = "Use Game ID As M3U Filename";
+            this.toolTip.SetToolTip(this.useGameIdM3uFilenameCheckBox, "Use the game\'s ID (GUID) when creating an M3U file.\r\nIf unchecked, the M3U file w" +
+        "ill be named after the game\'s title.");
+            this.useGameIdM3uFilenameCheckBox.UseVisualStyleBackColor = true;
             // 
             // versionLabel
             // 
@@ -244,6 +269,25 @@ namespace ArchiveCacheManager
             this.extensionPriorityDataGridView.StandardTab = true;
             this.extensionPriorityDataGridView.TabIndex = 13;
             this.extensionPriorityDataGridView.SelectionChanged += new System.EventHandler(this.extensionPriorityDataGridView_SelectionChanged);
+            // 
+            // Emulator
+            // 
+            this.Emulator.HeaderText = "Emulator";
+            this.Emulator.Name = "Emulator";
+            this.Emulator.ReadOnly = true;
+            // 
+            // Platform
+            // 
+            this.Platform.HeaderText = "Platform";
+            this.Platform.Name = "Platform";
+            this.Platform.ReadOnly = true;
+            // 
+            // Priority
+            // 
+            this.Priority.FillWeight = 200F;
+            this.Priority.HeaderText = "Priority";
+            this.Priority.Name = "Priority";
+            this.Priority.ReadOnly = true;
             // 
             // editPriorityButton
             // 
@@ -392,27 +436,9 @@ namespace ArchiveCacheManager
             this.cancelButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.cancelButton.UseVisualStyleBackColor = true;
             // 
-            // Emulator
-            // 
-            this.Emulator.HeaderText = "Emulator";
-            this.Emulator.Name = "Emulator";
-            this.Emulator.ReadOnly = true;
-            // 
-            // Platform
-            // 
-            this.Platform.HeaderText = "Platform";
-            this.Platform.Name = "Platform";
-            this.Platform.ReadOnly = true;
-            // 
-            // Priority
-            // 
-            this.Priority.FillWeight = 200F;
-            this.Priority.HeaderText = "Priority";
-            this.Priority.Name = "Priority";
-            this.Priority.ReadOnly = true;
-            // 
             // additionalOptionsGroupBox
             // 
+            this.additionalOptionsGroupBox.Controls.Add(this.useGameIdM3uFilenameCheckBox);
             this.additionalOptionsGroupBox.Controls.Add(this.multiDiscSupportCheckBox);
             this.additionalOptionsGroupBox.Location = new System.Drawing.Point(12, 516);
             this.additionalOptionsGroupBox.Name = "additionalOptionsGroupBox";
@@ -420,18 +446,6 @@ namespace ArchiveCacheManager
             this.additionalOptionsGroupBox.TabIndex = 18;
             this.additionalOptionsGroupBox.TabStop = false;
             this.additionalOptionsGroupBox.Text = "Additional Options";
-            // 
-            // multiDiscSupportCheckBox
-            // 
-            this.multiDiscSupportCheckBox.AutoSize = true;
-            this.multiDiscSupportCheckBox.Location = new System.Drawing.Point(15, 25);
-            this.multiDiscSupportCheckBox.Name = "multiDiscSupportCheckBox";
-            this.multiDiscSupportCheckBox.Size = new System.Drawing.Size(110, 17);
-            this.multiDiscSupportCheckBox.TabIndex = 0;
-            this.multiDiscSupportCheckBox.Text = "Multi-disc Support";
-            this.toolTip.SetToolTip(this.multiDiscSupportCheckBox, "Enabling multi-disc support will extract all discs in a multi-disc game to the ca" +
-        "che. It will also generate and use an M3U file if supported by the emulator.");
-            this.multiDiscSupportCheckBox.UseVisualStyleBackColor = true;
             // 
             // ConfigWindow
             // 
@@ -501,5 +515,6 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
         private System.Windows.Forms.GroupBox additionalOptionsGroupBox;
         private System.Windows.Forms.CheckBox multiDiscSupportCheckBox;
+        private System.Windows.Forms.CheckBox useGameIdM3uFilenameCheckBox;
     }
 }
