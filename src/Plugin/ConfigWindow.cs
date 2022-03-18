@@ -60,6 +60,8 @@ namespace ArchiveCacheManager
             deleteAllButton.Enabled = (cacheDataGridView.Rows.Count > 0);
             deleteSelectedButton.Enabled = (cacheDataGridView.SelectedRows.Count > 0);
 
+            useGameIdM3uFilenameCheckBox.Enabled = multiDiscSupportCheckBox.Checked;
+
             if (extensionPriorityDataGridView.SelectedRows.Count == 1)
             {
                 editPriorityButton.Enabled = true;
@@ -369,6 +371,11 @@ namespace ArchiveCacheManager
             {
                 PluginHelper.LaunchBoxMainViewModel.RefreshData();
             }
+        }
+
+        private void multiDiscSupportCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            updateEnabledState();
         }
     }
 }
