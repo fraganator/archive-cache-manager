@@ -170,7 +170,7 @@ namespace ArchiveCacheManager
             this.useGameIdM3uFilenameCheckBox.TabIndex = 0;
             this.useGameIdM3uFilenameCheckBox.Text = "Use Game ID As M3U Filename";
             this.toolTip.SetToolTip(this.useGameIdM3uFilenameCheckBox, "Use the game\'s ID (GUID) when creating an M3U file.\r\nIf unchecked, the M3U file w" +
-        "ill be named after the game\'s title.");
+        "ill be named \"Title (Platform).m3u\".");
             this.useGameIdM3uFilenameCheckBox.UseVisualStyleBackColor = true;
             // 
             // versionLabel

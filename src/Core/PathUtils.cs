@@ -238,12 +238,29 @@ namespace ArchiveCacheManager
         public static string GetArchiveCacheExtractingFlagPath(string archiveCachePath) => Path.Combine(archiveCachePath, "extracting");
 
         /// <summary>
-        /// Absolute path to the m3u file for the given archive cache path.
+        /// Absolute path to the m3u file for the given archive cache path. Filename includes the game ID.
         /// </summary>
         /// <param name="archiveCachePath"></param>
         /// <param name="gameId"></param>
         /// <returns></returns>
-        public static string GetArchiveCacheM3uPath(string archiveCachePath, string gameId) => Path.Combine(archiveCachePath, string.Format("{0}.m3u", gameId));
+        public static string GetArchiveCacheM3uGameIdPath(string archiveCachePath, string gameId) => GetArchiveCacheM3uPath(archiveCachePath, gameId);
+
+        /// <summary>
+        /// Absolute path to the m3u file for the given archive cache path. Filename includes the game title and platform.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <param name="title"></param>
+        /// <param name="platform"></param>
+        /// <returns></returns>
+        public static string GetArchiveCacheM3uGameTitlePath(string archiveCachePath, string title, string platform) => GetArchiveCacheM3uPath(archiveCachePath, string.Format("{0} ({1})", title, platform));
+
+        /// <summary>
+        /// Absolute path to the m3u file for the given archive cache path.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        private static string GetArchiveCacheM3uPath(string archiveCachePath, string filename) => Path.Combine(archiveCachePath, string.Format("{0}.m3u", filename));
 
         /// <summary>
         /// Game info filename.

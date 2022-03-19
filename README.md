@@ -23,6 +23,7 @@ As the cache approaches its maximum size, the least recently played games are de
 * Configurable cache size and location.
 * Configurable minimum archive size (skip caching small archives).
 * Option to keep select ROMs cached and ready to play.
+* Option to extract all discs in a multi-disc game, and generate M3U file.
 * Select and play individual ROM files from an archive.
 * Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
 
@@ -33,6 +34,7 @@ Why use Archive Cache Manager? Here's some example use cases.
 * ROM library maintained as accurately ripped/dumped collections, where specialised compression formats not an option.
 * Extract and play archives from location other than `LaunchBox\ThirdParty\7-Zip\Temp`, such as high speed SSD.
 * Playing ripped PS2 games with PCSX2 where the disc image is bin/cue format, avoiding the "CDVD plugin failed to open" error message.
+* Playing MSU versions of games, where archive contains mix of cue, bin, and rom files.
 * Your library contains GoodMerged sets, and you want a quick way to play individual ROMs.
 
 
@@ -160,14 +162,14 @@ Check this option to enable multi-disc support. When enabled, the following acti
 * The M3U contents will list the absolute path to one cached file per disc, where the file is chosen based on the associated emulator \ platform file priority (see above), or the special _All \ All_ priority.
 * If the emulator / platform supports M3U files, the generated M3U file will be used when launching the game.
 
-Default: _Checked_
+Default: _Enabled_
 
 #### Use Game ID As M3U Filename
-Check this option to use the game's ID (GUID) when creating an M3U file for a multi-disc game (this is the same convention used by LaunchBox). When unchecked, the M3U file will be named after the game's title.
+Check this option to use the game's ID (GUID) when creating an M3U file for a multi-disc game (this is the same convention used by LaunchBox). When unchecked, the M3U file will be named _Title (Platform).m3u_.
 
-*Note: The name of the M3U file is used by emulators to automatically name game save files. Using the game ID guarantees the save game files will be unique, but can be difficult to manually manage.*
+*Note: The name of the M3U file is typically used by emulators to name save files. Using the game ID guarantees the save game files will be unique, but can be difficult to manually manage.*
 
-Default: _Checked_
+Default: _Enabled_
 
 
 ## Building
