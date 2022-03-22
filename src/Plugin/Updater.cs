@@ -21,7 +21,7 @@ namespace ArchiveCacheManager
                 string latestReleaseString = latestRelease.TagName.Replace("v", "");
                 Version latestVersion = new Version(latestReleaseString);
 
-                if (latestVersion != CacheManager.Version)
+                if (latestVersion > CacheManager.Version)
                 {
                     Logger.Log(string.Format("Update check found new version: {0}", latestRelease.TagName));
 
