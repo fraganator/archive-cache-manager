@@ -184,7 +184,7 @@ namespace ArchiveCacheManager
         /// </summary>
         public static void RestoreAllSettings()
         {
-            if (IsRestoreTaskCompleted())
+            if (!IsRestoreTaskCompleted())
             {
                 // This doesn't cancel the restore operation, only the delay before the restoration
                 restoreSettingsDelayToken.Cancel();
