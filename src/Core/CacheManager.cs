@@ -10,13 +10,18 @@ namespace ArchiveCacheManager
     public class CacheManager
     {
         /// <summary>
+        /// Plugin version.
+        /// </summary>
+        public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
+
+        /// <summary>
         /// Plugin version string, in the form "vMajor.Minor".
         /// </summary>
-        public static string Version
+        public static string VersionString
         {
             get
             {
-                Version version = Assembly.GetExecutingAssembly().GetName().Version;
+                Version version = Version;
 
                 return string.Format("v{0}.{1}", version.Major, version.Minor);
             }

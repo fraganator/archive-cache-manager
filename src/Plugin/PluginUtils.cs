@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,18 @@ namespace ArchiveCacheManager
 {
     static class PluginUtils
     {
+        /// <summary>
+        /// Opens a URL with the default web browser.
+        /// </summary>
+        /// <param name="url"></param>
+        public static void OpenURL(string url)
+        {
+            ProcessStartInfo ps = new ProcessStartInfo(url);
+            ps.UseShellExecute = true;
+            ps.Verb = "Open";
+            Process.Start(ps);
+        }
+
         public static bool GetEmulatorPlatformAutoExtract(string emulatorId, string platformName)
         {
             var emulator = PluginHelper.DataManager.GetEmulatorById(emulatorId);

@@ -14,6 +14,7 @@ namespace ArchiveCacheManager
         private static readonly long defaultMinArchiveSize = 100;
         private static readonly bool defaultMultiDiscSupport = true;
         private static readonly bool defaultUseGameIdAsM3uFilename = true;
+        private static readonly bool? defaultUpdateCheck = null;
         private static readonly string defaultFilenamePrioritySection = @"All \ All";
         // Priorities determined by launching zip game from LaunchBox, where zip contains common rom and disc file types.
         // As matches were found, those file types were removed from the zip and the process repeated.
@@ -28,6 +29,7 @@ namespace ArchiveCacheManager
         private static Dictionary<string, string> mFilenamePriority;
         private static bool mMultiDiscSupport = defaultMultiDiscSupport;
         private static bool mUseGameIdAsM3uFilename = defaultUseGameIdAsM3uFilename;
+        private static bool? mUpdateCheck = defaultUpdateCheck;
 
         /// <summary>
         /// Static constructor which loads config from disk into memory.
@@ -92,6 +94,12 @@ namespace ArchiveCacheManager
             set => mUseGameIdAsM3uFilename = value;
         }
 
+        public static bool? UpdateCheck
+        {
+            get => mUpdateCheck;
+            set => mUpdateCheck = value;
+        }
+
         /// <summary>
         /// Load the config into memory from the config file on disk. Will save new config file to disk if there was a error loading the config.
         /// </summary>
@@ -152,6 +160,16 @@ namespace ArchiveCacheManager
                             if (section.Keys.ContainsKey(nameof(UseGameIdAsM3uFilename)))
                             {
                                 mUseGameIdAsM3uFilename = Convert.ToBoolean(section.Keys[nameof(UseGameIdAsM3uFilename)]);
+                            }
+
+                            if (section.Keys.ContainsKey(nameof(UpdateCheck)))
+                            {
+                                mUpdateCheck = Convert.ToBoolean(section.Keys[nameof(UpdateCheck)]);
+                            }
+                            else
+                            {
+                                // Set this null to indicate the option has never been set.
+                                mUpdateCheck = null;
                             }
                         }
                         else
@@ -234,6 +252,10 @@ namespace ArchiveCacheManager
             iniData[configSection][nameof(MinArchiveSize)] = mMinArchiveSize.ToString();
             iniData[configSection][nameof(MultiDiscSupport)] = mMultiDiscSupport.ToString();
             iniData[configSection][nameof(UseGameIdAsM3uFilename)] = mUseGameIdAsM3uFilename.ToString();
+            if (mUpdateCheck != null)
+            {
+                iniData[configSection][nameof(UpdateCheck)] = mUpdateCheck.ToString();
+            }
 
             foreach (KeyValuePair<string, string> priority in mFilenamePriority)
             {

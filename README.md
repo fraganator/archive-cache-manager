@@ -4,10 +4,12 @@
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred files from an archive.
 
 ## New in v2.11
-* Multi-disc support and automatic M3U generation!
+* Multi-disc support and automatic M3U generation
     * Extract and cache all discs in a multi-disc game
     * Generate and use M3U where supported by emulator / platform
 * Custom filename priority for all emulators / platforms
+* Option to automatically check for plugin updates
+* Updated 7-Zip to version 21.07
 * Minor bug fixes
 
 ## Description
@@ -185,6 +187,7 @@ Package               | Version | PM Command
 System.Drawing.Common | 4.7.2   | `Install-Package System.Drawing.Common -Version 4.7.2 -ProjectName Plugin`
 ini-parser            | latest  | `Install-Package ini-parser -ProjectName Core`
 ini-parser            | latest  | `Install-Package ini-parser -ProjectName Plugin`
+Octokit               | latest  | `Install-Package Octokit -ProjectName Plugin`
 
 
 ## Acknowledgements

@@ -17,6 +17,7 @@ namespace ArchiveCacheManager
             {
                 Logger.Log("Game started, cleaning up 7-Zip folder.");
                 Restore7z();
+                LaunchBoxDataBackup.RestoreAllSettings();
             }
         }
 
@@ -65,7 +66,7 @@ namespace ArchiveCacheManager
                 if (LaunchBoxDataBackup.Settings.Count > 0)
                 {
                     LaunchBoxDataBackup.Save();
-                    LaunchBoxDataBackup.RestoreAllSettings(5000);
+                    LaunchBoxDataBackup.RestoreAllSettingsDelay(5000);
                 }
             }
         }

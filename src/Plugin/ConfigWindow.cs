@@ -20,7 +20,7 @@ namespace ArchiveCacheManager
 
             Config.Load();
 
-            versionLabel.Text = CacheManager.Version;
+            versionLabel.Text = CacheManager.VersionString;
 
             extensionPriorityDataGridView.Rows.Clear();
             foreach (var priority in Config.FilenamePriority)
@@ -43,6 +43,7 @@ namespace ArchiveCacheManager
 
             multiDiscSupportCheckBox.Checked = Config.MultiDiscSupport;
             useGameIdM3uFilenameCheckBox.Checked = Config.UseGameIdAsM3uFilename;
+            updateCheckCheckBox.Checked = (bool)Config.UpdateCheck;
 
             updateCacheInfo(true);
             updateEnabledState();
@@ -149,18 +150,6 @@ namespace ArchiveCacheManager
             }
         }
 
-        /// <summary>
-        /// Opens a URL with the default web browser.
-        /// </summary>
-        /// <param name="url"></param>
-        private void OpenURL(string url)
-        {
-            ProcessStartInfo ps = new ProcessStartInfo(url);
-            ps.UseShellExecute = true;
-            ps.Verb = "Open";
-            Process.Start(ps);
-        }
-
         private void okButton_Click(object sender, EventArgs e)
         {
             Config.FilenamePriority.Clear();
@@ -171,6 +160,7 @@ namespace ArchiveCacheManager
 
             Config.MultiDiscSupport = multiDiscSupportCheckBox.Checked;
             Config.UseGameIdAsM3uFilename = useGameIdM3uFilenameCheckBox.Checked;
+            Config.UpdateCheck = updateCheckCheckBox.Checked;
 
             Config.Save();
 
@@ -238,19 +228,19 @@ namespace ArchiveCacheManager
         private void pluginLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             pluginLink.LinkVisited = true;
-            OpenURL("https://forums.launchbox-app.com/files/file/234-archive-cache-manager/");
+            PluginUtils.OpenURL("https://forums.launchbox-app.com/files/file/234-archive-cache-manager/");
         }
 
         private void forumLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             forumLink.LinkVisited = true;
-            OpenURL("https://forums.launchbox-app.com/topic/35010-archive-cache-manager/");
+            PluginUtils.OpenURL("https://forums.launchbox-app.com/topic/35010-archive-cache-manager/");
         }
 
         private void sourceLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             sourceLink.LinkVisited = true;
-            OpenURL("https://github.com/fraganator/archive-cache-manager");
+            PluginUtils.OpenURL("https://github.com/fraganator/archive-cache-manager");
         }
 
         private void configureCacheButton_Click(object sender, EventArgs e)
