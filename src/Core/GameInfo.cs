@@ -16,6 +16,7 @@ namespace ArchiveCacheManager
         private string mEmulator = string.Empty;
         private string mPlatform = string.Empty;
         private string mTitle = string.Empty;
+        private string mVersion = string.Empty;
         private string mSelectedFile = string.Empty;
         private long mDecompressedSize = 0;
         private bool mKeepInCache = false;
@@ -59,6 +60,11 @@ namespace ArchiveCacheManager
         {
             get => mTitle;
             set => mTitle = value;
+        }
+        public string Version
+        {
+            get => mVersion;
+            set => mVersion = value;
         }
         public string SelectedFile
         {
@@ -116,6 +122,7 @@ namespace ArchiveCacheManager
             mEmulator = game.mEmulator;
             mPlatform = game.mPlatform;
             mTitle = game.mTitle;
+            mVersion = game.mVersion;
             mSelectedFile = game.mSelectedFile;
             mDecompressedSize = game.mDecompressedSize;
             mKeepInCache = game.mKeepInCache;
@@ -146,6 +153,7 @@ namespace ArchiveCacheManager
                     mEmulator = iniData[gameSection][nameof(Emulator)];
                     mPlatform = iniData[gameSection][nameof(Platform)];
                     mTitle = iniData[gameSection][nameof(Title)];
+                    mVersion = iniData[gameSection][nameof(Version)];
                     mSelectedFile = iniData[gameSection][nameof(SelectedFile)];
                     mDecompressedSize = Convert.ToInt64(iniData[gameSection][nameof(DecompressedSize)]);
                     mKeepInCache = Convert.ToBoolean(iniData[gameSection][nameof(KeepInCache)]);
@@ -161,6 +169,7 @@ namespace ArchiveCacheManager
                             DiscInfo discInfo = new DiscInfo();
                             discInfo.ApplicationId = sectionData.Keys[nameof(DiscInfo.ApplicationId)];
                             discInfo.ArchivePath = sectionData.Keys[nameof(DiscInfo.ArchivePath)];
+                            discInfo.Version = sectionData.Keys[nameof(DiscInfo.Version)];
                             discInfo.Disc = Convert.ToInt32(sectionData.Keys[nameof(DiscInfo.Disc)]);
                             mDiscs.Add(discInfo);
                         }
@@ -169,7 +178,7 @@ namespace ArchiveCacheManager
 
                     // Check validity of what was loaded.
                     // All the items here are required for the GameInfo to be valid.
-                    mInfoLoaded = !(string.IsNullOrEmpty(mGameId) ||
+                    mInfoLoaded = !(/*string.IsNullOrEmpty(mGameId) ||*/
                                     string.IsNullOrEmpty(mArchivePath) ||
                                     string.IsNullOrEmpty(mEmulator) ||
                                     string.IsNullOrEmpty(mPlatform) ||
@@ -203,6 +212,7 @@ namespace ArchiveCacheManager
                 iniData[gameSection][nameof(Emulator)] = mEmulator;
                 iniData[gameSection][nameof(Platform)] = mPlatform;
                 iniData[gameSection][nameof(Title)] = mTitle;
+                iniData[gameSection][nameof(Version)] = mVersion;
                 iniData[gameSection][nameof(SelectedFile)] = mSelectedFile;
                 iniData[gameSection][nameof(DecompressedSize)] = mDecompressedSize.ToString();
                 iniData[gameSection][nameof(KeepInCache)] = mKeepInCache.ToString();
@@ -219,6 +229,7 @@ namespace ArchiveCacheManager
 
                         iniData[discNumberSection][nameof(DiscInfo.ApplicationId)] = discInfo.ApplicationId;
                         iniData[discNumberSection][nameof(DiscInfo.ArchivePath)] = discInfo.ArchivePath;
+                        iniData[discNumberSection][nameof(DiscInfo.Version)] = discInfo.Version;
                         iniData[discNumberSection][nameof(DiscInfo.Disc)] = discInfo.Disc.ToString();
                     }
                 }
@@ -250,6 +261,7 @@ namespace ArchiveCacheManager
     {
         private string mApplicationId = string.Empty;
         private string mArchivePath = string.Empty;
+        private string mVersion = string.Empty;
         private int mDisc = 0;
 
         public string ApplicationId
@@ -261,6 +273,11 @@ namespace ArchiveCacheManager
         {
             get => mArchivePath;
             set => mArchivePath = value;
+        }
+        public string Version
+        {
+            get => mVersion;
+            set => mVersion = value;
         }
         public int Disc
         {
@@ -276,6 +293,7 @@ namespace ArchiveCacheManager
         {
             mApplicationId = disc.mApplicationId;
             mArchivePath = disc.mArchivePath;
+            mVersion = disc.mVersion;
             mDisc = disc.mDisc;
         }
     }

@@ -23,9 +23,9 @@ namespace ArchiveCacheManager
 
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
-            if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform))
-                // && (app != null && PluginUtils.IsApplicationPathCompressedArchive(app.ApplicationPath)
-                // || PluginUtils.IsApplicationPathCompressedArchive(game.ApplicationPath)))
+            if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform)
+                && (app != null && PluginUtils.IsApplicationPathCompressedArchive(app.ApplicationPath)
+                || PluginUtils.IsApplicationPathCompressedArchive(game.ApplicationPath)))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
@@ -39,11 +39,13 @@ namespace ArchiveCacheManager
                 gameInfo.Emulator = emulator.Title;
                 gameInfo.Platform = game.Platform;
                 gameInfo.Title = game.Title;
+                gameInfo.Version = game.Version;
                 gameInfo.SelectedFile = GameIndex.GetSelectedFile(game.Id);
                 gameInfo.EmulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform);
                 gameInfo.MultiDisc = PluginUtils.IsLaunchedGameMultiDisc(game, app);
                 if (gameInfo.MultiDisc)
                 {
+                    Logger.Log("Multi-disc game detected.");
                     int totalDiscs = 0;
                     int selectedDisc = 0;
                     List<DiscInfo> discs = new List<DiscInfo>();
@@ -62,6 +64,7 @@ namespace ArchiveCacheManager
                 {
                     LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IEmulatorPlatform_M3uDiscLoadEnabled, true);
                     PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform, false);
+                    Logger.Log(string.Format("Temporarily set M3uDiscLoadEnabled to {0} for {1} \\ {2}.", false, emulator.Title, game.Platform));
                 }
                 if (LaunchBoxDataBackup.Settings.Count > 0)
                 {

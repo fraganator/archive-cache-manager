@@ -138,7 +138,7 @@ namespace ArchiveCacheManager
                     }
 
                     string m3uPathGameId = PathUtils.GetArchiveCacheM3uGameIdPath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.GameId);
-                    string m3uPathGameTitle = PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Platform);
+                    string m3uPathGameTitle = PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.GameId, LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Version, discInfo.Disc);
                     string m3uPath = Config.UseGameIdAsM3uFilename ? m3uPathGameId : m3uPathGameTitle;
                     try
                     {
@@ -216,7 +216,7 @@ namespace ArchiveCacheManager
                 if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport && LaunchGameInfo.Game.EmulatorPlatformM3u)
                 {
                     string m3uPath = Config.UseGameIdAsM3uFilename ? PathUtils.GetArchiveCacheM3uGameIdPath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), LaunchGameInfo.Game.GameId)
-                                                                   : PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Platform);
+                                                                   : PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), LaunchGameInfo.Game.GameId, LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Version, LaunchGameInfo.Game.SelectedDisc);
                     // This is a multi-disc game, and the emulator supports m3u files. Set the file list to the generated m3u file.
                     fileList.Add(m3uPath);
                 }
@@ -309,7 +309,7 @@ namespace ArchiveCacheManager
                                               PathUtils.GetArchiveCacheGameInfoPath(LaunchGameInfo.GetArchiveCachePath(disc)),
                                               PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.GetArchiveCachePath(disc)),
                                               PathUtils.GetArchiveCacheM3uGameIdPath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.GameId),
-                                              PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Platform) };
+                                              PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.GameId, LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Version, disc) };
 
             if (!LaunchGameInfo.Game.SelectedFile.Equals(string.Empty) && disc == null)
             {

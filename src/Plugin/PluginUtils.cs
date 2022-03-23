@@ -125,6 +125,7 @@ namespace ArchiveCacheManager
                 DiscInfo discInfo = new DiscInfo();
                 discInfo.ApplicationId = discApp.Id;
                 discInfo.ArchivePath = PathUtils.GetAbsolutePath(discApp.ApplicationPath);
+                discInfo.Version = discApp.Version;
                 discInfo.Disc = (int)discApp.Disc;
                 discs.Add(discInfo);
             }
