@@ -1,7 +1,7 @@
 # Archive Cache Manager
 ![Achive Cache Manager logo](images/logo-v2-title.png?raw=true "Achive Cache Manager")
 
-A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred files from an archive.
+A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
 ## New in v2.11
 * Multi-disc support and automatic M3U generation
@@ -17,15 +17,14 @@ When a compressed ROM (in zip, 7z, or rar format) is first extracted, it is stor
 
 ![Launch time comparison video](images/launch-video.gif?raw=true "Side-by-side video comparing launch time of game from zip vs. from cache")
 
-As the cache approaches its maximum size, the least recently played games are deleted from the cache, making room for new games.
-
+As the cache size approaches the maximum size, the oldest played games are deleted from the cache, making room for new games.
 
 ## Features
 * Skip the extraction wait time for recently played games.
 * Configurable cache size and location.
-* Configurable minimum archive size (skip caching small archives).
-* Option to keep select ROMs cached and ready to play.
+* Configurable minimum archive size (don't cache small archives).
 * Option to extract all discs in a multi-disc game, and generate M3U file.
+* Option to keep select ROMs cached and ready to play.
 * Select and play individual ROM files from an archive.
 * Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
 
@@ -36,7 +35,7 @@ Why use Archive Cache Manager? Here's some example use cases.
 * ROM library maintained as accurately ripped/dumped collections, where specialised compression formats not an option.
 * Extract and play archives from location other than `LaunchBox\ThirdParty\7-Zip\Temp`, such as high speed SSD.
 * Playing ripped PS2 games with PCSX2 where the disc image is bin/cue format, avoiding the "CDVD plugin failed to open" error message.
-* Playing MSU versions of games, where archive contains mix of cue, bin, and rom files.
+* Playing MSU versions of games, where need to launch the rom file instead of the cue file from the archive.
 * Your library contains GoodMerged sets, and you want a quick way to play individual ROMs.
 
 
@@ -44,7 +43,7 @@ Why use Archive Cache Manager? Here's some example use cases.
 * Download the latest release from https://forums.launchbox-app.com/files/file/234-archive-cache-manager/ or https://github.com/fraganator/archive-cache-manager/releases
 * Unblock the download if necessary (right-click file -> Properties -> Unblock)
 * Extract this archive to your `LaunchBox\Plugins` folder, then run LaunchBox / BigBox.
-* Within LaunchBox, ensure the desired emulator has the _"Extract ROM archives before running"_ option checked.
+* Within LaunchBox, ensure the emulator or emulator platform has the _"Extract ROM archives before running"_ option checked.
 
 
 ## Uninstallation
@@ -67,6 +66,11 @@ The next time the game is launched via the normal Play option, the previous ROM 
 The same menu is also available in BigBox, though currently only supports keyboard input.
 
 ![ROM file selection window](images/select-file-window-bigbox.png?raw=true "ROM file selection window")
+
+### Multi-Disc Games
+To use the multi-disc cache feature, check the _"Multi-disc Support"_ option in the Archive Cache Manager config window. The next time a multi-disc game is launched, all the discs from the game will be extracted to the cache and a corresponding M3U file generated.
+
+If the emulator \ platform supports M3U files (as configured in LaunchBox), the generated M3U file will be used when launching the game. Otherwise a single disc will be launched, and swapping between cached discs can be done manually in the emulator.
 
 ### Keeping Games Cached
 Games can be marked 'Keep' so they stay cached and ready to play. To keep a game cached, open the plugin configuration window from the _Tools->Archive Cache Manager_ menu. From there a list of games in the cache is shown. Check the Keep box next to the game, then click OK.
@@ -172,6 +176,11 @@ Check this option to use the game's ID (GUID) when creating an M3U file for a mu
 *Note: The name of the M3U file is typically used by emulators to name save files. Using the game ID guarantees the save game files will be unique, but can be difficult to manually manage.*
 
 Default: _Enabled_
+
+#### Check For Updates On Startup
+Enable this option to check for plugin updates when LaunchBox starts up. This is a simple version check of the latest release on github, and nothing is automatically downloaded or installed. If a new update is found a message box will appear shortly after LaunchBox is started, with the option to open the download page in a browser.
+
+Default: _On first run, a message box will appear asking the user if they'd like to enable the update check._
 
 
 ## Building
