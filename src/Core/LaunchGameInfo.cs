@@ -68,7 +68,7 @@ namespace ArchiveCacheManager
 
                     return (long)mMultiDiscCacheData[(int)disc].DecompressedSize;
                 }
-                catch (KeyNotFoundException e)
+                catch (KeyNotFoundException)
                 {
                     Logger.Log(string.Format("Unknown disc number {0}, using DecompressedSize instead.", (int)disc));
                 }
@@ -109,7 +109,7 @@ namespace ArchiveCacheManager
                 {
                     return mMultiDiscCacheData[(int)disc].ArchivePath;
                 }
-                catch (KeyNotFoundException e)
+                catch (KeyNotFoundException)
                 {
                     Logger.Log(string.Format("Unknown disc number {0}, using ArchivePath instead.", (int)disc));
                 }
@@ -131,7 +131,7 @@ namespace ArchiveCacheManager
                 {
                     return mMultiDiscCacheData[(int)disc].ArchiveCachePath;
                 }
-                catch (KeyNotFoundException e)
+                catch (KeyNotFoundException)
                 {
                     Logger.Log(string.Format("Unknown disc number {0}, using ArchiveCachePath instead.", (int)disc));
                 }
@@ -158,7 +158,7 @@ namespace ArchiveCacheManager
 
                     return (bool)mMultiDiscCacheData[(int)disc].ArchiveInCache;
                 }
-                catch (KeyNotFoundException e)
+                catch (KeyNotFoundException)
                 {
                     Logger.Log(string.Format("Unknown disc number {0}, using ArchiveInCache instead.", (int)disc));
                 }
