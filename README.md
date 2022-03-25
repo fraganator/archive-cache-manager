@@ -164,14 +164,14 @@ Default:
 #### Multi-Disc Support
 Check this option to enable multi-disc support. When enabled, the following actions occur when playing a multi-disc game:
 * All disc archives from a multi-disc game will be extracted and added to the archive cache.
-* M3U files will be generated, with the name based on LaunchBox's Game ID (this is LaunchBox's M3U naming convention).
+* M3U files will be generated, with the name based on LaunchBox's Game ID (this is LaunchBox's M3U naming convention) or game title + version, depending on the _Use Game ID As M3U Filename_ option.
 * The M3U contents will list the absolute path to one cached file per disc, where the file is chosen based on the associated emulator \ platform file priority (see above), or the special _All \ All_ priority.
 * If the emulator / platform supports M3U files, the generated M3U file will be used when launching the game.
 
 Default: _Enabled_
 
 #### Use Game ID As M3U Filename
-Check this option to use the game's ID (GUID) when creating an M3U file for a multi-disc game (this is the same convention used by LaunchBox). When unchecked, the M3U file will be named _Title (Platform).m3u_.
+Check this option to use the game's ID (GUID) when creating an M3U file for a multi-disc game (this is the same convention used by LaunchBox). When unchecked, the M3U file will be named _\<Game Title\> \<Game Version\>.m3u_.
 
 *Note: The name of the M3U file is typically used by emulators to name save files. Using the game ID guarantees the save game files will be unique, but can be difficult to manually manage.*
 
