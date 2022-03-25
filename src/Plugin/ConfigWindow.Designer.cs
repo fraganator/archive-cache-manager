@@ -39,6 +39,8 @@ namespace ArchiveCacheManager
             this.openInExplorerButton = new System.Windows.Forms.Button();
             this.deleteSelectedButton = new System.Windows.Forms.Button();
             this.configureCacheButton = new System.Windows.Forms.Button();
+            this.multiDiscSupportCheckBox = new System.Windows.Forms.CheckBox();
+            this.useGameIdM3uFilenameCheckBox = new System.Windows.Forms.CheckBox();
             this.versionLabel = new System.Windows.Forms.Label();
             this.forumLink = new System.Windows.Forms.LinkLabel();
             this.sourceLink = new System.Windows.Forms.LinkLabel();
@@ -61,10 +63,13 @@ namespace ArchiveCacheManager
             this.cacheSummaryTextBox = new System.Windows.Forms.TextBox();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
+            this.additionalOptionsGroupBox = new System.Windows.Forms.GroupBox();
+            this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
             this.fileExtensionPriorityGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
             this.cacheDetailsGroupBox.SuspendLayout();
+            this.additionalOptionsGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // deleteAllButton
@@ -144,10 +149,35 @@ namespace ArchiveCacheManager
             this.configureCacheButton.UseVisualStyleBackColor = true;
             this.configureCacheButton.Click += new System.EventHandler(this.configureCacheButton_Click);
             // 
+            // multiDiscSupportCheckBox
+            // 
+            this.multiDiscSupportCheckBox.AutoSize = true;
+            this.multiDiscSupportCheckBox.Location = new System.Drawing.Point(15, 25);
+            this.multiDiscSupportCheckBox.Name = "multiDiscSupportCheckBox";
+            this.multiDiscSupportCheckBox.Size = new System.Drawing.Size(110, 17);
+            this.multiDiscSupportCheckBox.TabIndex = 0;
+            this.multiDiscSupportCheckBox.Text = "Multi-disc Support";
+            this.toolTip.SetToolTip(this.multiDiscSupportCheckBox, "Enable multi-disc support to extract all discs in a multi-disc game to the cache." +
+        "\r\nIt will also generate and use an M3U file if supported by the emulator.");
+            this.multiDiscSupportCheckBox.UseVisualStyleBackColor = true;
+            this.multiDiscSupportCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
+            // 
+            // useGameIdM3uFilenameCheckBox
+            // 
+            this.useGameIdM3uFilenameCheckBox.AutoSize = true;
+            this.useGameIdM3uFilenameCheckBox.Location = new System.Drawing.Point(131, 25);
+            this.useGameIdM3uFilenameCheckBox.Name = "useGameIdM3uFilenameCheckBox";
+            this.useGameIdM3uFilenameCheckBox.Size = new System.Drawing.Size(176, 17);
+            this.useGameIdM3uFilenameCheckBox.TabIndex = 0;
+            this.useGameIdM3uFilenameCheckBox.Text = "Use Game ID As M3U Filename";
+            this.toolTip.SetToolTip(this.useGameIdM3uFilenameCheckBox, "Use the game\'s ID (GUID) when creating an M3U file.\r\nIf unchecked, the M3U file w" +
+        "ill be named \"<Title> <Version>.m3u\".");
+            this.useGameIdM3uFilenameCheckBox.UseVisualStyleBackColor = true;
+            // 
             // versionLabel
             // 
             this.versionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.versionLabel.Location = new System.Drawing.Point(672, 528);
+            this.versionLabel.Location = new System.Drawing.Point(672, 594);
             this.versionLabel.Name = "versionLabel";
             this.versionLabel.Size = new System.Drawing.Size(100, 19);
             this.versionLabel.TabIndex = 8;
@@ -156,8 +186,9 @@ namespace ArchiveCacheManager
             // 
             // forumLink
             // 
+            this.forumLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.forumLink.AutoSize = true;
-            this.forumLink.Location = new System.Drawing.Point(491, 531);
+            this.forumLink.Location = new System.Drawing.Point(491, 597);
             this.forumLink.Name = "forumLink";
             this.forumLink.Size = new System.Drawing.Size(76, 13);
             this.forumLink.TabIndex = 10;
@@ -167,8 +198,9 @@ namespace ArchiveCacheManager
             // 
             // sourceLink
             // 
+            this.sourceLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.sourceLink.AutoSize = true;
-            this.sourceLink.Location = new System.Drawing.Point(573, 531);
+            this.sourceLink.Location = new System.Drawing.Point(573, 597);
             this.sourceLink.Name = "sourceLink";
             this.sourceLink.Size = new System.Drawing.Size(93, 13);
             this.sourceLink.TabIndex = 11;
@@ -178,8 +210,9 @@ namespace ArchiveCacheManager
             // 
             // pluginLink
             // 
+            this.pluginLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pluginLink.AutoSize = true;
-            this.pluginLink.Location = new System.Drawing.Point(394, 531);
+            this.pluginLink.Location = new System.Drawing.Point(394, 597);
             this.pluginLink.Name = "pluginLink";
             this.pluginLink.Size = new System.Drawing.Size(91, 13);
             this.pluginLink.TabIndex = 10;
@@ -193,7 +226,7 @@ namespace ArchiveCacheManager
             this.fileExtensionPriorityGroupBox.Controls.Add(this.extensionPriorityDataGridView);
             this.fileExtensionPriorityGroupBox.Controls.Add(this.editPriorityButton);
             this.fileExtensionPriorityGroupBox.Controls.Add(this.addPriorityButton);
-            this.fileExtensionPriorityGroupBox.Location = new System.Drawing.Point(12, 301);
+            this.fileExtensionPriorityGroupBox.Location = new System.Drawing.Point(12, 300);
             this.fileExtensionPriorityGroupBox.Name = "fileExtensionPriorityGroupBox";
             this.fileExtensionPriorityGroupBox.Size = new System.Drawing.Size(760, 210);
             this.fileExtensionPriorityGroupBox.TabIndex = 12;
@@ -253,6 +286,7 @@ namespace ArchiveCacheManager
             // 
             // Priority
             // 
+            this.Priority.FillWeight = 200F;
             this.Priority.HeaderText = "Priority";
             this.Priority.Name = "Priority";
             this.Priority.ReadOnly = true;
@@ -380,7 +414,7 @@ namespace ArchiveCacheManager
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.okButton.Image = global::ArchiveCacheManager.Resources.tick;
-            this.okButton.Location = new System.Drawing.Point(12, 526);
+            this.okButton.Location = new System.Drawing.Point(12, 592);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 0;
@@ -395,7 +429,7 @@ namespace ArchiveCacheManager
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cancelButton.Image = global::ArchiveCacheManager.Resources.cross_script;
-            this.cancelButton.Location = new System.Drawing.Point(93, 526);
+            this.cancelButton.Location = new System.Drawing.Point(93, 592);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 1;
@@ -404,6 +438,29 @@ namespace ArchiveCacheManager
             this.cancelButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.cancelButton.UseVisualStyleBackColor = true;
             // 
+            // additionalOptionsGroupBox
+            // 
+            this.additionalOptionsGroupBox.Controls.Add(this.useGameIdM3uFilenameCheckBox);
+            this.additionalOptionsGroupBox.Controls.Add(this.updateCheckCheckBox);
+            this.additionalOptionsGroupBox.Controls.Add(this.multiDiscSupportCheckBox);
+            this.additionalOptionsGroupBox.Location = new System.Drawing.Point(12, 516);
+            this.additionalOptionsGroupBox.Name = "additionalOptionsGroupBox";
+            this.additionalOptionsGroupBox.Size = new System.Drawing.Size(760, 60);
+            this.additionalOptionsGroupBox.TabIndex = 18;
+            this.additionalOptionsGroupBox.TabStop = false;
+            this.additionalOptionsGroupBox.Text = "Additional Options";
+            // 
+            // updateCheckCheckBox
+            // 
+            this.updateCheckCheckBox.AutoSize = true;
+            this.updateCheckCheckBox.Location = new System.Drawing.Point(573, 25);
+            this.updateCheckCheckBox.Name = "updateCheckCheckBox";
+            this.updateCheckCheckBox.Size = new System.Drawing.Size(172, 17);
+            this.updateCheckCheckBox.TabIndex = 0;
+            this.updateCheckCheckBox.Text = "Check For Updates On Startup";
+            this.updateCheckCheckBox.UseVisualStyleBackColor = true;
+            this.updateCheckCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
+            // 
             // ConfigWindow
             // 
             this.AcceptButton = this.okButton;
@@ -411,7 +468,8 @@ namespace ArchiveCacheManager
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(784, 561);
+            this.ClientSize = new System.Drawing.Size(784, 627);
+            this.Controls.Add(this.additionalOptionsGroupBox);
             this.Controls.Add(this.cacheDetailsGroupBox);
             this.Controls.Add(this.fileExtensionPriorityGroupBox);
             this.Controls.Add(this.sourceLink);
@@ -433,6 +491,8 @@ namespace ArchiveCacheManager
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).EndInit();
             this.cacheDetailsGroupBox.ResumeLayout(false);
             this.cacheDetailsGroupBox.PerformLayout();
+            this.additionalOptionsGroupBox.ResumeLayout(false);
+            this.additionalOptionsGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -451,9 +511,6 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.LinkLabel pluginLink;
         private System.Windows.Forms.GroupBox fileExtensionPriorityGroupBox;
         private System.Windows.Forms.DataGridView extensionPriorityDataGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Emulator;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Platform;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
         private System.Windows.Forms.DataGridView cacheDataGridView;
         private System.Windows.Forms.Button configureCacheButton;
         private System.Windows.Forms.GroupBox cacheDetailsGroupBox;
@@ -467,5 +524,12 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewTextBoxColumn Archive;
         private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePlatform;
         private System.Windows.Forms.DataGridViewTextBoxColumn ArchiveSize;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Emulator;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Platform;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
+        private System.Windows.Forms.GroupBox additionalOptionsGroupBox;
+        private System.Windows.Forms.CheckBox multiDiscSupportCheckBox;
+        private System.Windows.Forms.CheckBox useGameIdM3uFilenameCheckBox;
+        private System.Windows.Forms.CheckBox updateCheckCheckBox;
     }
 }

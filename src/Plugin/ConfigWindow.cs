@@ -20,16 +20,30 @@ namespace ArchiveCacheManager
 
             Config.Load();
 
-            versionLabel.Text = CacheManager.Version;
+            versionLabel.Text = CacheManager.VersionString;
 
             extensionPriorityDataGridView.Rows.Clear();
-            foreach (KeyValuePair<string, string> priority in Config.FilenamePriority)
+            foreach (var priority in Config.FilenamePriority)
             {
                 string[] priorityInfo = priority.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
+                string priorityEmulator = priorityInfo[0].Trim();
+                string priorityPlatform = priorityInfo[1].Trim();
 
-                extensionPriorityDataGridView.Rows.Add(new string[] { priorityInfo[0].Trim(), priorityInfo[1].Trim(), priority.Value });
+                if (string.Equals(priorityEmulator, "All", StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(priorityPlatform, "All", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    extensionPriorityDataGridView.Rows.Insert(0, new string[] { priorityEmulator, priorityPlatform, priority.Value });
+                }
+                else
+                {
+                    extensionPriorityDataGridView.Rows.Add(new string[] { priorityEmulator, priorityPlatform, priority.Value });
+                }
             }
             extensionPriorityDataGridView.ClearSelection();
+
+            multiDiscSupportCheckBox.Checked = Config.MultiDiscSupport;
+            useGameIdM3uFilenameCheckBox.Checked = Config.UseGameIdAsM3uFilename;
+            updateCheckCheckBox.Checked = (bool)Config.UpdateCheck;
 
             updateCacheInfo(true);
             updateEnabledState();
@@ -47,10 +61,22 @@ namespace ArchiveCacheManager
             deleteAllButton.Enabled = (cacheDataGridView.Rows.Count > 0);
             deleteSelectedButton.Enabled = (cacheDataGridView.SelectedRows.Count > 0);
 
+            useGameIdM3uFilenameCheckBox.Enabled = multiDiscSupportCheckBox.Checked;
+
             if (extensionPriorityDataGridView.SelectedRows.Count == 1)
             {
                 editPriorityButton.Enabled = true;
-                deletePriorityButton.Enabled = true;
+
+                // Don't allow deletion of the default All / All file priority.
+                if (string.Equals(extensionPriorityDataGridView.SelectedRows[0].Cells[0].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(extensionPriorityDataGridView.SelectedRows[0].Cells[1].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    deletePriorityButton.Enabled = false;
+                }
+                else
+                {
+                    deletePriorityButton.Enabled = true;
+                }
             }
             else
             {
@@ -124,18 +150,6 @@ namespace ArchiveCacheManager
             }
         }
 
-        /// <summary>
-        /// Opens a URL with the default web browser.
-        /// </summary>
-        /// <param name="url"></param>
-        private void OpenURL(string url)
-        {
-            ProcessStartInfo ps = new ProcessStartInfo(url);
-            ps.UseShellExecute = true;
-            ps.Verb = "Open";
-            Process.Start(ps);
-        }
-
         private void okButton_Click(object sender, EventArgs e)
         {
             Config.FilenamePriority.Clear();
@@ -143,6 +157,10 @@ namespace ArchiveCacheManager
             {
                 Config.FilenamePriority.Add(string.Format(@"{0} \ {1}", row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString()), row.Cells[2].Value.ToString());
             }
+
+            Config.MultiDiscSupport = multiDiscSupportCheckBox.Checked;
+            Config.UseGameIdAsM3uFilename = useGameIdM3uFilenameCheckBox.Checked;
+            Config.UpdateCheck = updateCheckCheckBox.Checked;
 
             Config.Save();
 
@@ -210,19 +228,19 @@ namespace ArchiveCacheManager
         private void pluginLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             pluginLink.LinkVisited = true;
-            OpenURL("https://forums.launchbox-app.com/files/file/234-archive-cache-manager/");
+            PluginUtils.OpenURL("https://forums.launchbox-app.com/files/file/234-archive-cache-manager/");
         }
 
         private void forumLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             forumLink.LinkVisited = true;
-            OpenURL("https://forums.launchbox-app.com/topic/35010-archive-cache-manager/");
+            PluginUtils.OpenURL("https://forums.launchbox-app.com/topic/35010-archive-cache-manager/");
         }
 
         private void sourceLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             sourceLink.LinkVisited = true;
-            OpenURL("https://github.com/fraganator/archive-cache-manager");
+            PluginUtils.OpenURL("https://github.com/fraganator/archive-cache-manager");
         }
 
         private void configureCacheButton_Click(object sender, EventArgs e)
@@ -343,6 +361,11 @@ namespace ArchiveCacheManager
             {
                 PluginHelper.LaunchBoxMainViewModel.RefreshData();
             }
+        }
+
+        private void multiDiscSupportCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            updateEnabledState();
         }
     }
 }

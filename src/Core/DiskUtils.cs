@@ -44,6 +44,27 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Deletes a file from disk. Will set the FileAttributes.Normal attribute, so read-only files will be deleted.
+        /// </summary>
+        /// <param name="filePath">The file to delete.</param>
+        public static void DeleteFile(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    // Clear any read-only or other special file attributes.
+                    File.SetAttributes(filePath, FileAttributes.Normal);
+                    File.Delete(filePath);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+            }
+        }
+
+        /// <summary>
         /// Get the size on disk of the given directory. Recursively called to get the size of all subdirectories.
         /// </summary>
         /// <param name="directoryInfo">The directory to get the size of.</param>
@@ -96,6 +117,22 @@ namespace ArchiveCacheManager
                         File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.ReadOnly);
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+            }
+        }
+
+        /// <summary>
+        /// Sets the read-only attribute on the specified file.
+        /// </summary>
+        /// <param name="filePath">The path of the file to set read-only.</param>
+        public static void SetFileReadOnly(string filePath)
+        {
+            try
+            {
+                File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.ReadOnly);
             }
             catch (Exception e)
             {

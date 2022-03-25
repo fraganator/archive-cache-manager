@@ -1,4 +1,13 @@
 # Archive Cache Manager change history
+## v2.11 (2022-03-xx)
+* Multi-disc support and automatic M3U generation
+    * Extract and cache all discs in a multi-disc game
+    * Generate and use M3U where supported by emulator / platform
+* Custom filename priority for all emulators / platforms
+* Option to automatically check for plugin updates
+* Updated 7-Zip to version 21.07
+* Minor bug fixes
+
 ## v2.0.10 (2022-03-08)
 * Support for LaunchBox 12.8 Extract ROM per platform setting
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ArchiveCacheManager
 {
@@ -16,27 +17,60 @@ namespace ArchiveCacheManager
             {
                 Logger.Log("Game started, cleaning up 7-Zip folder.");
                 Restore7z();
+                LaunchBoxDataBackup.RestoreAllSettings();
             }
         }
 
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
-            if (PluginUtils.GetEmulatorPlatformAutoExtract(game.EmulatorId, game.Platform))
+            if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform)
+                && (app != null && PluginUtils.IsApplicationPathCompressedArchive(app.ApplicationPath)
+                || PluginUtils.IsApplicationPathCompressedArchive(game.ApplicationPath)))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
 
+                LaunchBoxDataBackup.RestoreAllSettings();
                 cacheManagerActive = true;
 
                 GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
-                gameInfo.ArchivePath = (app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath;
+                gameInfo.GameId = game.Id;
+                gameInfo.ArchivePath = PathUtils.GetAbsolutePath((app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath);
                 gameInfo.Emulator = emulator.Title;
                 gameInfo.Platform = game.Platform;
                 gameInfo.Title = game.Title;
+                gameInfo.Version = game.Version;
                 gameInfo.SelectedFile = GameIndex.GetSelectedFile(game.Id);
+                gameInfo.EmulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform);
+                gameInfo.MultiDisc = PluginUtils.IsLaunchedGameMultiDisc(game, app);
+                if (gameInfo.MultiDisc)
+                {
+                    Logger.Log("Multi-disc game detected.");
+                    int totalDiscs = 0;
+                    int selectedDisc = 0;
+                    List<DiscInfo> discs = new List<DiscInfo>();
+                    PluginUtils.GetMultiDiscInfo(game, app, ref totalDiscs, ref selectedDisc, ref discs);
+
+                    gameInfo.TotalDiscs = totalDiscs;
+                    gameInfo.SelectedDisc = selectedDisc;
+                    gameInfo.Discs = discs;
+                }
                 gameInfo.Save();
 
                 Replace7z();
+
+                LaunchBoxDataBackup.SetLaunchDetails(game, app, emulator);
+                if (gameInfo.MultiDisc && Config.MultiDiscSupport && gameInfo.EmulatorPlatformM3u)
+                {
+                    LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IEmulatorPlatform_M3uDiscLoadEnabled, true);
+                    PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform, false);
+                    Logger.Log(string.Format("Temporarily set M3uDiscLoadEnabled to {0} for {1} \\ {2}.", false, emulator.Title, game.Platform));
+                }
+                if (LaunchBoxDataBackup.Settings.Count > 0)
+                {
+                    LaunchBoxDataBackup.Save();
+                    LaunchBoxDataBackup.RestoreAllSettingsDelay(5000);
+                }
             }
         }
 
@@ -70,11 +104,11 @@ namespace ArchiveCacheManager
             Dictionary<string, string> paths = new Dictionary<string, string>();
 
             paths.Add(Path.Combine(pluginRootPath, "ArchiveCacheManager.Core.dll"), Path.Combine(launchBox7zRootPath, "ArchiveCacheManager.Core.dll"));
-            paths.Add(Path.Combine(pluginRootPath, "INIFileParser.dll"),            Path.Combine(launchBox7zRootPath, "INIFileParser.dll"));
-            paths.Add(Path.Combine(pluginRootPath, "ArchiveCacheManager.exe"),      Path.Combine(launchBox7zRootPath, "7z.exe"));
-            paths.Add(Path.Combine(plugin7zRootPath, "7z.exe.original"),            Path.Combine(launchBox7zRootPath, "7-zip.exe"));
+            paths.Add(Path.Combine(pluginRootPath, "INIFileParser.dll"), Path.Combine(launchBox7zRootPath, "INIFileParser.dll"));
+            paths.Add(Path.Combine(pluginRootPath, "ArchiveCacheManager.exe"), Path.Combine(launchBox7zRootPath, "7z.exe"));
+            paths.Add(Path.Combine(plugin7zRootPath, "7z.exe.original"), Path.Combine(launchBox7zRootPath, "7-zip.exe"));
 
-            foreach (KeyValuePair<string, string> path in paths)
+            foreach (var path in paths)
             {
                 try
                 {

@@ -21,6 +21,7 @@ namespace ArchiveCacheManager
         private static readonly string configFileName = @"config.ini";
         private static readonly string gameIndexFileName = @"game-index.ini";
         private static readonly string gameInfoFileName = @"game.ini";
+        private static readonly string settingsOverrideFileName = @"settings-override.ini";
         private static readonly string default7zFileName = @"7z.exe";
         private static readonly string alt7zFileName = @"7-zip.exe";
         private static readonly string relativePluginPath = @"Plugins\ArchiveCacheManager";
@@ -100,6 +101,16 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Returns lower case file extension with leading period removed.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetExtension(string path)
+        {
+            return Path.GetExtension(path).Trim(new char[] { '.' }).ToLower();
+        }
+
+        /// <summary>
         /// Determine the LaunchBox root path based on whether this function was called by the plugin, or the Archive Cache Manager exe.
         /// </summary>
         /// <returns></returns>
@@ -134,6 +145,12 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <returns>Absolute path to plugin game index info file.</returns>
         public static string GetPluginGameIndexPath() => Path.Combine(launchBoxRootPath, relativePluginPath, gameIndexFileName);
+
+        /// <summary>
+        /// Absolute path to file which stores temporary settings changes.
+        /// </summary>
+        /// <returns>Absolute path to temporary settings file.</returns>
+        public static string GetPluginSettingsFilenamePath() => Path.Combine(launchBoxRootPath, relativePluginPath, settingsOverrideFileName);
 
         /// <summary>
         /// Absolute path to 7z.exe.
@@ -221,6 +238,43 @@ namespace ArchiveCacheManager
         public static string GetArchiveCacheExtractingFlagPath(string archiveCachePath) => Path.Combine(archiveCachePath, "extracting");
 
         /// <summary>
+        /// Absolute path to the m3u file for the given archive cache path. Filename includes the game ID.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public static string GetArchiveCacheM3uGameIdPath(string archiveCachePath, string gameId) => GetArchiveCacheM3uPath(archiveCachePath, gameId);
+
+        /// <summary>
+        /// Absolute path to the m3u file for the given archive cache path. Filename includes the game title and platform.
+        /// If the combination of title and platform results in an invalid filename, use game ID instead.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <param name="title"></param>
+        /// <param name="platform"></param>
+        /// <returns></returns>
+        public static string GetArchiveCacheM3uGameTitlePath(string archiveCachePath, string gameId, string title, string version, int? disc = null)
+        {
+            string localVersion = version;
+
+            if (disc != null)
+            {
+                string versionNoDisc = version.Replace(string.Format("(Disc {0})", disc), "").Replace("(Disc 1)", "");
+                localVersion = String.Join(" ", versionNoDisc.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            }
+
+            return GetArchiveCacheM3uPath(archiveCachePath, GetValidFilename(string.Format("{0} {1}", title, localVersion), gameId).Trim());
+        }
+
+        /// <summary>
+        /// Absolute path to the m3u file for the given archive cache path.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        private static string GetArchiveCacheM3uPath(string archiveCachePath, string filename) => Path.Combine(archiveCachePath, string.Format("{0}.m3u", filename));
+
+        /// <summary>
         /// Game info filename.
         /// </summary>
         /// <returns></returns>
@@ -284,6 +338,57 @@ namespace ArchiveCacheManager
         public static string ArchiveCachePath(string archivePath)
         {
             return Path.Combine(CachePath(), FilenameWithHash(archivePath));
+        }
+
+        /// <summary>
+        /// Absolute path to the archive within the cache.
+        /// </summary>
+        /// <param name="archivePath">The path to the cache lcation.</param>
+        /// <returns>Absolute path to the archive within the cache.</returns>
+        public static string ArchiveCachePath(string archivePath, string title, string version, string id)
+        {
+            string path = string.Format("{0} {1} [{2}]", title, version, id.Substring(0, 6));
+            path = GetValidFilename(path, Path.GetFileName(archivePath));
+            return Path.Combine(CachePath(), path);
+        }
+
+        /// <summary>
+        /// Get a valid filename from the input string. Will replace invalid characters with '-'.
+        /// If the filename is reserved or otherwise generates an exception, safeFilename will be used.
+        /// </summary>
+        /// <param name="filenameToValidate">The filename to validate.</param>
+        /// <param name="safeFilename">The fallback filename to use if filename validation fails.</param>
+        /// <returns>The validated filename.</returns>
+        public static string GetValidFilename(string filenameToValidate, string safeFilename)
+        {
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var validFilename = String.Join("_", filenameToValidate.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            var reservedNames = new[]
+            {
+                "CON", "PRN", "AUX", "CLOCK$", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4",
+                "COM5", "COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4",
+                "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+            };
+
+            foreach (var reserved in reservedNames)
+            {
+                if (String.Equals(validFilename, reserved, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    validFilename = safeFilename;
+                    break;
+                }
+            }
+
+            try
+            {
+                FileInfo fileInfo = new FileInfo(validFilename);
+            }
+            catch
+            {
+                validFilename = safeFilename;
+            }
+
+            return validFilename;
         }
 
         /// <summary>

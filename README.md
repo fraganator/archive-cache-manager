@@ -1,24 +1,29 @@
 # Archive Cache Manager
 ![Achive Cache Manager logo](images/logo-v2-title.png?raw=true "Achive Cache Manager")
 
-A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred files from an archive.
+A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
-## New in v2.0.10
-* Support for LaunchBox 12.8 Extract ROM per platform setting.
-    * *Note this release is for LaunchBox 12.8 and above only.*
+## New in v2.11
+* Multi-disc support and automatic M3U generation
+    * Extract and cache all discs in a multi-disc game
+    * Generate and use M3U where supported by emulator / platform
+* Custom filename priority for all emulators / platforms
+* Option to automatically check for plugin updates
+* Updated 7-Zip to version 21.07
+* Minor bug fixes
 
 ## Description
 When a compressed ROM (in zip, 7z, or rar format) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.
 
 ![Launch time comparison video](images/launch-video.gif?raw=true "Side-by-side video comparing launch time of game from zip vs. from cache")
 
-As the cache approaches its maximum size, the least recently played games are deleted from the cache, making room for new games.
-
+As the cache size approaches the maximum size, the oldest played games are deleted from the cache, making room for new games.
 
 ## Features
 * Skip the extraction wait time for recently played games.
 * Configurable cache size and location.
-* Configurable minimum archive size (skip caching small archives).
+* Configurable minimum archive size (don't cache small archives).
+* Option to extract all discs in a multi-disc game, and generate M3U file.
 * Option to keep select ROMs cached and ready to play.
 * Select and play individual ROM files from an archive.
 * Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
@@ -30,6 +35,7 @@ Why use Archive Cache Manager? Here's some example use cases.
 * ROM library maintained as accurately ripped/dumped collections, where specialised compression formats not an option.
 * Extract and play archives from location other than `LaunchBox\ThirdParty\7-Zip\Temp`, such as high speed SSD.
 * Playing ripped PS2 games with PCSX2 where the disc image is bin/cue format, avoiding the "CDVD plugin failed to open" error message.
+* Playing MSU versions of games, where need to launch the rom file instead of the cue file from the archive.
 * Your library contains GoodMerged sets, and you want a quick way to play individual ROMs.
 
 
@@ -37,7 +43,7 @@ Why use Archive Cache Manager? Here's some example use cases.
 * Download the latest release from https://forums.launchbox-app.com/files/file/234-archive-cache-manager/ or https://github.com/fraganator/archive-cache-manager/releases
 * Unblock the download if necessary (right-click file -> Properties -> Unblock)
 * Extract this archive to your `LaunchBox\Plugins` folder, then run LaunchBox / BigBox.
-* Within LaunchBox, ensure the desired emulator has the _"Extract ROM archives before running"_ option checked.
+* Within LaunchBox, ensure the emulator or emulator platform has the _"Extract ROM archives before running"_ option checked.
 
 
 ## Uninstallation
@@ -60,6 +66,11 @@ The next time the game is launched via the normal Play option, the previous ROM 
 The same menu is also available in BigBox, though currently only supports keyboard input.
 
 ![ROM file selection window](images/select-file-window-bigbox.png?raw=true "ROM file selection window")
+
+### Multi-Disc Games
+To use the multi-disc cache feature, check the _"Multi-disc Support"_ option in the Archive Cache Manager config window. The next time a multi-disc game is launched, all the discs from the game will be extracted to the cache and a corresponding M3U file generated.
+
+If the emulator \ platform supports M3U files (as configured in LaunchBox), the generated M3U file will be used when launching the game. Otherwise a single disc will be launched, and swapping between cached discs can be done manually in the emulator.
 
 ### Keeping Games Cached
 Games can be marked 'Keep' so they stay cached and ready to play. To keep a game cached, open the plugin configuration window from the _Tools->Archive Cache Manager_ menu. From there a list of games in the cache is shown. Check the Keep box next to the game, then click OK.
@@ -140,13 +151,42 @@ The priorities are a comma delimited list, where the highest priority is the fir
 
 Note that the priority is applied to all archives, even if they are not cached.
 
-Default: _PCSX2 \ Sony Playstation 2 \ bin, iso_
+If a specific emulator \ priority doesn't exist when launching a game, a special _`All` \ `All`_ entry is used to set the global file priority for all files in an archive. Use this for common file priorities, such as disc table-of-contents types (mds, gdi, cue). The _`All` \ `All`_ priority is only applied when specific emulator \ platform priority matches aren't found.
+
+*Note that the _`All` \ `All`_ priority is the basis for the contents of the multi-disc M3U file generation. Be careful removing entries such as `cue`, unless a specific emulator \ platform is used to handle `cue` and similar file types.*
+
+Default:
+* _`All` \ `All` \ `mds, gdi, cue, eboot.bin`_
+* _`PCSX2` \ `Sony Playstation 2` \ `bin, iso`_
+
+### Additional Options
+
+#### Multi-Disc Support
+Check this option to enable multi-disc support. When enabled, the following actions occur when playing a multi-disc game:
+* All disc archives from a multi-disc game will be extracted and added to the archive cache.
+* M3U files will be generated, with the name based on LaunchBox's Game ID (this is LaunchBox's M3U naming convention).
+* The M3U contents will list the absolute path to one cached file per disc, where the file is chosen based on the associated emulator \ platform file priority (see above), or the special _All \ All_ priority.
+* If the emulator / platform supports M3U files, the generated M3U file will be used when launching the game.
+
+Default: _Enabled_
+
+#### Use Game ID As M3U Filename
+Check this option to use the game's ID (GUID) when creating an M3U file for a multi-disc game (this is the same convention used by LaunchBox). When unchecked, the M3U file will be named _Title (Platform).m3u_.
+
+*Note: The name of the M3U file is typically used by emulators to name save files. Using the game ID guarantees the save game files will be unique, but can be difficult to manually manage.*
+
+Default: _Enabled_
+
+#### Check For Updates On Startup
+Enable this option to check for plugin updates when LaunchBox starts up. This is a simple version check of the latest release on github, and nothing is automatically downloaded or installed. If a new update is found a message box will appear shortly after LaunchBox is started, with the option to open the download page in a browser.
+
+Default: _On first run, a message box will appear asking the user if they'd like to enable the update check._
 
 
 ## Building
 The project is built with Visual Studio Community 2019 and .NET Framework 4.7.2.
 
-An older version of the `Unbroken.LaunchBox.Plugins` assembly is preferred when building, to maintain compatibility across LaunchBox versions. The plugin is currently built against version 1.0.0.0 included with LaunchBox 10.14. It can be built with the latest version, but will not be backwards compatible. The minimum LaunchBox version supported is 10.11, required for _Badge_ support.
+The plugin references version 12.8 of `Unbroken.LaunchBox.Plugins` assembly, to handle certain newer features (per emulator/platform ROM extraction). If building for an older version of LaunchBox (pre 12.8), you can define the `LAUNCHBOX_PRE_12_8` conditional compilation symbol. The oldest minimum version of the `Unbroken.LaunchBox.Plugins` assembly supported is 1.0.0.0 included with LaunchBox 10.11, required for _Badge_ support.
 
 ### Dependencies
 Dependencies are listed below, and can be installed using Visual Studio's Package Manager Console with the command shown.
@@ -155,6 +195,8 @@ Package               | Version | PM Command
 ----------------------|---------|--------------------------
 System.Drawing.Common | 4.7.2   | `Install-Package System.Drawing.Common -Version 4.7.2 -ProjectName Plugin`
 ini-parser            | latest  | `Install-Package ini-parser -ProjectName Core`
+ini-parser            | latest  | `Install-Package ini-parser -ProjectName Plugin`
+Octokit               | latest  | `Install-Package Octokit -ProjectName Plugin`
 
 
 ## Acknowledgements

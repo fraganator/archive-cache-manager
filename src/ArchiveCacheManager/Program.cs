@@ -75,13 +75,11 @@ namespace ArchiveCacheManager
                     {
                         // Expected command: 7z.exe x <rom path> -o<output path> -y -aoa -bsp1
                         case "x":
-                            Archive.Init(args[1]);
                             Logger.Log("Running in extraction mode.");
                             ExtractArchive(args);
                             break;
                         // Expected command: 7z.exe l <rom path> -slt
                         case "l":
-                            Archive.Init(args[1]);
                             Logger.Log("Running in list mode.");
                             ListArchive(args);
                             break;
@@ -113,28 +111,7 @@ namespace ArchiveCacheManager
             // Any other path is likely to be either Metadata, or some other non-game archive
             if (outputPath.EndsWith(@"7-Zip\Temp", StringComparison.InvariantCultureIgnoreCase))
             {
-                // Check if already cached to avoid calculating the decompressed archive size
-                if (CacheManager.ArchiveInCache())
-                {
-                    // Calling this function won't actually extract archive as it will check if archive is cached, but will update last play time.
-                    CacheManager.ExtractArchive();
-                }
-                // MinArchiveSize is megabytes, multiply to convert to bytes
-                // TODO: Check if archive in cache first before anything else. Avoids unnecessary calls to 7z.
-                else
-                {
-                    // Only called when required, as can be very time consuming when large number of files in archive.
-                    Archive.UpdateDecompressedSize();
-                    if (Archive.DecompressedSize > Config.MinArchiveSize * 1048576)
-                    {
-                        CacheManager.ExtractArchive();
-                    }
-                    else
-                    {
-                        Logger.Log("Archive smaller than MinArchiveSize, bypassing extraction to cache.");
-                        Zip.Call7z(args);
-                    }
-                }
+                CacheManager.ExtractArchive(args);
             }
             else
             {

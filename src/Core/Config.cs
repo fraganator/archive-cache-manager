@@ -12,11 +12,24 @@ namespace ArchiveCacheManager
         private static readonly string defaultCachePath = "ArchiveCache";
         private static readonly long defaultCacheSize = 20000;
         private static readonly long defaultMinArchiveSize = 100;
+        private static readonly bool defaultMultiDiscSupport = true;
+        private static readonly bool defaultUseGameIdAsM3uFilename = true;
+        private static readonly bool? defaultUpdateCheck = null;
+        private static readonly string defaultFilenamePrioritySection = @"All \ All";
+        // Priorities determined by launching zip game from LaunchBox, where zip contains common rom and disc file types.
+        // As matches were found, those file types were removed from the zip and the process repeated.
+        // LaunchBox's priority list isn't documented anywhere, so this is a best guess. A more exhaustive list might look like:
+        // cue, gdi, toc, nrg, ccd, mds, cdr, iso, eboot.bin, bin, img, mdf, chd, pbp
+        // where disc metadata / table-of-contents types take priority over disc data types.
+        private static readonly string defaultFilenamePriority = @"mds, gdi, cue, eboot.bin";
 
         private static string mCachePath = defaultCachePath;
         private static long mCacheSize = defaultCacheSize;
         private static long mMinArchiveSize = defaultMinArchiveSize;
         private static Dictionary<string, string> mFilenamePriority;
+        private static bool mMultiDiscSupport = defaultMultiDiscSupport;
+        private static bool mUseGameIdAsM3uFilename = defaultUseGameIdAsM3uFilename;
+        private static bool? mUpdateCheck = defaultUpdateCheck;
 
         /// <summary>
         /// Static constructor which loads config from disk into memory.
@@ -61,6 +74,30 @@ namespace ArchiveCacheManager
         {
             get => mFilenamePriority;
             set => mFilenamePriority = value;
+        }
+
+        /// <summary>
+        /// Configured multi-disc support. Default is True.
+        /// </summary>
+        public static bool MultiDiscSupport
+        {
+            get => mMultiDiscSupport;
+            set => mMultiDiscSupport = value;
+        }
+
+        /// <summary>
+        /// Configured Game ID as M3U Filename. Default is True.
+        /// </summary>
+        public static bool UseGameIdAsM3uFilename
+        {
+            get => mUseGameIdAsM3uFilename;
+            set => mUseGameIdAsM3uFilename = value;
+        }
+
+        public static bool? UpdateCheck
+        {
+            get => mUpdateCheck;
+            set => mUpdateCheck = value;
         }
 
         /// <summary>
@@ -114,6 +151,26 @@ namespace ArchiveCacheManager
                             {
                                 mMinArchiveSize = Convert.ToInt64(section.Keys["minArchiveSize"]);
                             }
+
+                            if (section.Keys.ContainsKey(nameof(MultiDiscSupport)))
+                            {
+                                mMultiDiscSupport = Convert.ToBoolean(section.Keys[nameof(MultiDiscSupport)]);
+                            }
+
+                            if (section.Keys.ContainsKey(nameof(UseGameIdAsM3uFilename)))
+                            {
+                                mUseGameIdAsM3uFilename = Convert.ToBoolean(section.Keys[nameof(UseGameIdAsM3uFilename)]);
+                            }
+
+                            if (section.Keys.ContainsKey(nameof(UpdateCheck)))
+                            {
+                                mUpdateCheck = Convert.ToBoolean(section.Keys[nameof(UpdateCheck)]);
+                            }
+                            else
+                            {
+                                // Set this null to indicate the option has never been set.
+                                mUpdateCheck = null;
+                            }
                         }
                         else
                         {
@@ -130,6 +187,13 @@ namespace ArchiveCacheManager
                                 FilenamePriority.Add(section.SectionName, section.Keys["extensionPriority"]);
                             }
                         }
+                    }
+
+                    // Check if the [All \ All] section exists.
+                    if (!iniData.Sections.ContainsSection(defaultFilenamePrioritySection))
+                    {
+                        FilenamePriority.Add(defaultFilenamePrioritySection, defaultFilenamePriority);
+                        configMissing |= true;
                     }
                 }
                 catch (Exception e)
@@ -186,6 +250,12 @@ namespace ArchiveCacheManager
             iniData[configSection][nameof(CachePath)] = mCachePath;
             iniData[configSection][nameof(CacheSize)] = mCacheSize.ToString();
             iniData[configSection][nameof(MinArchiveSize)] = mMinArchiveSize.ToString();
+            iniData[configSection][nameof(MultiDiscSupport)] = mMultiDiscSupport.ToString();
+            iniData[configSection][nameof(UseGameIdAsM3uFilename)] = mUseGameIdAsM3uFilename.ToString();
+            if (mUpdateCheck != null)
+            {
+                iniData[configSection][nameof(UpdateCheck)] = mUpdateCheck.ToString();
+            }
 
             foreach (KeyValuePair<string, string> priority in mFilenamePriority)
             {
@@ -212,7 +282,10 @@ namespace ArchiveCacheManager
             mCacheSize = defaultCacheSize;
             mMinArchiveSize = defaultMinArchiveSize;
             mFilenamePriority = new Dictionary<string, string>();
+            mFilenamePriority.Add(defaultFilenamePrioritySection, defaultFilenamePriority);
             mFilenamePriority.Add(@"PCSX2 \ Sony Playstation 2", "bin, iso");
+            mMultiDiscSupport = defaultMultiDiscSupport;
+            mUseGameIdAsM3uFilename = defaultUseGameIdAsM3uFilename;
         }
     }
 }
