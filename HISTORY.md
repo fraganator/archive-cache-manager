@@ -1,5 +1,5 @@
 # Archive Cache Manager change history
-## v2.11 (2022-03-xx)
+## v2.11 (2022-03-25)
 * Multi-disc support and automatic M3U generation
     * Extract and cache all discs in a multi-disc game
     * Generate and use M3U where supported by emulator / platform
