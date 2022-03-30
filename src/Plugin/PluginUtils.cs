@@ -143,5 +143,11 @@ namespace ArchiveCacheManager
             totalDiscs = discs.Count;
             return true;
         }
+
+        public static IAdditionalApplication GetAdditionalApplicationById(string gameId, string appId)
+        {
+            var additionalApps = PluginHelper.DataManager.GetGameById(gameId).GetAllAdditionalApplications();
+            return Array.Find(additionalApps, app => app.Id == appId);
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace ArchiveCacheManager
     class GameLaunching : IGameLaunchingPlugin
     {
         private static bool cacheManagerActive = false;
+        private static readonly string tempArchivePath = PathUtils.GetTempArchivePath();
 
         public void OnAfterGameLaunched(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
@@ -59,18 +60,43 @@ namespace ArchiveCacheManager
 
                 Replace7z();
 
+                // This code block is responsible for making temporary settings changes, to support different game launch scenarios.
+                // All settings are reverted after a game has launched, or after 5 seconds.
+                #region Temporary settings changes
+                Directory.CreateDirectory(PathUtils.GetTempPath());
                 LaunchBoxDataBackup.SetLaunchDetails(game, app, emulator);
+                #region Multi-Disc Support
                 if (gameInfo.MultiDisc && Config.MultiDiscSupport && gameInfo.EmulatorPlatformM3u)
                 {
                     LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IEmulatorPlatform_M3uDiscLoadEnabled, true);
                     PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform, false);
-                    Logger.Log(string.Format("Temporarily set M3uDiscLoadEnabled to {0} for {1} \\ {2}.", false, emulator.Title, game.Platform));
+                    Logger.Log(string.Format("Temporarily set IEmulatorPlatform.M3uDiscLoadEnabled for {0} \\ {1} to {2}.", emulator.Title, game.Platform, false));
                 }
+                #endregion
+                #region Game / App ApplicationPath
+                /*
+                if (app != null)
+                {
+                    File.Create(tempArchivePath).Close();
+                    LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IAdditionalApplication_ApplicationPath, app.ApplicationPath);
+                    app.ApplicationPath = tempArchivePath;
+                    Logger.Log(string.Format("Temporarily IAdditionalApplication.ApplicationPath for {0} ({1} - {2}) to {3}.", app.Name, game.Title, game.Platform, app.ApplicationPath));
+                }
+                else
+                {
+                    File.Create(tempArchivePath).Close();
+                    LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IGame_ApplicationPath, game.ApplicationPath);
+                    game.ApplicationPath = tempArchivePath;
+                    Logger.Log(string.Format("Temporarily set IGame.ApplicationPath for {0} ({1}) to {2}.", game.Title, game.Platform, game.ApplicationPath));
+                }
+                */
+                #endregion
                 if (LaunchBoxDataBackup.Settings.Count > 0)
                 {
                     LaunchBoxDataBackup.Save();
                     LaunchBoxDataBackup.RestoreAllSettingsDelay(5000);
                 }
+                #endregion
             }
         }
 

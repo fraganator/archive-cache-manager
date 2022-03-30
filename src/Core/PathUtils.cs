@@ -21,9 +21,11 @@ namespace ArchiveCacheManager
         private static readonly string configFileName = @"config.ini";
         private static readonly string gameIndexFileName = @"game-index.ini";
         private static readonly string gameInfoFileName = @"game.ini";
-        private static readonly string settingsOverrideFileName = @"settings-override.ini";
         private static readonly string default7zFileName = @"7z.exe";
         private static readonly string alt7zFileName = @"7-zip.exe";
+        private static readonly string tempPath = @"Temp";
+        private static readonly string tempArchiveFilename = @"temp.zip";
+        private static readonly string restoreSettingsFileName = @"restore-settings.ini";
         private static readonly string relativePluginPath = @"Plugins\ArchiveCacheManager";
         private static readonly string relative7zPath = @"ThirdParty\7-Zip";
         private static readonly string relativeLogPath = Path.Combine(relativePluginPath, "Logs");
@@ -146,11 +148,15 @@ namespace ArchiveCacheManager
         /// <returns>Absolute path to plugin game index info file.</returns>
         public static string GetPluginGameIndexPath() => Path.Combine(launchBoxRootPath, relativePluginPath, gameIndexFileName);
 
+        public static string GetTempPath() => Path.Combine(launchBoxRootPath, relativePluginPath, tempPath);
+
+        public static string GetTempArchivePath() => Path.Combine(GetTempPath(), tempArchiveFilename);
+
         /// <summary>
         /// Absolute path to file which stores temporary settings changes.
         /// </summary>
         /// <returns>Absolute path to temporary settings file.</returns>
-        public static string GetPluginSettingsFilenamePath() => Path.Combine(launchBoxRootPath, relativePluginPath, settingsOverrideFileName);
+        public static string GetRestoreSettingsFilenamePath() => Path.Combine(GetTempPath(), restoreSettingsFileName);
 
         /// <summary>
         /// Absolute path to 7z.exe.
