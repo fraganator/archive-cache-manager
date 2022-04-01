@@ -83,16 +83,12 @@ namespace ArchiveCacheManager
                 return;
             }
 
-            string stdout = string.Empty;
-            string stderr = string.Empty;
-            int exitCode = 0;
-
             if (CreateCache())
             {
                 DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.GetArchiveCachePath(disc)));
                 ClearCacheSpace(LaunchGameInfo.GetDecompressedSize(disc));
                 Logger.Log(string.Format("Extracting archive to \"{0}\".", LaunchGameInfo.GetArchiveCachePath(disc)));
-                Zip.Extract(LaunchGameInfo.GetArchivePath(disc), LaunchGameInfo.GetArchiveCachePath(disc), ref stdout, ref stderr, ref exitCode);
+                var (_, _, exitCode) = Zip.Extract(LaunchGameInfo.GetArchivePath(disc), LaunchGameInfo.GetArchiveCachePath(disc));
                 if (exitCode == 0)
                 {
                     LaunchGameInfo.SaveToCache(disc);
@@ -108,7 +104,7 @@ namespace ArchiveCacheManager
             else
             {
                 Logger.Log(@"Error creating or accessing cache location. Archive will be extracted to LaunchBox\ThirdParty\7-Zip\Temp.");
-                Zip.Extract(LaunchGameInfo.GetArchivePath(disc), PathUtils.GetLaunchBox7zTempPath(), ref stdout, ref stderr, ref exitCode);
+                Zip.Extract(LaunchGameInfo.GetArchivePath(disc), PathUtils.GetLaunchBox7zTempPath());
             }
         }
 
@@ -227,7 +223,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                fileList = ListFileArchive(ref stderr, ref exitCode);
+                fileList = ListFileArchive();
             }
 
             if (fileList.Count > 0)
@@ -249,7 +245,7 @@ namespace ArchiveCacheManager
         /// Lists all of the files in the archive.
         /// </summary>
         /// <returns>The file list for the archive in "Path = absolute\file\path.ext" format, with one entry per line.</returns>
-        public static List<string> ListFileArchive(ref string stderr, ref int exitCode)
+        public static List<string> ListFileArchive()
         {
             string stdout = string.Empty;
             string selectedFilePath = string.Empty;

@@ -47,10 +47,7 @@ namespace ArchiveCacheManager
                 if (gameInfo.MultiDisc)
                 {
                     Logger.Log("Multi-disc game detected.");
-                    int totalDiscs = 0;
-                    int selectedDisc = 0;
-                    List<DiscInfo> discs = new List<DiscInfo>();
-                    PluginUtils.GetMultiDiscInfo(game, app, ref totalDiscs, ref selectedDisc, ref discs);
+                    var (totalDiscs, selectedDisc, discs) = PluginUtils.GetMultiDiscInfo(game, app);
 
                     gameInfo.TotalDiscs = totalDiscs;
                     gameInfo.SelectedDisc = selectedDisc;

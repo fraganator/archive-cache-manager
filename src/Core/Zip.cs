@@ -29,17 +29,8 @@ namespace ArchiveCacheManager
 
         public static string Get7zVersion()
         {
-            string stdout = string.Empty;
-            string stderr = string.Empty;
-            int exitCode = 0;
-            string versionInfo = string.Empty;
-
-            if (run7z("", ref stdout, ref stderr, ref exitCode))
-            {
-                versionInfo = stdout.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0];
-            }
-
-            return versionInfo;
+            var (stdout, _, _) = Run7z("");
+            return stdout.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0];
         }
 
         /// <summary>
@@ -47,73 +38,42 @@ namespace ArchiveCacheManager
         /// LaunchBox has access to the extraction progress.
         /// </summary>
         /// <param name="archivePath"></param>
-        /// <param name="stdout"></param>
-        /// <param name="stderr"></param>
-        /// <param name="exitCode"></param>
-        public static void Extract(string archivePath, string cachePath, ref string stdout, ref string stderr, ref int exitCode)
+        /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
+        public static (string, string, int) Extract(string archivePath, string cachePath, string wildcard = null, bool excludeFiles = false)
         {
-            // This command is a duplicate of that used by LaunchBox.
+            // -i!"<wildcard>" = include files which match wildcard
+            // -x!"<wildcard>" = exclude files which match wildcard
+            // -r = recursive search for files
+            string wildcardArgs = (wildcard != null) ? string.Format(" -{0}!\"{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
+
             // x = extract
             // {0} = archive path
             // -o{1} = output path
             // -y = answer yes to any queries
             // -aoa = overwrite all existing files
             // -bsp1 = redirect progress to stdout
-            string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa -bsp1", archivePath, cachePath);
+            string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa -bsp1{2}", archivePath, cachePath, wildcardArgs);
 
-            run7z(args, ref stdout, ref stderr, ref exitCode, true);
+            return Run7z(args, true);
         }
 
         /// <summary>
         /// Run the 7z list command on the specified archive.
         /// </summary>
         /// <param name="archivePath"></param>
-        /// <param name="stdout"></param>
-        /// <param name="stderr"></param>
-        /// <param name="exitCode"></param>
-        public static void List(string archivePath, ref string stdout, ref string stderr, ref int exitCode)
+        /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
+        private static (string, string, int) List(string archivePath, string wildcard = null, bool excludeFiles = false)
         {
+            // -i!"<wildcard>" = include files which match wildcard
+            // -x!"<wildcard>" = exclude files which match wildcard
+            // -r = recursive search for files
+            string wildcardArgs = (wildcard != null) ? string.Format(" -{0}!\"{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
+
             // l = list
             // {0} = archive path
-            string args = string.Format("l \"{0}\"", archivePath);
+            string args = string.Format("l \"{0}\"{1}", archivePath, wildcardArgs);
 
-            run7z(args, ref stdout, ref stderr, ref exitCode);
-        }
-
-        /// <summary>
-        /// Run the 7z list command on the specified archive. Listing contains technical data on every file.
-        /// </summary>
-        /// <param name="archivePath"></param>
-        /// <param name="stdout"></param>
-        /// <param name="stderr"></param>
-        /// <param name="exitCode"></param>
-        public static void ListVerbose(string archivePath, ref string stdout, ref string stderr, ref int exitCode)
-        {
-            // This command is a duplicate of that used by LaunchBox.
-            // l = list
-            // {0} = archive path
-            // -slt = technical listing
-            string args = string.Format("l \"{0}\" -slt", archivePath);
-
-            run7z(args, ref stdout, ref stderr, ref exitCode);
-        }
-
-        /// <summary>
-        /// Run the 7z list command on the specified archive.
-        /// </summary>
-        /// <param name="archivePath"></param>
-        /// <param name="stdout"></param>
-        /// <param name="stderr"></param>
-        /// <param name="exitCode"></param>
-        public static void ListWildcard(string archivePath, string wildcard, ref string stdout, ref string stderr, ref int exitCode)
-        {
-            // l = list
-            // {0} = archive path
-            // -i! = wildcard match filename
-            // {1} = wildcard to match
-            string args = string.Format("l \"{0}\" -i!\"{1}\" -r", archivePath, wildcard);
-
-            run7z(args, ref stdout, ref stderr, ref exitCode);
+            return Run7z(args);
         }
 
         /// <summary>
@@ -126,19 +86,9 @@ namespace ArchiveCacheManager
             // Run List command
             // Parse stdout for all "Path = " entries
             // Return -1 on error
-            string stdout = string.Empty;
-            string stderr = string.Empty;
-            int exitCode = 0;
             string[] fileList = { };
 
-            if (!string.IsNullOrEmpty(wildcard))
-            {
-                ListWildcard(archivePath, wildcard, ref stdout, ref stderr, ref exitCode);
-            }
-            else
-            {
-                List(archivePath, ref stdout, ref stderr, ref exitCode);
-            }
+            var (stdout, _, exitCode) = List(archivePath, wildcard);
 
             /*
             stdout will be in the format below:
@@ -204,19 +154,17 @@ namespace ArchiveCacheManager
         /// Get the decompressed size of the specified archive.
         /// </summary>
         /// <param name="archivePath"></param>
+        /// /// <param name="wildcard"></param>
         /// <returns>The decompressed size of the archive in bytes.</returns>
-        public static long GetDecompressedSize(string archivePath)
+        public static long GetDecompressedSize(string archivePath, string wildcard = null)
         {
             // Run List command
             // Parse stdout for all "Size = " entries
             // Extract sizes and sum
             // Return -1 on error
-            string stdout = string.Empty;
-            string stderr = string.Empty;
-            int exitCode = 0;
             long size = 0;
 
-            List(archivePath, ref stdout, ref stderr, ref exitCode);
+            var (stdout, _, exitCode) = List(archivePath, wildcard);
 
             if (exitCode == 0)
             {
@@ -237,9 +185,6 @@ namespace ArchiveCacheManager
         /// <param name="args"></param>
         public static void Call7z(string[] args)
         {
-            string stdout = string.Empty;
-            string stderr = string.Empty;
-            int exitCode = 0;
             string[] quotedArgs = args;
             string argString;
 
@@ -254,7 +199,7 @@ namespace ArchiveCacheManager
 
             argString = String.Join(" ", quotedArgs);
 
-            run7z(argString, ref stdout, ref stderr, ref exitCode);
+            var (stdout, stderr, exitCode) = Run7z(argString);
 
             // Print the results to console and set the error code for LaunchBox to deal with
             Console.Write(stdout);
@@ -266,11 +211,12 @@ namespace ArchiveCacheManager
         /// Run 7z with the specified arguments. Results are returned by ref.
         /// </summary>
         /// <param name="args"></param>
-        /// <param name="stdout"></param>
-        /// <param name="stderr"></param>
-        /// <param name="exitCode"></param>
-        static bool run7z(string args, ref string stdout, ref string stderr, ref int exitCode, bool redirectOutput = false, bool redirectError = false)
+        /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
+        static (string, string, int) Run7z(string args, bool redirectOutput = false, bool redirectError = false)
         {
+            string stdout;
+            string stderr;
+            int exitCode;
             Process process = new Process();
             process.StartInfo.FileName = PathUtils.GetLaunchBox7zPath();
             process.StartInfo.Arguments = args;
@@ -327,7 +273,7 @@ namespace ArchiveCacheManager
                 Logger.Log(string.Format("7-Zip returned exit code {0} with error output:\r\n{1}", exitCode, stderr));
             }
 
-            return true;
+            return (stdout, stderr, exitCode);
         }
 
         private static string CalculateProgress(string stdout)

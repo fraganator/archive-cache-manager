@@ -101,21 +101,25 @@ namespace ArchiveCacheManager
 
         /// <summary>
         /// Get info on a multi-disc game.
+        /// 
+        /// totalDiscs is the total number of discs in a game. Determined by counting additional apps with Disc property set. Will be 0 if not a multi-dsc game.
+        /// selectedDisc is the selected disc, based on the additional app Disc property. Will be 1 if additional app is null, and 0 if not a multi-disc game.
+        /// discs is a list of discs and associated info in disc order. Will be empty if not a multi-disc game.
         /// </summary>
         /// <param name="game"></param>
         /// <param name="app"></param>
-        /// <param name="totalDiscs">The total number of discs in a game. Determined by counting additional apps with Disc property set. Will be 0 if not a multi-dsc game.</param>
-        /// <param name="selectedDisc">The selected disc, based on the additional app Disc property. Will be 1 if additional app is null, and 0 if not a multi-disc game.</param>
-        /// <param name="discs">List of discs and associated info in disc order. Will be empty if not a multi-disc game.</param>
-        /// <returns>True if multi-disc info populated, False otherwise.</returns>
-        public static bool GetMultiDiscInfo(IGame game, IAdditionalApplication app, ref int totalDiscs, ref int selectedDisc, ref List<DiscInfo> discs)
+        /// <returns>Tuple of (totalDiscs, selectedDisc, discs).</returns>
+        public static (int, int, List<DiscInfo>) GetMultiDiscInfo(IGame game, IAdditionalApplication app)
         {
+            int totalDiscs = 0;
+            int selectedDisc = 0;
+            List<DiscInfo> discs = new List<DiscInfo>();
+
             if (!IsLaunchedGameMultiDisc(game, app))
             {
                 totalDiscs = 0;
                 selectedDisc = 0;
                 discs.Clear();
-                return false;
             }
 
             var additionalApps = game.GetAllAdditionalApplications();
@@ -141,7 +145,8 @@ namespace ArchiveCacheManager
             }
 
             totalDiscs = discs.Count;
-            return true;
+
+            return (totalDiscs, selectedDisc, discs);
         }
 
         public static IAdditionalApplication GetAdditionalApplicationById(string gameId, string appId)
