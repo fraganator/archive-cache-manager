@@ -34,6 +34,8 @@ namespace ArchiveCacheManager
             this.cancelButton = new System.Windows.Forms.Button();
             this.okButton = new System.Windows.Forms.Button();
             this.archiveNameLabel = new System.Windows.Forms.Label();
+            this.emulatorComboBox = new System.Windows.Forms.ComboBox();
+            this.emulatorComboBoxLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // fileListBox
@@ -86,6 +88,25 @@ namespace ArchiveCacheManager
             this.archiveNameLabel.Text = "Game.zip";
             this.archiveNameLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // emulatorComboBox
+            // 
+            this.emulatorComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.emulatorComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.emulatorComboBox.FormattingEnabled = true;
+            this.emulatorComboBox.Location = new System.Drawing.Point(303, 418);
+            this.emulatorComboBox.Name = "emulatorComboBox";
+            this.emulatorComboBox.Size = new System.Drawing.Size(228, 21);
+            this.emulatorComboBox.TabIndex = 5;
+            // 
+            // emulatorComboBoxLabel
+            // 
+            this.emulatorComboBoxLabel.AutoSize = true;
+            this.emulatorComboBoxLabel.Location = new System.Drawing.Point(246, 421);
+            this.emulatorComboBoxLabel.Name = "emulatorComboBoxLabel";
+            this.emulatorComboBoxLabel.Size = new System.Drawing.Size(51, 13);
+            this.emulatorComboBoxLabel.TabIndex = 6;
+            this.emulatorComboBoxLabel.Text = "Emulator:";
+            // 
             // ArchiveListWindow
             // 
             this.AcceptButton = this.okButton;
@@ -93,6 +114,8 @@ namespace ArchiveCacheManager
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(543, 453);
+            this.Controls.Add(this.emulatorComboBoxLabel);
+            this.Controls.Add(this.emulatorComboBox);
             this.Controls.Add(this.archiveNameLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
@@ -105,6 +128,7 @@ namespace ArchiveCacheManager
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Select File";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -114,5 +138,7 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Label archiveNameLabel;
+        private System.Windows.Forms.ComboBox emulatorComboBox;
+        private System.Windows.Forms.Label emulatorComboBoxLabel;
     }
 }

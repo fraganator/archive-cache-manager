@@ -50,6 +50,8 @@ namespace ArchiveCacheManager
                 return;
             }
 
+            var emulatorsTuple = PluginUtils.GetPlatformEmulators(selectedGame.Platform, selectedGame.EmulatorId);
+
             Form window;
             if (PluginHelper.StateManager.IsBigBox)
             {
@@ -57,7 +59,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
+                window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, emulatorsTuple.Select(emu => PluginUtils.GetEmulatorTitle(emu.Item1, emu.Item2)).ToArray(), GameIndex.GetSelectedFile(selectedGame.Id));
             }
             //NativeWindow parent = new NativeWindow();
 
@@ -74,8 +76,15 @@ namespace ArchiveCacheManager
                 }
                 else
                 {
+                    int emulatorIndex = (window as ArchiveListWindow).EmulatorIndex;
+                    string commandLine = emulatorsTuple[emulatorIndex].Item2.CommandLine;
+                    // Use the game's custom command line if it exists and we're running with the game's emulator (index 0)
+                    if (emulatorIndex == 0 && !string.IsNullOrEmpty(selectedGame.CommandLine))
+                    {
+                        commandLine = selectedGame.CommandLine;
+                    }
                     GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindow).SelectedFile);
-                    PluginHelper.LaunchBoxMainViewModel.PlayGame(selectedGame, null, PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId), null);
+                    PluginHelper.LaunchBoxMainViewModel.PlayGame(selectedGame, null, emulatorsTuple[emulatorIndex].Item1, commandLine);
                 }
             }
         }

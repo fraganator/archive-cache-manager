@@ -13,12 +13,26 @@ namespace ArchiveCacheManager
     public partial class ArchiveListWindow : Form
     {
         public string SelectedFile;
+        public int EmulatorIndex;
 
-        public ArchiveListWindow(string archiveName, string[] fileList, string selection = "")
+        public ArchiveListWindow(string archiveName, string[] fileList, string[] emulatorList, string selection = "")
         {
             InitializeComponent();
 
             archiveNameLabel.Text = archiveName;
+
+            emulatorComboBox.Items.Clear();
+            if (emulatorList.Count() > 0)
+            {
+                emulatorComboBox.Items.AddRange(emulatorList);
+                emulatorComboBox.SelectedIndex = 0;
+                EmulatorIndex = emulatorComboBox.SelectedIndex;
+                emulatorComboBox.Enabled = true;
+            }
+            else
+            {
+                emulatorComboBox.Enabled = false;
+            }
 
             fileListBox.Items.Clear();
             fileListBox.Items.AddRange(fileList);
@@ -37,6 +51,7 @@ namespace ArchiveCacheManager
         private void okButton_Click(object sender, EventArgs e)
         {
             SelectedFile = fileListBox.SelectedItem.ToString();
+            EmulatorIndex = emulatorComboBox.SelectedIndex;
         }
 
         private void fileListBox_MouseDoubleClick(object sender, MouseEventArgs e)
