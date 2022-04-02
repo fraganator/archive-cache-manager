@@ -23,7 +23,7 @@ namespace ArchiveCacheManager
             {
                 Version version = Version;
 
-                return string.Format("v{0}.{1} beta", version.Major, version.Minor);
+                return string.Format("v{0}.{1} beta 1", version.Major, version.Minor);
             }
         }
 
@@ -85,10 +85,19 @@ namespace ArchiveCacheManager
 
             if (CreateCache())
             {
+                string wildcard = null;
+                if (LaunchGameInfo.GetExtractSingleFile())
+                {
+                    wildcard = LaunchGameInfo.Game.SelectedFile;
+                    // Delete previous directory contents. Don't want a build up of old individually extracted files.
+                    DiskUtils.DeleteDirectory(LaunchGameInfo.GetArchiveCachePath(disc), true);
+                }
+
                 DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.GetArchiveCachePath(disc)));
                 ClearCacheSpace(LaunchGameInfo.GetDecompressedSize(disc));
                 Logger.Log(string.Format("Extracting archive to \"{0}\".", LaunchGameInfo.GetArchiveCachePath(disc)));
-                var (_, _, exitCode) = Zip.Extract(LaunchGameInfo.GetArchivePath(disc), LaunchGameInfo.GetArchiveCachePath(disc));
+
+                var (_, _, exitCode) = Zip.Extract(LaunchGameInfo.GetArchivePath(disc), LaunchGameInfo.GetArchiveCachePath(disc), wildcard);
                 if (exitCode == 0)
                 {
                     LaunchGameInfo.SaveToCache(disc);
@@ -563,7 +572,17 @@ namespace ArchiveCacheManager
                 else
                 {
                     Logger.Log("Archive smaller than MinArchiveSize, bypassing extraction to cache.");
-                    Zip.Call7z(args);
+
+                    List<string> newArgs = new List<string>(args);
+                    newArgs[1] = LaunchGameInfo.Game.ArchivePath;
+                    if (LaunchGameInfo.GetExtractSingleFile())
+                    {
+                        // Don't wrap arg in double quotes here, as the Call7z function will do it automatically.
+                        newArgs.Add(string.Format("-i!{0}", LaunchGameInfo.Game.SelectedFile));
+                        newArgs.Add("-r");
+                    }
+
+                    Zip.Call7z(newArgs.ToArray());
                 }
             }
         }

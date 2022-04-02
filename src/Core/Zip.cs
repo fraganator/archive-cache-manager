@@ -44,7 +44,7 @@ namespace ArchiveCacheManager
             // -i!"<wildcard>" = include files which match wildcard
             // -x!"<wildcard>" = exclude files which match wildcard
             // -r = recursive search for files
-            string wildcardArgs = (wildcard != null) ? string.Format(" -{0}!\"{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
+            string wildcardArgs = (wildcard != null) ? string.Format(" \"-{0}!{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
 
             // x = extract
             // {0} = archive path
@@ -67,7 +67,7 @@ namespace ArchiveCacheManager
             // -i!"<wildcard>" = include files which match wildcard
             // -x!"<wildcard>" = exclude files which match wildcard
             // -r = recursive search for files
-            string wildcardArgs = (wildcard != null) ? string.Format(" -{0}!\"{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
+            string wildcardArgs = (wildcard != null) ? string.Format(" \"-{0}!{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
 
             // l = list
             // {0} = archive path
@@ -81,14 +81,14 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <param name="archivePath"></param>
         /// <returns>A simple file list of archive contents.</returns>
-        public static string[] GetFileList(string archivePath, string wildcard = null)
+        public static string[] GetFileList(string archivePath, string wildcard = null, bool excludeFiles = false)
         {
             // Run List command
             // Parse stdout for all "Path = " entries
             // Return -1 on error
             string[] fileList = { };
 
-            var (stdout, _, exitCode) = List(archivePath, wildcard);
+            var (stdout, _, exitCode) = List(archivePath, wildcard, excludeFiles);
 
             /*
             stdout will be in the format below:
@@ -191,7 +191,7 @@ namespace ArchiveCacheManager
             // Wrap any args containing spaces with double-quotes.
             for (int i = 0; i < quotedArgs.Count(); i++)
             {
-                if (quotedArgs[i].Contains(" "))
+                if (quotedArgs[i].Contains(" ") && !quotedArgs[i].StartsWith("\"") && !quotedArgs[i].EndsWith("\""))
                 {
                     quotedArgs[i] = string.Format("\"{0}\"", quotedArgs[i]);
                 }

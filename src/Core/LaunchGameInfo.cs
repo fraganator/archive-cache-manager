@@ -18,6 +18,7 @@ namespace ArchiveCacheManager
             public string ArchiveCachePath;
             public bool? ArchiveInCache;
             public long? DecompressedSize;
+            public bool? ExtractSingleFile;
         };
 
         private static GameInfo mGame;
@@ -35,9 +36,11 @@ namespace ArchiveCacheManager
             mGameCacheData = new CacheData();
             mGameCacheData.ArchivePath = mGame.ArchivePath;
             mGameCacheData.ArchiveCachePath = PathUtils.ArchiveCachePath(mGame.ArchivePath);
-            Logger.Log(string.Format("Archive path set to \"{0}\".", mGameCacheData.ArchivePath));
-            Logger.Log(string.Format("Archive cache path set to \"{0}\".", mGameCacheData.ArchiveCachePath));
-
+            if (mGame.InfoLoaded)
+            {
+                Logger.Log(string.Format("Archive path set to \"{0}\".", mGameCacheData.ArchivePath));
+                Logger.Log(string.Format("Archive cache path set to \"{0}\".", mGameCacheData.ArchiveCachePath));
+            }
             mMultiDiscCacheData = new Dictionary<int, CacheData>();
             foreach (var disc in mGame.Discs)
             {
@@ -88,12 +91,38 @@ namespace ArchiveCacheManager
 
             if (mGameCacheData.DecompressedSize == null)
             {
-                mGameCacheData.DecompressedSize = Zip.GetDecompressedSize(mGameCacheData.ArchivePath);
+                string wildcard = null;
+                if (GetExtractSingleFile())
+                {
+                    wildcard = mGame.SelectedFile;
+                }
+
+                mGameCacheData.DecompressedSize = Zip.GetDecompressedSize(mGameCacheData.ArchivePath, wildcard);
                 mGame.DecompressedSize = (long)mGameCacheData.DecompressedSize;
                 Logger.Log(string.Format("Decompressed archive size is {0} bytes.", (long)mGameCacheData.DecompressedSize));
             }
 
             return (long)mGameCacheData.DecompressedSize;
+        }
+
+        public static bool GetExtractSingleFile()
+        {
+            if (mGameCacheData.ExtractSingleFile == null)
+            {
+                mGameCacheData.ExtractSingleFile = false;
+
+                if (Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
+                {
+                    string extension = Path.GetExtension(mGame.SelectedFile);
+                    if (Zip.GetFileList(mGame.ArchivePath, "*" + extension, true).Count() == 0)
+                    {
+                        mGameCacheData.ExtractSingleFile = true;
+                        Logger.Log(string.Format("Smart Extraction enabled for file \"{0}\".", mGame.SelectedFile));
+                    }
+                }
+            }
+
+            return (bool)mGameCacheData.ExtractSingleFile;
         }
 
         /// <summary>
@@ -180,6 +209,11 @@ namespace ArchiveCacheManager
             if (mGameCacheData.ArchiveInCache == null)
             {
                 mGameCacheData.ArchiveInCache = File.Exists(PathUtils.GetArchiveCacheGameInfoPath(mGameCacheData.ArchiveCachePath));
+            }
+
+            if (Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
+            {
+                mGameCacheData.ArchiveInCache &= File.Exists(Path.Combine(mGameCacheData.ArchiveCachePath, mGame.SelectedFile));
             }
 
             return (bool)mGameCacheData.ArchiveInCache;

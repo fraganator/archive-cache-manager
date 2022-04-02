@@ -14,6 +14,7 @@ namespace ArchiveCacheManager
         private static readonly long defaultMinArchiveSize = 100;
         private static readonly bool defaultMultiDiscSupport = true;
         private static readonly bool defaultUseGameIdAsM3uFilename = true;
+        private static readonly bool defaultSmartExtract = true;
         private static readonly bool? defaultUpdateCheck = null;
         private static readonly string defaultFilenamePrioritySection = @"All \ All";
         // Priorities determined by launching zip game from LaunchBox, where zip contains common rom and disc file types.
@@ -29,6 +30,7 @@ namespace ArchiveCacheManager
         private static Dictionary<string, string> mFilenamePriority;
         private static bool mMultiDiscSupport = defaultMultiDiscSupport;
         private static bool mUseGameIdAsM3uFilename = defaultUseGameIdAsM3uFilename;
+        private static bool mSmartExtract = defaultSmartExtract;
         private static bool? mUpdateCheck = defaultUpdateCheck;
 
         /// <summary>
@@ -92,6 +94,12 @@ namespace ArchiveCacheManager
         {
             get => mUseGameIdAsM3uFilename;
             set => mUseGameIdAsM3uFilename = value;
+        }
+
+        public static bool SmartExtract
+        {
+            get => mSmartExtract;
+            set => mSmartExtract = value;
         }
 
         public static bool? UpdateCheck
@@ -160,6 +168,11 @@ namespace ArchiveCacheManager
                             if (section.Keys.ContainsKey(nameof(UseGameIdAsM3uFilename)))
                             {
                                 mUseGameIdAsM3uFilename = Convert.ToBoolean(section.Keys[nameof(UseGameIdAsM3uFilename)]);
+                            }
+
+                            if (section.Keys.ContainsKey(nameof(SmartExtract)))
+                            {
+                                mSmartExtract = Convert.ToBoolean(section.Keys[nameof(SmartExtract)]);
                             }
 
                             if (section.Keys.ContainsKey(nameof(UpdateCheck)))
@@ -252,6 +265,7 @@ namespace ArchiveCacheManager
             iniData[configSection][nameof(MinArchiveSize)] = mMinArchiveSize.ToString();
             iniData[configSection][nameof(MultiDiscSupport)] = mMultiDiscSupport.ToString();
             iniData[configSection][nameof(UseGameIdAsM3uFilename)] = mUseGameIdAsM3uFilename.ToString();
+            iniData[configSection][nameof(SmartExtract)] = mSmartExtract.ToString();
             if (mUpdateCheck != null)
             {
                 iniData[configSection][nameof(UpdateCheck)] = mUpdateCheck.ToString();
@@ -286,6 +300,7 @@ namespace ArchiveCacheManager
             mFilenamePriority.Add(@"PCSX2 \ Sony Playstation 2", "bin, iso");
             mMultiDiscSupport = defaultMultiDiscSupport;
             mUseGameIdAsM3uFilename = defaultUseGameIdAsM3uFilename;
+            mSmartExtract = defaultSmartExtract;
         }
     }
 }

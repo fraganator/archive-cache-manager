@@ -62,7 +62,9 @@ namespace ArchiveCacheManager
     {
         static void Main(string[] args)
         {
-            // Debugger.Launch();
+#if DEBUG
+            Debugger.Launch();
+#endif
             Logger.Log("========");
             Logger.Log(string.Format("Archive Cache Manager started with arguments: {0}", string.Join(" ", args)));
 

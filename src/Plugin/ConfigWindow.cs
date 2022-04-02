@@ -44,6 +44,7 @@ namespace ArchiveCacheManager
             multiDiscSupportCheckBox.Checked = Config.MultiDiscSupport;
             useGameIdM3uFilenameCheckBox.Checked = Config.UseGameIdAsM3uFilename;
             updateCheckCheckBox.Checked = (bool)Config.UpdateCheck;
+            smartExtractCheckBox.Checked = Config.SmartExtract;
 
             updateCacheInfo(true);
             updateEnabledState();
@@ -161,6 +162,7 @@ namespace ArchiveCacheManager
             Config.MultiDiscSupport = multiDiscSupportCheckBox.Checked;
             Config.UseGameIdAsM3uFilename = useGameIdM3uFilenameCheckBox.Checked;
             Config.UpdateCheck = updateCheckCheckBox.Checked;
+            Config.SmartExtract = smartExtractCheckBox.Checked;
 
             Config.Save();
 

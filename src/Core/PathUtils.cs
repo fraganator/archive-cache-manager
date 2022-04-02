@@ -329,7 +329,7 @@ namespace ArchiveCacheManager
         /// <summary>
         /// Absolute path to the supplied cache path, or to the configured cache if cachePath omitted.
         /// </summary>
-        /// <param name="cachePath">The path to the cache lcation.</param>
+        /// <param name="cachePath">The path to the cache location.</param>
         /// <returns>Absolute path of the cache.</returns>
         public static string CachePath(string cachePath = null)
         {

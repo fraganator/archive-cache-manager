@@ -65,6 +65,7 @@ namespace ArchiveCacheManager
             this.cancelButton = new System.Windows.Forms.Button();
             this.additionalOptionsGroupBox = new System.Windows.Forms.GroupBox();
             this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
+            this.smartExtractCheckBox = new System.Windows.Forms.CheckBox();
             this.fileExtensionPriorityGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
@@ -440,6 +441,7 @@ namespace ArchiveCacheManager
             // 
             // additionalOptionsGroupBox
             // 
+            this.additionalOptionsGroupBox.Controls.Add(this.smartExtractCheckBox);
             this.additionalOptionsGroupBox.Controls.Add(this.useGameIdM3uFilenameCheckBox);
             this.additionalOptionsGroupBox.Controls.Add(this.updateCheckCheckBox);
             this.additionalOptionsGroupBox.Controls.Add(this.multiDiscSupportCheckBox);
@@ -460,6 +462,17 @@ namespace ArchiveCacheManager
             this.updateCheckCheckBox.Text = "Check For Updates On Startup";
             this.updateCheckCheckBox.UseVisualStyleBackColor = true;
             this.updateCheckCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
+            // 
+            // smartExtractCheckBox
+            // 
+            this.smartExtractCheckBox.AutoSize = true;
+            this.smartExtractCheckBox.Location = new System.Drawing.Point(313, 25);
+            this.smartExtractCheckBox.Name = "smartExtractCheckBox";
+            this.smartExtractCheckBox.Size = new System.Drawing.Size(89, 17);
+            this.smartExtractCheckBox.TabIndex = 1;
+            this.smartExtractCheckBox.Text = "Smart Extract";
+            this.toolTip.SetToolTip(this.smartExtractCheckBox, resources.GetString("smartExtractCheckBox.ToolTip"));
+            this.smartExtractCheckBox.UseVisualStyleBackColor = true;
             // 
             // ConfigWindow
             // 
@@ -531,5 +544,6 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.CheckBox multiDiscSupportCheckBox;
         private System.Windows.Forms.CheckBox useGameIdM3uFilenameCheckBox;
         private System.Windows.Forms.CheckBox updateCheckCheckBox;
+        private System.Windows.Forms.CheckBox smartExtractCheckBox;
     }
 }
