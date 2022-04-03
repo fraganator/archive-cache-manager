@@ -21,6 +21,9 @@ namespace ArchiveCacheManager
             public bool? ExtractSingleFile;
         };
 
+        private static readonly List<string> StandaloneFileList = new List<string> { ".gb", ".gbc", ".gba", ".agb", ".nes", ".fds", ".smc", ".sfc", ".n64", ".z64", ".v64", ".ndd", ".md", ".smd", ".gen", ".iso", ".chd", ".rvn", ".gg", ".gcm", ".32x", ".bin" };
+        private static readonly List<string> MetadataFileList = new List<string> { ".nfo", ".txt", ".dat", ".xml", ".json" };
+
         private static GameInfo mGame;
         private static CacheData mGameCacheData;
         private static Dictionary<int, CacheData> mMultiDiscCacheData;
@@ -113,17 +116,16 @@ namespace ArchiveCacheManager
 
                 if (Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
                 {
-                    // List<string> multiFileList = new List<string> { ".cue", ".gdi", ".toc", ".nrg", ".ccd", ".mds", ".cdr", };
-                    List<string> singleFileList = new List<string> { ".gb", ".gbc", ".gba", ".agb", ".nes", ".fds", ".smc", ".sfc", ".n64", ".z64", ".v64", ".ndd", ".md", ".smd", ".gen", ".iso", ".chd", ".rvn", ".gg", ".gcm", ".32x", ".bin" };
-                    List<string> metaFileList = new List<string> { ".nfo", ".txt", ".dat", ".xml" };
+                    List<string> excludeList = new List<string>(MetadataFileList);
 
-                    List<string> excludeList = new List<string>(metaFileList);
-
-                    string extension = Path.GetExtension(mGame.SelectedFile);
-                    excludeList.Add(extension);
-                    if (singleFileList.Contains(extension))
+                    string extension = Path.GetExtension(mGame.SelectedFile).ToLower();
+                    if (StandaloneFileList.Contains(extension))
                     {
-                        excludeList.AddRange(singleFileList);
+                        excludeList.AddRange(StandaloneFileList);
+                    }
+                    else
+                    {
+                        excludeList.Add(extension);
                     }
 
                     if (Zip.GetFileList(mGame.ArchivePath, null, excludeList.ToArray(), true).Count() == 0)
