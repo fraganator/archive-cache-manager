@@ -23,7 +23,7 @@ namespace ArchiveCacheManager
             {
                 Version version = Version;
 
-                return string.Format("v{0}.{1} beta 1", version.Major, version.Minor);
+                return string.Format("v{0}.{1} beta 2", version.Major, version.Minor);
             }
         }
 
@@ -97,7 +97,7 @@ namespace ArchiveCacheManager
                 ClearCacheSpace(LaunchGameInfo.GetDecompressedSize(disc));
                 Logger.Log(string.Format("Extracting archive to \"{0}\".", LaunchGameInfo.GetArchiveCachePath(disc)));
 
-                var (_, _, exitCode) = Zip.Extract(LaunchGameInfo.GetArchivePath(disc), LaunchGameInfo.GetArchiveCachePath(disc), wildcard);
+                var (_, _, exitCode) = Zip.Extract(LaunchGameInfo.GetArchivePath(disc), LaunchGameInfo.GetArchiveCachePath(disc), wildcard != null ? new string[] { wildcard } : null);
                 if (exitCode == 0)
                 {
                     LaunchGameInfo.SaveToCache(disc);
@@ -262,7 +262,7 @@ namespace ArchiveCacheManager
 
             if (!LaunchGameInfo.Game.SelectedFile.Equals(string.Empty))
             {
-                if (Zip.GetFileList(LaunchGameInfo.GetArchivePath(), LaunchGameInfo.Game.SelectedFile).Length > 0)
+                if (Zip.GetFileList(LaunchGameInfo.GetArchivePath(), new string[] { LaunchGameInfo.Game.SelectedFile }).Length > 0)
                 {
                     fileList.Add(LaunchGameInfo.Game.SelectedFile);
                     Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchGameInfo.Game.SelectedFile));
@@ -283,7 +283,7 @@ namespace ArchiveCacheManager
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
                     {
-                        fileList = Zip.GetFileList(LaunchGameInfo.GetArchivePath(), string.Format("*{0}", extension.Trim())).ToList();
+                        fileList = Zip.GetFileList(LaunchGameInfo.GetArchivePath(), new string[] { string.Format("*{0}", extension.Trim()) }).ToList();
 
                         if (fileList.Count > 0)
                         {

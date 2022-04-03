@@ -9,8 +9,9 @@ namespace ArchiveCacheManager
         {
             if (eventType == "PluginInitialized")
             {
-                // Debugger.Launch();
-
+#if DEBUG
+                Debugger.Launch();
+#endif
                 Logger.Init();
                 Logger.Log("-------- PLUGIN INITIALIZED --------");
                 Logger.Log(string.Format("Archive Cache Manager plugin initialized ({0}).", CacheManager.VersionString));

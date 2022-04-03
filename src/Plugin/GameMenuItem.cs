@@ -77,6 +77,7 @@ namespace ArchiveCacheManager
                 else
                 {
                     int emulatorIndex = (window as ArchiveListWindow).EmulatorIndex;
+                    // Use a specific command line for the IEmulatorPlatform. This covers the case where RetroArch has more than one core configured for the same platform.
                     string commandLine = emulatorsTuple[emulatorIndex].Item2.CommandLine;
                     // Use the game's custom command line if it exists and we're running with the game's emulator (index 0)
                     if (emulatorIndex == 0 && !string.IsNullOrEmpty(selectedGame.CommandLine))

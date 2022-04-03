@@ -39,20 +39,15 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <param name="archivePath"></param>
         /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
-        public static (string, string, int) Extract(string archivePath, string cachePath, string wildcard = null, bool excludeFiles = false)
+        public static (string, string, int) Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
         {
-            // -i!"<wildcard>" = include files which match wildcard
-            // -x!"<wildcard>" = exclude files which match wildcard
-            // -r = recursive search for files
-            string wildcardArgs = (wildcard != null) ? string.Format(" \"-{0}!{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
-
             // x = extract
             // {0} = archive path
             // -o{1} = output path
             // -y = answer yes to any queries
             // -aoa = overwrite all existing files
             // -bsp1 = redirect progress to stdout
-            string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa -bsp1{2}", archivePath, cachePath, wildcardArgs);
+            string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa -bsp1 {2}", archivePath, cachePath, GetIncludeExcludeArgs(includeList, excludeList, prefixWildcard));
 
             return Run7z(args, true);
         }
@@ -62,18 +57,43 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <param name="archivePath"></param>
         /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
-        private static (string, string, int) List(string archivePath, string wildcard = null, bool excludeFiles = false)
+        private static (string, string, int) List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
         {
+            // l = list
+            // {0} = archive path
+            string args = string.Format("l \"{0}\" {1}", archivePath, GetIncludeExcludeArgs(includeList, excludeList, prefixWildcard));
+
+            return Run7z(args);
+        }
+
+        private static string GetIncludeExcludeArgs(string[] includeList, string[] excludeList, bool prefixWildcard)
+        {
+            string includeExcludeArgs = string.Empty;
             // -i!"<wildcard>" = include files which match wildcard
             // -x!"<wildcard>" = exclude files which match wildcard
             // -r = recursive search for files
-            string wildcardArgs = (wildcard != null) ? string.Format(" \"-{0}!{1}\" -r", (excludeFiles ? "x" : "i"), wildcard) : string.Empty;
+            if (includeList != null && includeList.Count() > 0)
+            {
+                foreach (var include in includeList)
+                {
+                    includeExcludeArgs = string.Format("{0} \"-i!{1}{2}\"", includeExcludeArgs, prefixWildcard ? "*" : "", include);
+                }
+            }
 
-            // l = list
-            // {0} = archive path
-            string args = string.Format("l \"{0}\"{1}", archivePath, wildcardArgs);
+            if (excludeList != null && excludeList.Count() > 0)
+            {
+                foreach (var exclude in excludeList)
+                {
+                    includeExcludeArgs = string.Format("{0} \"-x!{1}{2}\"", includeExcludeArgs, prefixWildcard ? "*" : "", exclude);
+                }
+            }
 
-            return Run7z(args);
+            if (!string.IsNullOrEmpty(includeExcludeArgs))
+            {
+                includeExcludeArgs += " -r";
+            }
+
+            return includeExcludeArgs.Trim();
         }
 
         /// <summary>
@@ -81,14 +101,14 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <param name="archivePath"></param>
         /// <returns>A simple file list of archive contents.</returns>
-        public static string[] GetFileList(string archivePath, string wildcard = null, bool excludeFiles = false)
+        public static string[] GetFileList(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
         {
             // Run List command
             // Parse stdout for all "Path = " entries
             // Return -1 on error
-            string[] fileList = { };
+            string[] fileList = Array.Empty<string>();
 
-            var (stdout, _, exitCode) = List(archivePath, wildcard, excludeFiles);
+            var (stdout, _, exitCode) = List(archivePath, includeList, excludeList, prefixWildcard);
 
             /*
             stdout will be in the format below:
@@ -154,9 +174,9 @@ namespace ArchiveCacheManager
         /// Get the decompressed size of the specified archive.
         /// </summary>
         /// <param name="archivePath"></param>
-        /// /// <param name="wildcard"></param>
+        /// /// <param name="filename"></param>
         /// <returns>The decompressed size of the archive in bytes.</returns>
-        public static long GetDecompressedSize(string archivePath, string wildcard = null)
+        public static long GetDecompressedSize(string archivePath, string filename = null)
         {
             // Run List command
             // Parse stdout for all "Size = " entries
@@ -164,7 +184,7 @@ namespace ArchiveCacheManager
             // Return -1 on error
             long size = 0;
 
-            var (stdout, _, exitCode) = List(archivePath, wildcard);
+            var (stdout, _, exitCode) = List(archivePath, filename != null ? new string[] { filename } : null, null, false);
 
             if (exitCode == 0)
             {

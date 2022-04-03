@@ -91,13 +91,13 @@ namespace ArchiveCacheManager
 
             if (mGameCacheData.DecompressedSize == null)
             {
-                string wildcard = null;
+                string filename = null;
                 if (GetExtractSingleFile())
                 {
-                    wildcard = mGame.SelectedFile;
+                    filename = mGame.SelectedFile;
                 }
 
-                mGameCacheData.DecompressedSize = Zip.GetDecompressedSize(mGameCacheData.ArchivePath, wildcard);
+                mGameCacheData.DecompressedSize = Zip.GetDecompressedSize(mGameCacheData.ArchivePath, filename);
                 mGame.DecompressedSize = (long)mGameCacheData.DecompressedSize;
                 Logger.Log(string.Format("Decompressed archive size is {0} bytes.", (long)mGameCacheData.DecompressedSize));
             }
@@ -113,8 +113,20 @@ namespace ArchiveCacheManager
 
                 if (Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
                 {
+                    // List<string> multiFileList = new List<string> { ".cue", ".gdi", ".toc", ".nrg", ".ccd", ".mds", ".cdr", };
+                    List<string> singleFileList = new List<string> { ".gb", ".gbc", ".gba", ".agb", ".nes", ".fds", ".smc", ".sfc", ".n64", ".z64", ".v64", ".ndd", ".md", ".smd", ".gen", ".iso", ".chd", ".rvn", ".gg", ".gcm", ".32x", ".bin" };
+                    List<string> metaFileList = new List<string> { ".nfo", ".txt", ".dat", ".xml" };
+
+                    List<string> excludeList = new List<string>(metaFileList);
+
                     string extension = Path.GetExtension(mGame.SelectedFile);
-                    if (Zip.GetFileList(mGame.ArchivePath, "*" + extension, true).Count() == 0)
+                    excludeList.Add(extension);
+                    if (singleFileList.Contains(extension))
+                    {
+                        excludeList.AddRange(singleFileList);
+                    }
+
+                    if (Zip.GetFileList(mGame.ArchivePath, null, excludeList.ToArray(), true).Count() == 0)
                     {
                         mGameCacheData.ExtractSingleFile = true;
                         Logger.Log(string.Format("Smart Extraction enabled for file \"{0}\".", mGame.SelectedFile));
