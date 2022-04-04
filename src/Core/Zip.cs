@@ -184,7 +184,7 @@ namespace ArchiveCacheManager
             // Return -1 on error
             long size = 0;
 
-            var (stdout, _, exitCode) = List(archivePath, filename != null ? new string[] { filename } : null, null, false);
+            var (stdout, _, exitCode) = List(archivePath, filename.ToSingleArray(), null, false);
 
             if (exitCode == 0)
             {

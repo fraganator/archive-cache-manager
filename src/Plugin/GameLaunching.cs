@@ -25,8 +25,8 @@ namespace ArchiveCacheManager
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
             if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform)
-                && (app != null && PluginUtils.IsApplicationPathCompressedArchive(app.ApplicationPath)
-                || PluginUtils.IsApplicationPathCompressedArchive(game.ApplicationPath)))
+                && (app != null && PathUtils.IsPathCompressedArchive(app.ApplicationPath)
+                || PathUtils.IsPathCompressedArchive(game.ApplicationPath)))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
@@ -74,14 +74,14 @@ namespace ArchiveCacheManager
                 /*
                 if (app != null)
                 {
-                    File.Create(tempArchivePath).Close();
+                    DiskUtils.CreateFile(tempArchivePath);
                     LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IAdditionalApplication_ApplicationPath, app.ApplicationPath);
                     app.ApplicationPath = tempArchivePath;
                     Logger.Log(string.Format("Temporarily IAdditionalApplication.ApplicationPath for {0} ({1} - {2}) to {3}.", app.Name, game.Title, game.Platform, app.ApplicationPath));
                 }
                 else
                 {
-                    File.Create(tempArchivePath).Close();
+                    DiskUtils.CreateFile(tempArchivePath);
                     LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IGame_ApplicationPath, game.ApplicationPath);
                     game.ApplicationPath = tempArchivePath;
                     Logger.Log(string.Format("Temporarily set IGame.ApplicationPath for {0} ({1}) to {2}.", game.Title, game.Platform, game.ApplicationPath));

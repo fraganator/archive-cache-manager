@@ -167,5 +167,4 @@ namespace ArchiveCacheManager
             return success;
         }
     }
-
 }

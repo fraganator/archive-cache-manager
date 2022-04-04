@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Linq;
 
 namespace ArchiveCacheManager
 {
@@ -100,16 +101,6 @@ namespace ArchiveCacheManager
             }
 
             return path;
-        }
-
-        /// <summary>
-        /// Returns lower case file extension with leading period removed.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string GetExtension(string path)
-        {
-            return Path.GetExtension(path).Trim(new char[] { '.' }).ToLower();
         }
 
         /// <summary>
@@ -462,6 +453,19 @@ namespace ArchiveCacheManager
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Check if the launched game is a compressed archive based on the file extension.
+        /// Extensions checked are zip, 7z, rar.
+        /// </summary>
+        /// <param name="applicationPath"></param>
+        /// <returns></returns>
+        public static bool IsPathCompressedArchive(string applicationPath)
+        {
+            string[] archiveExtensions = { ".zip", ".7z", ".rar" };
+            string extension = Path.GetExtension(applicationPath).ToLower();
+            return archiveExtensions.Contains(extension);
         }
     }
 }

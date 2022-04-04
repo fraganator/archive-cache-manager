@@ -19,9 +19,16 @@ namespace ArchiveCacheManager
             public bool? ArchiveInCache;
             public long? DecompressedSize;
             public bool? ExtractSingleFile;
+            public bool CopyOnly;
         };
 
+        /// <summary>
+        /// The extensions in this list can be extracted, copied, and run individually without dependence on other files.
+        /// </summary>
         private static readonly List<string> StandaloneFileList = new List<string> { ".gb", ".gbc", ".gba", ".agb", ".nes", ".fds", ".smc", ".sfc", ".n64", ".z64", ".v64", ".ndd", ".md", ".smd", ".gen", ".iso", ".chd", ".rvn", ".gg", ".gcm", ".32x", ".bin" };
+        /// <summary>
+        /// The extensions in this list are considered metadata, and are not required by an emulator to play
+        /// </summary>
         private static readonly List<string> MetadataFileList = new List<string> { ".nfo", ".txt", ".dat", ".xml", ".json" };
 
         private static GameInfo mGame;
@@ -39,6 +46,7 @@ namespace ArchiveCacheManager
             mGameCacheData = new CacheData();
             mGameCacheData.ArchivePath = mGame.ArchivePath;
             mGameCacheData.ArchiveCachePath = PathUtils.ArchiveCachePath(mGame.ArchivePath);
+            mGameCacheData.CopyOnly = /* Config.Copy && */ PathUtils.IsPathCompressedArchive(mGame.ArchivePath);
             if (mGame.InfoLoaded)
             {
                 Logger.Log(string.Format("Archive path set to \"{0}\".", mGameCacheData.ArchivePath));
@@ -50,6 +58,7 @@ namespace ArchiveCacheManager
                 mMultiDiscCacheData[disc.Disc] = new CacheData();
                 mMultiDiscCacheData[disc.Disc].ArchivePath = disc.ArchivePath;
                 mMultiDiscCacheData[disc.Disc].ArchiveCachePath = PathUtils.ArchiveCachePath(disc.ArchivePath);
+                mMultiDiscCacheData[disc.Disc].CopyOnly = /* Config.Copy && */ PathUtils.IsPathCompressedArchive(disc.ArchivePath);
                 Logger.Log(string.Format("Disc {0} archive path set to \"{1}\".", disc.Disc, mMultiDiscCacheData[disc.Disc].ArchivePath));
                 Logger.Log(string.Format("Disc {0} archive cache path set to \"{1}\".", disc.Disc, mMultiDiscCacheData[disc.Disc].ArchiveCachePath));
             }

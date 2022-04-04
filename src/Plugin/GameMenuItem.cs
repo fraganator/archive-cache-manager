@@ -20,7 +20,8 @@ namespace ArchiveCacheManager
         public bool ShowInLaunchBox => true;
         public bool ShowInBigBox => true;
 
-        public bool GetIsValidForGame(IGame selectedGame) => PluginUtils.GetEmulatorPlatformAutoExtract(selectedGame.EmulatorId, selectedGame.Platform);
+        public bool GetIsValidForGame(IGame selectedGame) => PathUtils.IsPathCompressedArchive(selectedGame.ApplicationPath)
+                                                             && PluginUtils.GetEmulatorPlatformAutoExtract(selectedGame.EmulatorId, selectedGame.Platform);
         public bool GetIsValidForGames(IGame[] selectedGames) => false;
 
         public void OnSelected(IGame selectedGame)
@@ -44,7 +45,7 @@ namespace ArchiveCacheManager
                 }
                 else
                 {
-                    MessageBox.Show(errorMessage, "Archive Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(errorMessage, "Archive Cache Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 
                 return;
