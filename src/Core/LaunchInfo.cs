@@ -10,17 +10,18 @@ namespace ArchiveCacheManager
     /// <summary>
     /// Singleton class containing current launched game information, including that game's cache information.
     /// </summary>
-    public class LaunchGameInfo
+    public class LaunchInfo
     {
-        public class CacheData
+        private class CacheData
         {
             public string ArchivePath;
             public string ArchiveCachePath;
             public bool? ArchiveInCache;
-            public long? DecompressedSize;
+            public long? Size;
             public bool? ExtractSingleFile;
-            public bool CopyOnly;
         };
+
+        public static IExtractor Extractor = null;
 
         /// <summary>
         /// The extensions in this list can be extracted, copied, and run individually without dependence on other files.
@@ -40,13 +41,12 @@ namespace ArchiveCacheManager
         /// </summary>
         public static GameInfo Game => mGame;
 
-        static LaunchGameInfo()
+        static LaunchInfo()
         {
             mGame = new GameInfo(PathUtils.GetGameInfoPath());
             mGameCacheData = new CacheData();
             mGameCacheData.ArchivePath = mGame.ArchivePath;
             mGameCacheData.ArchiveCachePath = PathUtils.ArchiveCachePath(mGame.ArchivePath);
-            mGameCacheData.CopyOnly = /* Config.Copy && */ PathUtils.IsPathCompressedArchive(mGame.ArchivePath);
             if (mGame.InfoLoaded)
             {
                 Logger.Log(string.Format("Archive path set to \"{0}\".", mGameCacheData.ArchivePath));
@@ -58,10 +58,23 @@ namespace ArchiveCacheManager
                 mMultiDiscCacheData[disc.Disc] = new CacheData();
                 mMultiDiscCacheData[disc.Disc].ArchivePath = disc.ArchivePath;
                 mMultiDiscCacheData[disc.Disc].ArchiveCachePath = PathUtils.ArchiveCachePath(disc.ArchivePath);
-                mMultiDiscCacheData[disc.Disc].CopyOnly = /* Config.Copy && */ PathUtils.IsPathCompressedArchive(disc.ArchivePath);
                 Logger.Log(string.Format("Disc {0} archive path set to \"{1}\".", disc.Disc, mMultiDiscCacheData[disc.Disc].ArchivePath));
                 Logger.Log(string.Format("Disc {0} archive cache path set to \"{1}\".", disc.Disc, mMultiDiscCacheData[disc.Disc].ArchiveCachePath));
             }
+
+            Extractor = GetExtractor(mGameCacheData.ArchivePath);
+            Logger.Log(string.Format("Extractor set to {0}.", Extractor.Name()));
+        }
+
+        private static IExtractor GetExtractor(string archivePath)
+        {
+            if (Zip.SupportedType(archivePath))
+            {
+                return new Zip();
+            }
+
+            // Default to the Zip extractor
+            return new Zip();
         }
 
         /// <summary>
@@ -69,19 +82,19 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <param name="disc"></param>
         /// <returns></returns>
-        public static long GetDecompressedSize(int? disc = null)
+        public static long GetSize(int? disc = null)
         {
             if (disc != null)
             {
                 try
                 {
-                    if (mMultiDiscCacheData[(int)disc].DecompressedSize == null)
+                    if (mMultiDiscCacheData[(int)disc].Size == null)
                     {
-                        mMultiDiscCacheData[(int)disc].DecompressedSize = Zip.GetDecompressedSize(mMultiDiscCacheData[(int)disc].ArchivePath);
-                        Logger.Log(string.Format("Disc {0} decompressed archive size is {1} bytes.", (int)disc, (long)mMultiDiscCacheData[(int)disc].DecompressedSize));
+                        mMultiDiscCacheData[(int)disc].Size = Extractor.GetSize(mMultiDiscCacheData[(int)disc].ArchivePath);
+                        Logger.Log(string.Format("Disc {0} decompressed archive size is {1} bytes.", (int)disc, (long)mMultiDiscCacheData[(int)disc].Size));
                     }
 
-                    return (long)mMultiDiscCacheData[(int)disc].DecompressedSize;
+                    return (long)mMultiDiscCacheData[(int)disc].Size;
                 }
                 catch (KeyNotFoundException)
                 {
@@ -95,29 +108,28 @@ namespace ArchiveCacheManager
 
                 foreach (var discCacheData in mMultiDiscCacheData)
                 {
-                    multiDiscDecompressedSize += GetDecompressedSize(discCacheData.Key);
+                    multiDiscDecompressedSize += GetSize(discCacheData.Key);
                 }
 
                 return multiDiscDecompressedSize;
             }
 
-            if (mGameCacheData.DecompressedSize == null)
+            if (mGameCacheData.Size == null)
             {
-                string filename = null;
-                if (GetExtractSingleFile())
-                {
-                    filename = mGame.SelectedFile;
-                }
-
-                mGameCacheData.DecompressedSize = Zip.GetDecompressedSize(mGameCacheData.ArchivePath, filename);
-                mGame.DecompressedSize = (long)mGameCacheData.DecompressedSize;
-                Logger.Log(string.Format("Decompressed archive size is {0} bytes.", (long)mGameCacheData.DecompressedSize));
+                mGameCacheData.Size = Extractor.GetSize(mGameCacheData.ArchivePath, GetExtractSingleFile());
+                mGame.DecompressedSize = (long)mGameCacheData.Size;
+                Logger.Log(string.Format("Decompressed archive size is {0} bytes.", (long)mGameCacheData.Size));
             }
 
-            return (long)mGameCacheData.DecompressedSize;
+            return (long)mGameCacheData.Size;
         }
 
-        public static bool GetExtractSingleFile()
+        /// <summary>
+        /// Get the individual file to be extracted from the archive, if supported.
+        /// Will only return a result if SmartExtract is enabled, and the game was launched with a file selected.
+        /// </summary>
+        /// <returns>Name of file to extract from archive, or null if not applicable.</returns>
+        public static string GetExtractSingleFile()
         {
             if (mGameCacheData.ExtractSingleFile == null)
             {
@@ -137,7 +149,7 @@ namespace ArchiveCacheManager
                         excludeList.Add(extension);
                     }
 
-                    if (Zip.GetFileList(mGame.ArchivePath, null, excludeList.ToArray(), true).Count() == 0)
+                    if (Extractor.List(mGame.ArchivePath, null, excludeList.ToArray(), true).Count() == 0)
                     {
                         mGameCacheData.ExtractSingleFile = true;
                         Logger.Log(string.Format("Smart Extraction enabled for file \"{0}\".", mGame.SelectedFile));
@@ -145,7 +157,7 @@ namespace ArchiveCacheManager
                 }
             }
 
-            return (bool)mGameCacheData.ExtractSingleFile;
+            return (bool)mGameCacheData.ExtractSingleFile ? mGame.SelectedFile : null;
         }
 
         /// <summary>
@@ -285,7 +297,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                savedGameInfo.DecompressedSize = GetDecompressedSize(disc);
+                savedGameInfo.DecompressedSize = GetSize(disc);
             }
 
             if (disc != null)

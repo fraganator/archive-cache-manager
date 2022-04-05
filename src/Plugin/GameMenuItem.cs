@@ -20,7 +20,7 @@ namespace ArchiveCacheManager
         public bool ShowInLaunchBox => true;
         public bool ShowInBigBox => true;
 
-        public bool GetIsValidForGame(IGame selectedGame) => PathUtils.IsPathCompressedArchive(selectedGame.ApplicationPath)
+        public bool GetIsValidForGame(IGame selectedGame) => Zip.SupportedType(selectedGame.ApplicationPath)
                                                              && PluginUtils.GetEmulatorPlatformAutoExtract(selectedGame.EmulatorId, selectedGame.Platform);
         public bool GetIsValidForGames(IGame[] selectedGames) => false;
 
@@ -32,7 +32,7 @@ namespace ArchiveCacheManager
             // and the first file listing removed. Restore 7z here, just in case it wasn't cleaned up properly previously.
             GameLaunching.Restore7z();
 
-            string[] fileList = Zip.GetFileList(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
+            string[] fileList = Zip.List(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
 
             if (fileList.Count() == 0)
             {

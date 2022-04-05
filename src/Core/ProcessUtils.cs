@@ -1,10 +1,80 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ArchiveCacheManager
 {
+    public static class ProcessUtils
+    {
+        public static (string, string, int) RunProcess(string executable, string args, bool redirectOutput = false, Func<string, string> processOutput = null, bool redirectError = false)
+        {
+            string stdout;
+            string stderr;
+            int exitCode;
+            Process process = new Process();
+            process.StartInfo.FileName = executable;
+            process.StartInfo.Arguments = args;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            StringBuilder asyncError = new StringBuilder();
+            StringBuilder asyncOutput = new StringBuilder();
+            string processedStdout = string.Empty;
+            process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
+            {
+                if (redirectOutput)
+                {
+                    processedStdout = (processOutput != null) ? processOutput(e.Data) : e.Data;
+                    Console.Out.WriteLine(processedStdout);
+                }
+                asyncOutput.Append("\r\n" + e.Data);
+            });
+            process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+            {
+                if (redirectError)
+                {
+                    Console.Error.WriteLine(e.Data);
+                }
+                asyncError.Append("\r\n" + e.Data);
+            });
+
+            try
+            {
+                process.Start();
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
+
+                // LB allows terminating the extraction process by pressing Esc on the loading screen. If this process is killed,
+                // the child process (the real 7z in this case) will NOT be terminated. Add 7z as a tracked child process, which
+                // will be automatically killed if this process is also killed.
+                ChildProcessTracker.AddProcess(process);
+
+                process.WaitForExit();
+                exitCode = process.ExitCode;
+            }
+            catch (Exception e)
+            {
+                exitCode = -1;
+                Logger.Log(e.ToString(), Logger.LogLevel.Exception);
+            }
+
+            stdout = asyncOutput.ToString();
+            stderr = asyncError.ToString();
+
+            if (exitCode != 0)
+            {
+                Logger.Log(string.Format("{0} returned exit code {1} with error output:\r\n{2}", Path.GetFileName(executable), exitCode, stderr));
+            }
+
+            return (stdout, stderr, exitCode);
+        }
+    }
+
     /// <summary>
     /// Allows processes to be automatically killed if this parent process unexpectedly quits.
     /// This feature requires Windows 8 or greater. On Windows 7, nothing is done.</summary>

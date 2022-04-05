@@ -25,8 +25,8 @@ namespace ArchiveCacheManager
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
             if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform)
-                && (app != null && PathUtils.IsPathCompressedArchive(app.ApplicationPath)
-                || PathUtils.IsPathCompressedArchive(game.ApplicationPath)))
+                && (app != null && Zip.SupportedType(app.ApplicationPath)
+                || Zip.SupportedType(game.ApplicationPath)))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));

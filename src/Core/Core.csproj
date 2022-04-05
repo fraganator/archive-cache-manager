@@ -48,11 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LaunchGameInfo.cs" />
+    <Compile Include="IExtractor.cs" />
+    <Compile Include="LaunchInfo.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="GameIndex.cs" />
     <Compile Include="GameInfo.cs" />
-    <Compile Include="ChildProcessTracker.cs" />
+    <Compile Include="ProcessUtils.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Zip.cs" />
