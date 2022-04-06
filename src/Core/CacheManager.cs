@@ -67,14 +67,14 @@ namespace ArchiveCacheManager
         {
             if (LaunchInfo.Game.MultiDisc && Config.MultiDiscSupport && disc == null)
             {
-                LaunchInfo.Extractor.SetProgressDivisor(LaunchInfo.Game.TotalDiscs - LaunchInfo.GetDiscCountInCache());
+                LaunchInfo.Extractor.ProgressDivisor = LaunchInfo.Game.TotalDiscs - LaunchInfo.GetDiscCountInCache();
 
                 int discIndex = 0;
                 foreach (var discInfo in LaunchInfo.Game.Discs)
                 {
                     if (!LaunchInfo.GetArchiveInCache(discInfo.Disc))
                     {
-                        LaunchInfo.Extractor.SetProgressOffset((100 / LaunchInfo.Extractor.GetProgressDivisor()) * discIndex);
+                        LaunchInfo.Extractor.ProgressOffset = (100 / LaunchInfo.Extractor.ProgressDivisor) * discIndex;
                         AddArchiveToCache(discInfo.Disc);
                         discIndex++;
                     }

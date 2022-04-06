@@ -21,7 +21,7 @@ namespace ArchiveCacheManager
             public bool? ExtractSingleFile;
         };
 
-        public static IExtractor Extractor = null;
+        public static Extractor Extractor = null;
 
         /// <summary>
         /// The extensions in this list can be extracted, copied, and run individually without dependence on other files.
@@ -63,18 +63,26 @@ namespace ArchiveCacheManager
             }
 
             Extractor = GetExtractor(mGameCacheData.ArchivePath);
-            Logger.Log(string.Format("Extractor set to {0}.", Extractor.Name()));
+            Logger.Log(string.Format("Extractor set to \"{0}\".", Extractor.Name()));
         }
 
-        private static IExtractor GetExtractor(string archivePath)
+        private static Extractor GetExtractor(string archivePath)
         {
             if (Zip.SupportedType(archivePath))
             {
                 return new Zip();
             }
+            else if (Chdman.SupportedType(archivePath))
+            {
+                return new Chdman();
+            }
+            else if (DolphinTool.SupportedType(archivePath))
+            {
+                return new DolphinTool();
+            }
 
-            // Default to the Zip extractor
-            return new Zip();
+            // Default to file copy extractor
+            return new Robocopy();
         }
 
         /// <summary>

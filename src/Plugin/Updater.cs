@@ -25,7 +25,7 @@ namespace ArchiveCacheManager
                 {
                     Logger.Log(string.Format("Update check found new version: {0}", latestRelease.TagName));
 
-                    var result = MessageBox.Show(string.Format("Version {0} of Archive Cache Manager is now available for download.\r\n\r\nView release page now?", latestReleaseString),
+                    var result = MessageBox.Show(string.Format("Version {0} of Archive Cache Manager is now available for download. New features include:\r\n\r\n{1}\r\n\r\nView download page now?", latestReleaseString, latestRelease.Body),
                                                     "Archive Cache Manager Update Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
                     if (result == DialogResult.Yes)
                     {

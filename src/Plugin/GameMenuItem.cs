@@ -32,7 +32,7 @@ namespace ArchiveCacheManager
             // and the first file listing removed. Restore 7z here, just in case it wasn't cleaned up properly previously.
             GameLaunching.Restore7z();
 
-            string[] fileList = Zip.List(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
+            string[] fileList = new Zip().List(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
 
             if (fileList.Count() == 0)
             {

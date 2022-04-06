@@ -10,7 +10,7 @@ namespace ArchiveCacheManager
 {
     public static class ProcessUtils
     {
-        public static (string, string, int) RunProcess(string executable, string args, bool redirectOutput = false, Func<string, string> processOutput = null, bool redirectError = false)
+        public static (string, string, int) RunProcess(string executable, string args, bool redirectOutput = false, Func<string, string> processOutput = null, bool redirectError = false, Func<string, string> processError = null)
         {
             string stdout;
             string stderr;
@@ -25,6 +25,7 @@ namespace ArchiveCacheManager
             StringBuilder asyncError = new StringBuilder();
             StringBuilder asyncOutput = new StringBuilder();
             string processedStdout = string.Empty;
+            string processedStderr = string.Empty;
             process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
             {
                 if (redirectOutput)
@@ -38,7 +39,15 @@ namespace ArchiveCacheManager
             {
                 if (redirectError)
                 {
-                    Console.Error.WriteLine(e.Data);
+                    if (processError != null)
+                    {
+                        processedStderr = processError(e.Data);
+                        Console.Out.WriteLine(processedStderr);
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine(e.Data);
+                    }
                 }
                 asyncError.Append("\r\n" + e.Data);
             });
@@ -65,11 +74,6 @@ namespace ArchiveCacheManager
 
             stdout = asyncOutput.ToString();
             stderr = asyncError.ToString();
-
-            if (exitCode != 0)
-            {
-                Logger.Log(string.Format("{0} returned exit code {1} with error output:\r\n{2}", Path.GetFileName(executable), exitCode, stderr));
-            }
 
             return (stdout, stderr, exitCode);
         }

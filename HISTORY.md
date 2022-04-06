@@ -1,4 +1,10 @@
 # Archive Cache Manager change history
+## v2.12 (2022-04-xx)
+* Smart Extract option to only extract required files in an archive
+* Emulator selection when launching a file from "Select ROM In Archive" list
+* Option to extract CHD, RVZ, GZ
+* Option to copy non-archive files to cache
+
 ## v2.11 (2022-03-25)
 * Multi-disc support and automatic M3U generation
     * Extract and cache all discs in a multi-disc game

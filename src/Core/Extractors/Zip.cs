@@ -11,63 +11,37 @@ namespace ArchiveCacheManager
     /// <summary>
     /// Handles all calls to 7-Zip.
     /// </summary>
-    public class Zip : IExtractor
+    public class Zip : Extractor
     {
-        private static int mProgressDivisor = 1;
-        private static int mProgressOffset = 0;
-
-        int IExtractor.GetProgressDivisor()
-        {
-            return mProgressDivisor;
-        }
-
-        void IExtractor.SetProgressDivisor(int divisor)
-        {
-            mProgressDivisor = Math.Max(divisor, 1);
-        }
-
-        int IExtractor.GetProgressOffset()
-        {
-            return mProgressOffset;
-        }
-
-        void IExtractor.SetProgressOffset(int offset)
-        {
-            mProgressOffset = Math.Max(offset, 0);
-        }
-
-        string IExtractor.Name()
+        public override string Name()
         {
             return "7-Zip";
         }
 
-        long IExtractor.GetSize(string archivePath, string fileInArchive = null)
+        public override long GetSize(string archivePath, string fileInArchive = null)
         {
-            return GetSize(archivePath, fileInArchive);
+            // Run List command
+            // Parse stdout for all "Size = " entries
+            // Extract sizes and sum
+            // Return -1 on error
+            long size = 0;
+
+            var (stdout, _, exitCode) = ListArchiveDetails(archivePath, fileInArchive.ToSingleArray(), null, false);
+
+            if (exitCode == 0)
+            {
+                // TODO: Replace logic with regex?
+                string[] stdoutArray = stdout.Split(new string[] { "------------------------" }, StringSplitOptions.RemoveEmptyEntries);
+
+                // Take substring at 25th char, after date/time/attr details and before file sizes
+                string summary = stdoutArray[stdoutArray.Length - 1].Substring(25);
+                size = Convert.ToInt64(summary.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0]);
+            }
+
+            return size;
         }
 
-        bool IExtractor.Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
-        {
-            return Extract(archivePath, cachePath, includeList, excludeList);
-        }
-
-        string[] IExtractor.List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
-        {
-            return List(archivePath, includeList, excludeList, prefixWildcard);
-        }
-
-        public static string Get7zVersion()
-        {
-            var (stdout, _, _) = Run7z("");
-            return stdout.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0];
-        }
-
-        public static bool SupportedType(string archivePath)
-        {
-            return PathUtils.HasExtension(archivePath, new string[] { ".zip", ".7z", ".rar" });
-        }
-
-        public static bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
+        public override bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
         {
             // x = extract
             // {0} = archive path
@@ -81,51 +55,7 @@ namespace ArchiveCacheManager
             return exitCode == 0;
         }
 
-        /// <summary>
-        /// Run the 7z list command on the specified archive.
-        /// </summary>
-        /// <param name="archivePath"></param>
-        /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
-        private static (string, string, int) ListArchiveDetails(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
-        {
-            // l = list
-            // {0} = archive path
-            string args = string.Format("l \"{0}\" {1}", archivePath, GetIncludeExcludeArgs(includeList, excludeList, prefixWildcard));
-
-            return Run7z(args);
-        }
-
-        private static string GetIncludeExcludeArgs(string[] includeList, string[] excludeList, bool prefixWildcard)
-        {
-            string includeExcludeArgs = string.Empty;
-            // -i!"<wildcard>" = include files which match wildcard
-            // -x!"<wildcard>" = exclude files which match wildcard
-            // -r = recursive search for files
-            if (includeList != null && includeList.Count() > 0)
-            {
-                foreach (var include in includeList)
-                {
-                    includeExcludeArgs = string.Format("{0} \"-i!{1}{2}\"", includeExcludeArgs, prefixWildcard ? "*" : "", include);
-                }
-            }
-
-            if (excludeList != null && excludeList.Count() > 0)
-            {
-                foreach (var exclude in excludeList)
-                {
-                    includeExcludeArgs = string.Format("{0} \"-x!{1}{2}\"", includeExcludeArgs, prefixWildcard ? "*" : "", exclude);
-                }
-            }
-
-            if (!string.IsNullOrEmpty(includeExcludeArgs))
-            {
-                includeExcludeArgs += " -r";
-            }
-
-            return includeExcludeArgs.Trim();
-        }
-
-        public static string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
         {
             // Run List command
             // Parse stdout for all "Path = " entries
@@ -194,27 +124,59 @@ namespace ArchiveCacheManager
             return fileList;
         }
 
-        public static long GetSize(string archivePath, string fileInArchive = null)
+        public static string Get7zVersion()
         {
-            // Run List command
-            // Parse stdout for all "Size = " entries
-            // Extract sizes and sum
-            // Return -1 on error
-            long size = 0;
+            var (stdout, _, _) = Run7z("");
+            return stdout.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0];
+        }
 
-            var (stdout, _, exitCode) = ListArchiveDetails(archivePath, fileInArchive.ToSingleArray(), null, false);
+        public static bool SupportedType(string archivePath)
+        {
+            return PathUtils.HasExtension(archivePath, new string[] { ".zip", ".7z", ".rar", ".gz", ".gzip" });
+        }
 
-            if (exitCode == 0)
+        /// <summary>
+        /// Run the 7z list command on the specified archive.
+        /// </summary>
+        /// <param name="archivePath"></param>
+        /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
+        private (string, string, int) ListArchiveDetails(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        {
+            // l = list
+            // {0} = archive path
+            string args = string.Format("l \"{0}\" {1}", archivePath, GetIncludeExcludeArgs(includeList, excludeList, prefixWildcard));
+
+            return Run7z(args);
+        }
+
+        private string GetIncludeExcludeArgs(string[] includeList, string[] excludeList, bool prefixWildcard)
+        {
+            string includeExcludeArgs = string.Empty;
+            // -i!"<wildcard>" = include files which match wildcard
+            // -x!"<wildcard>" = exclude files which match wildcard
+            // -r = recursive search for files
+            if (includeList != null && includeList.Count() > 0)
             {
-                // TODO: Replace logic with regex?
-                string[] stdoutArray = stdout.Split(new string[] { "------------------------" }, StringSplitOptions.RemoveEmptyEntries);
-
-                // Take substring at 25th char, after date/time/attr details and before file sizes
-                string summary = stdoutArray[stdoutArray.Length - 1].Substring(25);
-                size = Convert.ToInt64(summary.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0]);
+                foreach (var include in includeList)
+                {
+                    includeExcludeArgs = string.Format("{0} \"-i!{1}{2}\"", includeExcludeArgs, prefixWildcard ? "*" : "", include);
+                }
             }
 
-            return size;
+            if (excludeList != null && excludeList.Count() > 0)
+            {
+                foreach (var exclude in excludeList)
+                {
+                    includeExcludeArgs = string.Format("{0} \"-x!{1}{2}\"", includeExcludeArgs, prefixWildcard ? "*" : "", exclude);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(includeExcludeArgs))
+            {
+                includeExcludeArgs += " -r";
+            }
+
+            return includeExcludeArgs.Trim();
         }
 
         /// <summary>
@@ -252,24 +214,14 @@ namespace ArchiveCacheManager
         /// <returns>Tuple of (stdout, stderr, exitCode).</returns>
         static (string, string, int) Run7z(string args, bool redirectOutput = false, bool redirectError = false)
         {
-            return ProcessUtils.RunProcess(PathUtils.GetLaunchBox7zPath(), args, redirectOutput, CalculateProgress, redirectError);
-        }
+            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(PathUtils.GetLaunchBox7zPath(), args, redirectOutput, ExtractionProgress, redirectError);
 
-        private static string CalculateProgress(string stdout)
-        {
-            string progress = string.Empty;
-            string regex = "(\\d+)%(.*)"; // String format is " 15% - File being extracted.ext"
-
-            if (stdout != null)
+            if (exitCode != 0)
             {
-                Match match = Regex.Match(stdout, regex);
-                if (match.Success)
-                {
-                    progress = string.Format("{0,3}%{1}", (int.Parse(match.Groups[1].Value) / mProgressDivisor) + mProgressOffset, match.Groups[2].Value);
-                }
+                Logger.Log(string.Format("7-Zip returned exit code {0} with error output:\r\n{1}", exitCode, stderr));
             }
 
-            return progress;
+            return (stdout, stderr, exitCode);
         }
     }
 }
