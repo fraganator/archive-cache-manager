@@ -30,9 +30,9 @@ namespace ArchiveCacheManager
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigWindow));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigWindow));
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.deleteAllButton = new System.Windows.Forms.Button();
             this.refreshButton = new System.Windows.Forms.Button();
@@ -41,6 +41,7 @@ namespace ArchiveCacheManager
             this.configureCacheButton = new System.Windows.Forms.Button();
             this.multiDiscSupportCheckBox = new System.Windows.Forms.CheckBox();
             this.useGameIdM3uFilenameCheckBox = new System.Windows.Forms.CheckBox();
+            this.smartExtractCheckBox = new System.Windows.Forms.CheckBox();
             this.versionLabel = new System.Windows.Forms.Label();
             this.forumLink = new System.Windows.Forms.LinkLabel();
             this.sourceLink = new System.Windows.Forms.LinkLabel();
@@ -65,7 +66,6 @@ namespace ArchiveCacheManager
             this.cancelButton = new System.Windows.Forms.Button();
             this.additionalOptionsGroupBox = new System.Windows.Forms.GroupBox();
             this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
-            this.smartExtractCheckBox = new System.Windows.Forms.CheckBox();
             this.fileExtensionPriorityGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
@@ -174,6 +174,17 @@ namespace ArchiveCacheManager
             this.toolTip.SetToolTip(this.useGameIdM3uFilenameCheckBox, "Use the game\'s ID (GUID) when creating an M3U file.\r\nIf unchecked, the M3U file w" +
         "ill be named \"<Title> <Version>.m3u\".");
             this.useGameIdM3uFilenameCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // smartExtractCheckBox
+            // 
+            this.smartExtractCheckBox.AutoSize = true;
+            this.smartExtractCheckBox.Location = new System.Drawing.Point(313, 25);
+            this.smartExtractCheckBox.Name = "smartExtractCheckBox";
+            this.smartExtractCheckBox.Size = new System.Drawing.Size(89, 17);
+            this.smartExtractCheckBox.TabIndex = 1;
+            this.smartExtractCheckBox.Text = "Smart Extract";
+            this.toolTip.SetToolTip(this.smartExtractCheckBox, resources.GetString("smartExtractCheckBox.ToolTip"));
+            this.smartExtractCheckBox.UseVisualStyleBackColor = true;
             // 
             // versionLabel
             // 
@@ -462,17 +473,6 @@ namespace ArchiveCacheManager
             this.updateCheckCheckBox.Text = "Check For Updates On Startup";
             this.updateCheckCheckBox.UseVisualStyleBackColor = true;
             this.updateCheckCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
-            // 
-            // smartExtractCheckBox
-            // 
-            this.smartExtractCheckBox.AutoSize = true;
-            this.smartExtractCheckBox.Location = new System.Drawing.Point(313, 25);
-            this.smartExtractCheckBox.Name = "smartExtractCheckBox";
-            this.smartExtractCheckBox.Size = new System.Drawing.Size(89, 17);
-            this.smartExtractCheckBox.TabIndex = 1;
-            this.smartExtractCheckBox.Text = "Smart Extract";
-            this.toolTip.SetToolTip(this.smartExtractCheckBox, resources.GetString("smartExtractCheckBox.ToolTip"));
-            this.smartExtractCheckBox.UseVisualStyleBackColor = true;
             // 
             // ConfigWindow
             // 

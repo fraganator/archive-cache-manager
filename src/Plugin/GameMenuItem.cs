@@ -45,7 +45,7 @@ namespace ArchiveCacheManager
                 }
                 else
                 {
-                    MessageBox.Show(errorMessage, "Archive Cache Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    FlexibleMessageBox.Show(errorMessage, "Archive Cache Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 
                 return;

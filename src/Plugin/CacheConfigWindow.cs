@@ -22,6 +22,8 @@ namespace ArchiveCacheManager
             minArchiveSize.Value = Config.MinArchiveSize;
 
             updateEnabledState();
+
+            UserInterface.ApplyTheme(this);
         }
 
         private void updateEnabledState()
@@ -33,7 +35,7 @@ namespace ArchiveCacheManager
         {
             if (!PathUtils.IsPathSafe(cachePath.Text))
             {
-                MessageBox.Show(this, string.Format("ERROR! The cache path can not be set to {0}.\r\nPlease change the cache path.", Path.GetFullPath(cachePath.Text)), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FlexibleMessageBox.Show(this, string.Format("ERROR! The cache path can not be set to {0}.\r\nPlease change the cache path.", Path.GetFullPath(cachePath.Text)), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 return;
             }
@@ -44,7 +46,7 @@ namespace ArchiveCacheManager
                 if (!PathUtils.ComparePaths(cachePath.Text, Config.CachePath) &&
                     (Directory.EnumerateFiles(cachePath.Text, "*", SearchOption.AllDirectories).Any() || Directory.EnumerateDirectories(cachePath.Text).Any()))
                 {
-                    DialogResult result = MessageBox.Show(this, "WARNING! The selected cache path already contains files. These files WILL be deleted when the cache is cleaned. Continue?", "Warning!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    DialogResult result = FlexibleMessageBox.Show(this, "WARNING! The selected cache path already contains files. These files WILL be deleted when the cache is cleaned. Continue?", "Warning!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
                     if (result == DialogResult.No)
                     {

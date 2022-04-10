@@ -46,6 +46,8 @@ namespace ArchiveCacheManager
                 fileListBox.SelectedIndex = 0;
             }
             SelectedFile = string.Empty;
+
+            UserInterface.ApplyTheme(this);
         }
 
         private void okButton_Click(object sender, EventArgs e)

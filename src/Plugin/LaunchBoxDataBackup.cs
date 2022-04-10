@@ -9,7 +9,7 @@ using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 using IniParser;
 using IniParser.Model;
-using System.Windows;
+using System.Windows.Forms;
 
 namespace ArchiveCacheManager
 {
@@ -132,9 +132,9 @@ namespace ArchiveCacheManager
                 }
                 else if (retries <= 0)
                 {
-                    MessageBox.Show(string.Format("Archive Cache Manager:\r\nError restoring temporary settings changes.\r\n" +
+                    FlexibleMessageBox.Show(string.Format("Archive Cache Manager:\r\nError restoring temporary settings changes.\r\n" +
                                                   "Please review the items below and manually restore them.\r\n\r\n{0}", message),
-                                    "Archive Cache Manager Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    "Archive Cache Manager Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     File.Delete(mSettingsPath);
                 }
             }

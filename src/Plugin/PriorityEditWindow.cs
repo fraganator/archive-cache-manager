@@ -45,6 +45,8 @@ namespace ArchiveCacheManager
             }
 
             updateEnabledState();
+
+            UserInterface.ApplyTheme(this);
         }
 
         private void populatePlatforms(string emulatorName)

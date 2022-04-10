@@ -202,3 +202,5 @@ Octokit               | latest  | `Install-Package Octokit -ProjectName Plugin`
 ## Acknowledgements
 * Icons by Yusuke Kamiyamane. Licensed under a Creative Commons Attribution 3.0 License. https://p.yusukekamiyamane.com/
 * INI File Parser library Copyright (c) 2008 Ricardo Amores Hernández. Licensed under the MIT license. https://github.com/rickyah/ini-parser
+* Octokit library Copyright (c) 2017 GitHub Inc. Licensed under the MIT license. https://github.com/octokit/octokit.net
+* FlexibleMessageBox Copyright (c) 2014 Jörg Reichert. Licensed under the CPOL. https://www.codeproject.com/Articles/601900/FlexibleMessageBox

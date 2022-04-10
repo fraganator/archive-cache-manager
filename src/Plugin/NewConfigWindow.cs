@@ -8,14 +8,14 @@ using Unbroken.LaunchBox.Plugins;
 
 namespace ArchiveCacheManager
 {
-    public partial class ConfigWindow : Form
+    public partial class NewConfigWindow : Form
     {
         private bool refreshLaunchBox = false;
 
-        public ConfigWindow()
+        public NewConfigWindow()
         {
             InitializeComponent();
-            //UserInterface.ApplyTheme(this);
+            UserInterface.ApplyTheme(this);
 
             refreshLaunchBox = false;
 
@@ -142,8 +142,8 @@ namespace ArchiveCacheManager
 
                     if (gameInfo.InfoLoaded)
                     {
-                        cacheDataGridView.Rows.Add(new object[] { directory, gameInfo.KeepInCache, Path.GetFileName(gameInfo.ArchivePath),
-                                                   gameInfo.Platform, gameInfo.DecompressedSize / 1048576.0 });
+                        cacheDataGridView.Rows.Add(new object[] { directory, Path.GetFileName(gameInfo.ArchivePath),
+                                                   gameInfo.Platform, gameInfo.DecompressedSize / 1048576.0, gameInfo.KeepInCache });
                     }
                 }
             }
@@ -350,7 +350,7 @@ namespace ArchiveCacheManager
                 {
                     var w = mediaIcon.Width;
                     var h = mediaIcon.Height;
-                    var x = e.CellBounds.Left + 1;// + (e.CellBounds.Width - w) / 2;
+                    var x = e.CellBounds.Left + 5;// + (e.CellBounds.Width - w) / 2;
                     var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
 
                     e.Graphics.DrawImage(mediaIcon, new Rectangle(x, y, w, h));
@@ -370,6 +370,11 @@ namespace ArchiveCacheManager
         private void multiDiscSupportCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             updateEnabledState();
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            tabControl1.SelectTab(e.Node.Index);
         }
     }
 }
