@@ -61,7 +61,7 @@ namespace ArchiveCacheManager
             this.ArchivePlatform = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ArchiveSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.cacheDetailsGroupBox = new System.Windows.Forms.GroupBox();
-            this.cacheSummaryTextBox = new System.Windows.Forms.TextBox();
+            this.cacheSummaryTextBox = new System.Windows.Forms.RichTextBox();
             this.okButton = new System.Windows.Forms.Button();
             this.cancelButton = new System.Windows.Forms.Button();
             this.additionalOptionsGroupBox = new System.Windows.Forms.GroupBox();
@@ -530,7 +530,7 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.Button deleteSelectedButton;
         private System.Windows.Forms.Button openInExplorerButton;
         private System.Windows.Forms.Button refreshButton;
-        private System.Windows.Forms.TextBox cacheSummaryTextBox;
+        private System.Windows.Forms.RichTextBox cacheSummaryTextBox;
         private System.Windows.Forms.Button deleteAllButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePath;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Keep;

@@ -55,7 +55,7 @@ namespace ArchiveCacheManager
             this.tabControl1 = new ArchiveCacheManager.StackPanel();
             this.tab1CacheSettings = new System.Windows.Forms.TabPage();
             this.label1 = new System.Windows.Forms.Label();
-            this.cacheSummaryTextBox = new System.Windows.Forms.TextBox();
+            this.cacheSummaryTextBox = new System.Windows.Forms.RichTextBox();
             this.cacheDataGridView = new System.Windows.Forms.DataGridView();
             this.ArchivePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Archive = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -73,6 +73,8 @@ namespace ArchiveCacheManager
             this.MultiDisc = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.GameIdM3u = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.SmartExtract = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Chdman = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.DolphinTool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.editPriorityButton = new System.Windows.Forms.Button();
             this.addPriorityButton = new System.Windows.Forms.Button();
             this.tab3PluginSettings = new System.Windows.Forms.TabPage();
@@ -274,6 +276,8 @@ namespace ArchiveCacheManager
             // 
             // treeView1
             // 
+            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.treeView1.FullRowSelect = true;
             this.treeView1.HideSelection = false;
@@ -346,13 +350,14 @@ namespace ArchiveCacheManager
             // 
             this.cacheSummaryTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.cacheSummaryTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.cacheSummaryTextBox.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cacheSummaryTextBox.Cursor = System.Windows.Forms.Cursors.Default;
+            this.cacheSummaryTextBox.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cacheSummaryTextBox.Location = new System.Drawing.Point(9, 62);
-            this.cacheSummaryTextBox.Multiline = true;
             this.cacheSummaryTextBox.Name = "cacheSummaryTextBox";
             this.cacheSummaryTextBox.ReadOnly = true;
             this.cacheSummaryTextBox.Size = new System.Drawing.Size(561, 62);
             this.cacheSummaryTextBox.TabIndex = 20;
+            this.cacheSummaryTextBox.Text = "";
             // 
             // cacheDataGridView
             // 
@@ -365,7 +370,6 @@ namespace ArchiveCacheManager
             this.cacheDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.cacheDataGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.cacheDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.cacheDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.cacheDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.cacheDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ArchivePath,
@@ -475,10 +479,9 @@ namespace ArchiveCacheManager
             this.extensionPriorityDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.extensionPriorityDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.extensionPriorityDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.extensionPriorityDataGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.extensionPriorityDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.extensionPriorityDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.extensionPriorityDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.extensionPriorityDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Emulator,
@@ -487,13 +490,15 @@ namespace ArchiveCacheManager
             this.Action,
             this.MultiDisc,
             this.GameIdM3u,
-            this.SmartExtract});
+            this.SmartExtract,
+            this.Chdman,
+            this.DolphinTool});
             this.extensionPriorityDataGridView.Location = new System.Drawing.Point(6, 62);
             this.extensionPriorityDataGridView.MultiSelect = false;
             this.extensionPriorityDataGridView.Name = "extensionPriorityDataGridView";
             this.extensionPriorityDataGridView.RowHeadersVisible = false;
             this.extensionPriorityDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.extensionPriorityDataGridView.Size = new System.Drawing.Size(726, 273);
+            this.extensionPriorityDataGridView.Size = new System.Drawing.Size(726, 420);
             this.extensionPriorityDataGridView.StandardTab = true;
             this.extensionPriorityDataGridView.TabIndex = 13;
             this.extensionPriorityDataGridView.SelectionChanged += new System.EventHandler(this.extensionPriorityDataGridView_SelectionChanged);
@@ -504,6 +509,7 @@ namespace ArchiveCacheManager
             this.Emulator.MinimumWidth = 150;
             this.Emulator.Name = "Emulator";
             this.Emulator.ReadOnly = true;
+            this.Emulator.Width = 150;
             // 
             // Platform
             // 
@@ -511,17 +517,19 @@ namespace ArchiveCacheManager
             this.Platform.MinimumWidth = 150;
             this.Platform.Name = "Platform";
             this.Platform.ReadOnly = true;
+            this.Platform.Width = 150;
             // 
             // Priority
             // 
             this.Priority.HeaderText = "Priority";
             this.Priority.MinimumWidth = 150;
             this.Priority.Name = "Priority";
+            this.Priority.Width = 150;
             // 
             // Action
             // 
-            this.Action.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.Action.FillWeight = 50F;
+            this.Action.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Action.HeaderText = "Action";
             this.Action.Items.AddRange(new object[] {
             "Extract",
@@ -534,7 +542,6 @@ namespace ArchiveCacheManager
             // 
             // MultiDisc
             // 
-            this.MultiDisc.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
             this.MultiDisc.FillWeight = 50F;
             this.MultiDisc.HeaderText = "Multi-Disc";
             this.MultiDisc.Name = "MultiDisc";
@@ -542,8 +549,8 @@ namespace ArchiveCacheManager
             // 
             // GameIdM3u
             // 
-            this.GameIdM3u.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.GameIdM3u.FillWeight = 50F;
+            this.GameIdM3u.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.GameIdM3u.HeaderText = "M3U Name";
             this.GameIdM3u.Items.AddRange(new object[] {
             "Game ID",
@@ -554,11 +561,22 @@ namespace ArchiveCacheManager
             // 
             // SmartExtract
             // 
-            this.SmartExtract.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
             this.SmartExtract.FillWeight = 50F;
             this.SmartExtract.HeaderText = "Smart Extract";
             this.SmartExtract.Name = "SmartExtract";
             this.SmartExtract.Width = 76;
+            // 
+            // Chdman
+            // 
+            this.Chdman.HeaderText = "chdman";
+            this.Chdman.Name = "Chdman";
+            this.Chdman.Width = 51;
+            // 
+            // DolphinTool
+            // 
+            this.DolphinTool.HeaderText = "DolphinTool";
+            this.DolphinTool.Name = "DolphinTool";
+            this.DolphinTool.Width = 70;
             // 
             // editPriorityButton
             // 
@@ -619,7 +637,7 @@ namespace ArchiveCacheManager
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(944, 613);
@@ -631,17 +649,17 @@ namespace ArchiveCacheManager
             this.Controls.Add(this.versionLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(640, 480);
             this.Name = "NewConfigWindow";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Archive Cache Manager";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ConfigWindow_FormClosed);
             this.tabControl1.ResumeLayout(false);
             this.tab1CacheSettings.ResumeLayout(false);
-            this.tab1CacheSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).EndInit();
             this.tab2ExtractionSettings.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).EndInit();
@@ -669,7 +687,7 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.Button deleteSelectedButton;
         private System.Windows.Forms.Button openInExplorerButton;
         private System.Windows.Forms.Button refreshButton;
-        private System.Windows.Forms.TextBox cacheSummaryTextBox;
+        private System.Windows.Forms.RichTextBox cacheSummaryTextBox;
         private System.Windows.Forms.Button deleteAllButton;
         private System.Windows.Forms.CheckBox multiDiscSupportCheckBox;
         private System.Windows.Forms.CheckBox useGameIdM3uFilenameCheckBox;
@@ -682,6 +700,11 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePath;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Archive;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePlatform;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ArchiveSize;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Keep;
         private System.Windows.Forms.DataGridViewTextBoxColumn Emulator;
         private System.Windows.Forms.DataGridViewTextBoxColumn Platform;
         private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
@@ -689,10 +712,7 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewCheckBoxColumn MultiDisc;
         private System.Windows.Forms.DataGridViewComboBoxColumn GameIdM3u;
         private System.Windows.Forms.DataGridViewCheckBoxColumn SmartExtract;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePath;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Archive;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePlatform;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ArchiveSize;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn Keep;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Chdman;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn DolphinTool;
     }
 }

@@ -172,7 +172,7 @@ namespace ArchiveCacheManager
                 {
                     RichTextBox richTextBox = control as RichTextBox;
                     richTextBox.ForeColor = foreColor;
-                    richTextBox.BackColor = backColor;
+                    richTextBox.BackColor = richTextBox.Parent.BackColor;
                     if (richTextBox.BorderStyle == BorderStyle.Fixed3D)
                     {
                         richTextBox.BorderStyle = BorderStyle.FixedSingle;
@@ -249,6 +249,13 @@ namespace ArchiveCacheManager
                     dataGridView.DefaultCellStyle.ForeColor = foreColor;
                     dataGridView.DefaultCellStyle.SelectionBackColor = LaunchBoxSettings.DialogAccentColor;
                     dataGridView.DefaultCellStyle.SelectionForeColor = foreColor;
+                    dataGridView.GridColor = LaunchBoxSettings.DialogBorderColor;
+                    dataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+                    dataGridView.ColumnHeadersDefaultCellStyle.BackColor = backColorContrast2;
+                    dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = foreColor;
+                    dataGridView.ColumnHeadersDefaultCellStyle.SelectionBackColor = backColorContrast2;
+                    dataGridView.ColumnHeadersDefaultCellStyle.SelectionForeColor = foreColor;
+                    dataGridView.EnableHeadersVisualStyles = false;
                 }
             }
         }
