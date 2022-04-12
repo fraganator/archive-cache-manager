@@ -16,6 +16,14 @@ namespace ArchiveCacheManager
         {
             InitializeComponent();
             UserInterface.ApplyTheme(this);
+            foreach (DataGridViewColumn column in cacheDataGridView.Columns)
+            {
+                UserInterface.SetColumnMinimumWidth(column);
+            }
+            foreach (DataGridViewColumn column in extensionPriorityDataGridView.Columns)
+            {
+                UserInterface.SetColumnMinimumWidth(column);
+            }
 
             refreshLaunchBox = false;
 
@@ -375,6 +383,27 @@ namespace ArchiveCacheManager
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             tabControl1.SelectTab(e.Node.Index);
+        }
+
+        private void extensionPriorityDataGridView_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView dataGridView = sender as DataGridView;
+            if (dataGridView.Cursor != Cursors.IBeam &&
+                e.RowIndex >= 0 &&
+                dataGridView.Columns[e.ColumnIndex] is DataGridViewTextBoxColumn &&
+                !(dataGridView.Columns[e.ColumnIndex] as DataGridViewTextBoxColumn).ReadOnly)
+            {
+                dataGridView.Cursor = Cursors.IBeam;
+            }
+        }
+
+        private void extensionPriorityDataGridView_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridView dataGridView = sender as DataGridView;
+            if (dataGridView.Cursor != Cursors.Default)
+            {
+                dataGridView.Cursor = Cursors.Default;
+            }
         }
     }
 }

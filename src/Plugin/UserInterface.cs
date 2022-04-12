@@ -37,6 +37,26 @@ namespace ArchiveCacheManager
             }
         }
 
+        public static void SetColumnMinimumWidth(DataGridViewColumn column)
+        {
+            if (column is DataGridViewComboBoxColumn)
+            {
+                DataGridViewComboBoxColumn comboBoxColumn = column as DataGridViewComboBoxColumn;
+                int minWidth = 5;
+
+                foreach (var item in comboBoxColumn.Items)
+                {
+                    minWidth = Math.Max(minWidth, TextRenderer.MeasureText(item.ToString(), comboBoxColumn.DefaultCellStyle.Font).Width + 28);
+                }
+
+                comboBoxColumn.MinimumWidth = minWidth;
+                if (comboBoxColumn.Width < minWidth)
+                {
+                    comboBoxColumn.Width = minWidth;
+                }
+            }
+        }
+
         private static Color CalcContrast(Color colour, double contrast)
         {
             return Color.FromArgb(CalcContrast(colour.R, contrast), CalcContrast(colour.G, contrast), CalcContrast(colour.B, contrast));
@@ -249,7 +269,7 @@ namespace ArchiveCacheManager
                     dataGridView.DefaultCellStyle.ForeColor = foreColor;
                     dataGridView.DefaultCellStyle.SelectionBackColor = LaunchBoxSettings.DialogAccentColor;
                     dataGridView.DefaultCellStyle.SelectionForeColor = foreColor;
-                    dataGridView.GridColor = LaunchBoxSettings.DialogBorderColor;
+                    dataGridView.GridColor = backColorContrast1;
                     dataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
                     dataGridView.ColumnHeadersDefaultCellStyle.BackColor = backColorContrast2;
                     dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = foreColor;
