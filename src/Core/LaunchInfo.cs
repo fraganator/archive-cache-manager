@@ -19,6 +19,15 @@ namespace ArchiveCacheManager
             public bool? ArchiveInCache;
             public long? Size;
             public bool? ExtractSingleFile;
+
+            public Config.EmulatorPlatformConfig Config;
+            public string ArchiveCacheLaunchPath;
+            public string M3uName;
+
+            public CacheData()
+            {
+                Config = new Config.EmulatorPlatformConfig();
+            }
         };
 
         public static Extractor Extractor = null;
@@ -40,6 +49,8 @@ namespace ArchiveCacheManager
         /// The game info from LaunchBox.
         /// </summary>
         public static GameInfo Game => mGame;
+        public static Config.LaunchPath LaunchPathConfig => mGameCacheData.Config.LaunchPath;
+        public static bool MultiDiscSupport => mGameCacheData.Config.MultiDisc;
 
         static LaunchInfo()
         {
@@ -47,6 +58,7 @@ namespace ArchiveCacheManager
             mGameCacheData = new CacheData();
             mGameCacheData.ArchivePath = mGame.ArchivePath;
             mGameCacheData.ArchiveCachePath = PathUtils.ArchiveCachePath(mGame.ArchivePath);
+            mGameCacheData.Config = Config.GetEmulatorPlatformConfig(Config.EmulatorPlatformKey(mGame.Emulator, mGame.Platform));
             if (mGame.InfoLoaded)
             {
                 Logger.Log(string.Format("Archive path set to \"{0}\".", mGameCacheData.ArchivePath));
@@ -68,21 +80,30 @@ namespace ArchiveCacheManager
 
         private static Extractor GetExtractor(string archivePath)
         {
-            if (Zip.SupportedType(archivePath))
+            if ((mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
+                && Zip.SupportedType(archivePath))
             {
                 return new Zip();
             }
-            else if (Chdman.SupportedType(archivePath))
+            else if ((mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
+                && mGameCacheData.Config.Chdman
+                && Chdman.SupportedType(archivePath))
             {
                 return new Chdman();
             }
-            else if (DolphinTool.SupportedType(archivePath))
+            else if ((mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
+                && mGameCacheData.Config.DolphinTool
+                && DolphinTool.SupportedType(archivePath))
             {
                 return new DolphinTool();
             }
+            else if (mGameCacheData.Config.Action == Config.Action.Copy || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
+            {
+                return new Robocopy();
+            }
 
-            // Default to file copy extractor
-            return new Robocopy();
+            // Default to Zip extractor
+            return new Zip();
         }
 
         /// <summary>
@@ -110,7 +131,7 @@ namespace ArchiveCacheManager
                 }
             }
 
-            if (mGame.MultiDisc && Config.MultiDiscSupport && disc == null)
+            if (mGame.MultiDisc && MultiDiscSupport && disc == null)
             {
                 long multiDiscDecompressedSize = 0;
 
@@ -143,7 +164,7 @@ namespace ArchiveCacheManager
             {
                 mGameCacheData.ExtractSingleFile = false;
 
-                if (Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
+                if (mGameCacheData.Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
                 {
                     List<string> excludeList = new List<string>(MetadataFileList);
 
@@ -212,6 +233,93 @@ namespace ArchiveCacheManager
             return mGameCacheData.ArchiveCachePath;
         }
 
+        private static string GetLaunchPath(int? disc = null)
+        {
+            string launchPath;
+
+            switch (mGameCacheData.Config.LaunchPath)
+            {
+                case Config.LaunchPath.Title:
+                    launchPath = Path.Combine(PathUtils.CachePath(), PathUtils.GetValidPath(mGame.Title, "Title"));
+                    break;
+                case Config.LaunchPath.Platform:
+                    launchPath = Path.Combine(PathUtils.CachePath(), PathUtils.GetValidPath(mGame.Platform, "Platform"));
+                    break;
+                case Config.LaunchPath.Emulator:
+                    launchPath = Path.Combine(PathUtils.CachePath(), PathUtils.GetValidPath(mGame.Emulator, "Emulator"));
+                    break;
+                case Config.LaunchPath.Default:
+                default:
+                    launchPath = GetArchiveCachePath(disc);
+                    break;
+            }
+
+            return launchPath;
+        }
+
+        /// <summary>
+        /// Get the cache path of the game. If disc is specified, the archive path will be to that disc.
+        /// </summary>
+        /// <param name="disc"></param>
+        /// <returns></returns>
+        public static string GetArchiveCacheLaunchPath(int? disc = null)
+        {
+            if (disc != null)
+            {
+                if (mMultiDiscCacheData[(int)disc].ArchiveCacheLaunchPath == null)
+                {
+                    mMultiDiscCacheData[(int)disc].ArchiveCacheLaunchPath = GetLaunchPath(disc);
+                }
+
+                return mMultiDiscCacheData[(int)disc].ArchiveCacheLaunchPath;
+            }
+
+            if (mGameCacheData.ArchiveCacheLaunchPath == null)
+            {
+                mGameCacheData.ArchiveCacheLaunchPath = GetLaunchPath();
+            }
+
+            return mGameCacheData.ArchiveCacheLaunchPath;
+        }
+
+        private static string GetM3u(int? disc = null)
+        {
+            string m3uName;
+
+            switch (mGameCacheData.Config.M3uName)
+            {
+                case Config.M3uName.GameId:
+                default:
+                    m3uName = PathUtils.GetArchiveCacheM3uGameIdPath(GetArchiveCachePath(disc), mGame.GameId);
+                    break;
+                case Config.M3uName.TitleVersion:
+                    m3uName = PathUtils.GetArchiveCacheM3uGameTitlePath(GetArchiveCachePath(disc), mGame.GameId, mGame.Title, mGame.Version, disc);
+                    break;
+            }
+
+            return m3uName;
+        }
+
+        public static string GetM3uName(int? disc = null)
+        {
+            if (disc != null)
+            {
+                if (mMultiDiscCacheData[(int)disc].M3uName == null)
+                {
+                    mMultiDiscCacheData[(int)disc].M3uName = GetM3u(disc);
+                }
+
+                return mMultiDiscCacheData[(int)disc].M3uName;
+            }
+
+            if (mGameCacheData.M3uName == null)
+            {
+                mGameCacheData.M3uName = GetM3u();
+            }
+
+            return mGameCacheData.M3uName;
+        }
+
         /// <summary>
         /// Check if the game is cached. Will check if all discs of a multi-disc game are cached.
         /// </summary>
@@ -236,7 +344,7 @@ namespace ArchiveCacheManager
                 }
             }
 
-            if (mGame.MultiDisc && Config.MultiDiscSupport && disc == null)
+            if (mGame.MultiDisc && MultiDiscSupport && disc == null)
             {
                 // Set true if there are multiple discs, false otherwise. When false, subsequent boolean operations will be false.
                 bool multiDiscArchiveInCache = mMultiDiscCacheData.Count > 0;
@@ -254,7 +362,7 @@ namespace ArchiveCacheManager
                 mGameCacheData.ArchiveInCache = File.Exists(PathUtils.GetArchiveCacheGameInfoPath(mGameCacheData.ArchiveCachePath));
             }
 
-            if (Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
+            if (mGameCacheData.Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
             {
                 mGameCacheData.ArchiveInCache &= File.Exists(Path.Combine(mGameCacheData.ArchiveCachePath, mGame.SelectedFile));
             }
@@ -285,7 +393,7 @@ namespace ArchiveCacheManager
 
         public static void SaveToCache(int? disc = null)
         {
-            if (mGame.MultiDisc && Config.MultiDiscSupport && disc == null)
+            if (mGame.MultiDisc && MultiDiscSupport && disc == null)
             {
                 foreach (var discInfo in mGame.Discs)
                 {

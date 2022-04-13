@@ -242,6 +242,13 @@ namespace ArchiveCacheManager
         public static string GetArchiveCacheExtractingFlagPath(string archiveCachePath) => Path.Combine(archiveCachePath, "extracting");
 
         /// <summary>
+        /// Absolute path to the link flag file for the given archive cache path.
+        /// </summary>
+        /// <param name="archiveLaunchPath">Location of the launch path in the cache.</param>
+        /// <returns>Absolute path to the link flag file.</returns>
+        public static string GetArchiveCacheLinkFlagPath(string archiveLaunchPath) => Path.Combine(archiveLaunchPath, "link");
+
+        /// <summary>
         /// Absolute path to the m3u file for the given archive cache path. Filename includes the game ID.
         /// </summary>
         /// <param name="archiveCachePath"></param>
@@ -277,6 +284,11 @@ namespace ArchiveCacheManager
         /// <param name="filename"></param>
         /// <returns></returns>
         private static string GetArchiveCacheM3uPath(string archiveCachePath, string filename) => Path.Combine(archiveCachePath, string.Format("{0}.m3u", filename));
+
+        public static string[] GetManagerFiles(string archiveCachePath) => new string[] { GetArchiveCachePlaytimePath(archiveCachePath),
+                                                                                          GetArchiveCacheGameInfoPath(archiveCachePath),
+                                                                                          GetArchiveCacheExtractingFlagPath(archiveCachePath),
+                                                                                          GetArchiveCacheLinkFlagPath(archiveCachePath) };
 
         /// <summary>
         /// Game info filename.
@@ -357,7 +369,7 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
-        /// Get a valid filename from the input string. Will replace invalid characters with '-'.
+        /// Get a valid filename from the input string. Will replace invalid characters with '_'.
         /// If the filename is reserved or otherwise generates an exception, safeFilename will be used.
         /// </summary>
         /// <param name="filenameToValidate">The filename to validate.</param>
@@ -393,6 +405,45 @@ namespace ArchiveCacheManager
             }
 
             return validFilename;
+        }
+
+        /// <summary>
+        /// Get a valid path from the input string. Will replace invalid characters with '_'.
+        /// If the path is reserved or otherwise generates an exception, safePath will be used.
+        /// </summary>
+        /// <param name="pathToValidate">The path to validate.</param>
+        /// <param name="safePath">The fallback path to use if path validation fails.</param>
+        /// <returns>The validated filename.</returns>
+        public static string GetValidPath(string pathToValidate, string safePath)
+        {
+            var invalidChars = Path.GetInvalidPathChars();
+            var validPath = String.Join("_", pathToValidate.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            var reservedNames = new[]
+            {
+                "CON", "PRN", "AUX", "CLOCK$", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4",
+                "COM5", "COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4",
+                "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+            };
+
+            foreach (var reserved in reservedNames)
+            {
+                if (String.Equals(validPath, reserved, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    validPath = safePath;
+                    break;
+                }
+            }
+
+            try
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(validPath);
+            }
+            catch
+            {
+                validPath = safePath;
+            }
+
+            return validPath;
         }
 
         /// <summary>

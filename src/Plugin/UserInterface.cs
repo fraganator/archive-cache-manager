@@ -176,7 +176,10 @@ namespace ArchiveCacheManager
                 {
                     Label label = control as Label;
                     label.ForeColor = foreColor;
-                    label.BackColor = label.BackColor == Color.Transparent ? Color.Transparent : backColor;
+                    if (label.BackColor != label.Parent.BackColor)
+                    {
+                        label.BackColor = backColor;
+                    }
                 }
                 else if (control is TextBox)
                 {

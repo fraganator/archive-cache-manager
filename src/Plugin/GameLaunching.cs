@@ -63,7 +63,7 @@ namespace ArchiveCacheManager
                 Directory.CreateDirectory(PathUtils.GetTempPath());
                 LaunchBoxDataBackup.SetLaunchDetails(game, app, emulator);
                 #region Multi-Disc Support
-                if (gameInfo.MultiDisc && Config.MultiDiscSupport && gameInfo.EmulatorPlatformM3u)
+                if (gameInfo.MultiDisc && Config.GetMultiDisc(Config.EmulatorPlatformKey(emulator.Title, game.Platform)) && gameInfo.EmulatorPlatformM3u)
                 {
                     LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IEmulatorPlatform_M3uDiscLoadEnabled, true);
                     PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform, false);

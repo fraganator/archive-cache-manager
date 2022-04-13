@@ -32,28 +32,47 @@ namespace ArchiveCacheManager
             versionLabel.Text = CacheManager.VersionString;
 
             extensionPriorityDataGridView.Rows.Clear();
-            foreach (var priority in Config.FilenamePriority)
+
+            var actionItems = (extensionPriorityDataGridView.Columns["Action"] as DataGridViewComboBoxColumn).Items;
+            var launchPathItems = (extensionPriorityDataGridView.Columns["LaunchPath"] as DataGridViewComboBoxColumn).Items;
+            var m3uNameItems = (extensionPriorityDataGridView.Columns["M3uName"] as DataGridViewComboBoxColumn).Items;
+            foreach (var config in Config.GetAllEmulatorPlatformConfig())
             {
-                string[] priorityInfo = priority.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] priorityInfo = config.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
                 string priorityEmulator = priorityInfo[0].Trim();
                 string priorityPlatform = priorityInfo[1].Trim();
 
                 if (string.Equals(priorityEmulator, "All", StringComparison.InvariantCultureIgnoreCase) &&
                     string.Equals(priorityPlatform, "All", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    extensionPriorityDataGridView.Rows.Insert(0, new string[] { priorityEmulator, priorityPlatform, priority.Value });
+                    extensionPriorityDataGridView.Rows.Insert(0, new object[] { priorityEmulator,
+                                                                                priorityPlatform,
+                                                                                config.Value.FilenamePriority,
+                                                                                actionItems[(int)config.Value.Action],
+                                                                                launchPathItems[(int)config.Value.LaunchPath],
+                                                                                config.Value.MultiDisc,
+                                                                                m3uNameItems[(int)config.Value.M3uName],
+                                                                                config.Value.SmartExtract,
+                                                                                config.Value.Chdman,
+                                                                                config.Value.DolphinTool });
                 }
                 else
                 {
-                    extensionPriorityDataGridView.Rows.Add(new string[] { priorityEmulator, priorityPlatform, priority.Value });
+                    extensionPriorityDataGridView.Rows.Add(new object[] { priorityEmulator,
+                                                                          priorityPlatform,
+                                                                          config.Value.FilenamePriority,
+                                                                          actionItems[(int)config.Value.Action],
+                                                                          launchPathItems[(int)config.Value.LaunchPath],
+                                                                          config.Value.MultiDisc,
+                                                                          m3uNameItems[(int)config.Value.M3uName],
+                                                                          config.Value.SmartExtract,
+                                                                          config.Value.Chdman,
+                                                                          config.Value.DolphinTool });
                 }
             }
             extensionPriorityDataGridView.ClearSelection();
 
-            multiDiscSupportCheckBox.Checked = Config.MultiDiscSupport;
-            useGameIdM3uFilenameCheckBox.Checked = Config.UseGameIdAsM3uFilename;
             updateCheckCheckBox.Checked = (bool)Config.UpdateCheck;
-            smartExtractCheckBox.Checked = Config.SmartExtract;
 
             updateCacheInfo(true);
             updateEnabledState();
@@ -70,8 +89,6 @@ namespace ArchiveCacheManager
             openInExplorerButton.Enabled = cachePathExists;
             deleteAllButton.Enabled = (cacheDataGridView.Rows.Count > 0);
             deleteSelectedButton.Enabled = (cacheDataGridView.SelectedRows.Count > 0);
-
-            useGameIdM3uFilenameCheckBox.Enabled = multiDiscSupportCheckBox.Checked;
 
             if (extensionPriorityDataGridView.SelectedRows.Count == 1)
             {
@@ -162,16 +179,27 @@ namespace ArchiveCacheManager
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            Config.FilenamePriority.Clear();
+            var config = Config.GetAllEmulatorPlatformConfigByRef();
+            config.Clear();
+
+            var actionItems = (extensionPriorityDataGridView.Columns["Action"] as DataGridViewComboBoxColumn).Items;
+            var launchPathItems = (extensionPriorityDataGridView.Columns["LaunchPath"] as DataGridViewComboBoxColumn).Items;
+            var m3uNameItems = (extensionPriorityDataGridView.Columns["M3uName"] as DataGridViewComboBoxColumn).Items;
             foreach (DataGridViewRow row in extensionPriorityDataGridView.Rows)
             {
-                Config.FilenamePriority.Add(string.Format(@"{0} \ {1}", row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString()), row.Cells[2].Value.ToString());
+                string key = Config.EmulatorPlatformKey(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString());
+                config.Add(key, new Config.EmulatorPlatformConfig());
+                config[key].FilenamePriority = row.Cells[2].Value.ToString();
+                config[key].Action = (Config.Action)actionItems.IndexOf(row.Cells[3].Value);
+                config[key].LaunchPath = (Config.LaunchPath)launchPathItems.IndexOf(row.Cells[4].Value);
+                config[key].MultiDisc = Convert.ToBoolean(row.Cells[5].Value);
+                config[key].M3uName = (Config.M3uName)m3uNameItems.IndexOf(row.Cells[6].Value);
+                config[key].SmartExtract = Convert.ToBoolean(row.Cells[7].Value);
+                config[key].Chdman = Convert.ToBoolean(row.Cells[8].Value);
+                config[key].DolphinTool = Convert.ToBoolean(row.Cells[9].Value);
             }
 
-            Config.MultiDiscSupport = multiDiscSupportCheckBox.Checked;
-            Config.UseGameIdAsM3uFilename = useGameIdM3uFilenameCheckBox.Checked;
             Config.UpdateCheck = updateCheckCheckBox.Checked;
-            Config.SmartExtract = smartExtractCheckBox.Checked;
 
             Config.Save();
 

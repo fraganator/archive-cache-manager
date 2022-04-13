@@ -19,7 +19,7 @@ namespace ArchiveCacheManager
 
         public static bool SupportedType(string archivePath)
         {
-            return PathUtils.HasExtension(archivePath, new string[] { ".rvz" });
+            return PathUtils.HasExtension(archivePath, new string[] { ".rvz", ".wia", ".gcz" });
         }
 
         override public bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)

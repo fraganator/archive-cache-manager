@@ -1,23 +1,36 @@
 ﻿using System;
 using System.Linq;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace ArchiveCacheManager
 {
     public class DiskUtils
     {
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode)]
+        static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
+
         /// <summary>
         /// Deletes the entire content of a directory, and optionally the path itself.
         /// All files will have the FileAttributes.Normal attribute applied, so read-only files will be deleted.
         /// </summary>
         /// <param name="path">The path to delete.</param>
         /// <param name="contentsOnly">Whether to delete the path itself, or only the contents.</param>
-        public static void DeleteDirectory(string path, bool contentsOnly = false)
+        public static void DeleteDirectory(string path, bool contentsOnly = false, bool unlink = false)
         {
             try
             {
                 if (Directory.Exists(path))
                 {
+                    string linkSource = string.Empty;
+                    try
+                    {
+                        linkSource = File.ReadAllText(PathUtils.GetArchiveCacheLinkFlagPath(path));
+                    }
+                    catch (Exception)
+                    {
+                    }
+
                     // Enumerate and delete all files in all subdirectories
                     foreach (string filePath in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
                     {
@@ -34,6 +47,12 @@ namespace ArchiveCacheManager
                     if (!contentsOnly)
                     {
                         Directory.Delete(path, true);
+                    }
+
+                    if (!string.IsNullOrEmpty(linkSource) && unlink)
+                    {
+                        SetDirectoryContentsReadOnly(linkSource);
+                        File.Delete(PathUtils.GetArchiveCacheLinkFlagPath(linkSource));
                     }
                 }
             }
@@ -103,9 +122,7 @@ namespace ArchiveCacheManager
         public static void SetDirectoryContentsReadOnly(string path)
         {
             // These files will not be set read-only, as they are written by Archive Cache Manager.
-            string[] managerFiles = { PathUtils.GetArchiveCachePlaytimePath(path),
-                                      PathUtils.GetArchiveCacheGameInfoPath(path),
-                                      PathUtils.GetArchiveCacheExtractingFlagPath(path) };
+            string[] managerFiles = PathUtils.GetManagerFiles(path);
 
             try
             {
@@ -165,6 +182,11 @@ namespace ArchiveCacheManager
             }
 
             return success;
+        }
+
+        public static void HardLink(string dest, string source)
+        {
+            bool result = CreateHardLink(dest, source, IntPtr.Zero);
         }
     }
 }
