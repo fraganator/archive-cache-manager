@@ -36,6 +36,8 @@ namespace ArchiveCacheManager
         private static readonly bool defaultMultiDisc = true;
         private static readonly bool defaultUseGameIdAsM3uFilename = true;
         private static readonly bool defaultSmartExtract = true;
+        private static readonly string defaultStandaloneExtensions = "gb, gbc, gba, agb, nes, fds, smc, sfc, n64, z64, v64, ndd, md, smd, gen, iso, chd, rvn, gg, gcm, 32x, bin";
+        private static readonly string defaultMetadataExtensions = "nfo, txt, dat, xml, json";
         private static readonly bool? defaultUpdateCheck = null;
         private static readonly string defaultEmulatorPlatform = @"All \ All";
         // Priorities determined by launching zip game from LaunchBox, where zip contains common rom and disc file types.
@@ -81,6 +83,8 @@ namespace ArchiveCacheManager
         private static bool mMultiDiscSupport = defaultMultiDisc;
         private static bool mUseGameIdAsM3uFilename = defaultUseGameIdAsM3uFilename;
         private static bool? mUpdateCheck = defaultUpdateCheck;
+        private static string mStandaloneExtensions = defaultStandaloneExtensions;
+        private static string mMetadataExtensions = defaultMetadataExtensions;
 
         private static Dictionary<string, EmulatorPlatformConfig> mEmulatorPlatformConfig;
 
@@ -126,6 +130,18 @@ namespace ArchiveCacheManager
             set => mUpdateCheck = value;
         }
 
+        public static string StandaloneExtensions
+        {
+            get => mStandaloneExtensions;
+            set => mStandaloneExtensions = value;
+        }
+
+        public static string MetadataExtensions
+        {
+            get => mMetadataExtensions;
+            set => mMetadataExtensions = value;
+        }
+
         public static Dictionary<string, EmulatorPlatformConfig> GetAllEmulatorPlatformConfig()
         {
             return mEmulatorPlatformConfig;
@@ -168,6 +184,23 @@ namespace ArchiveCacheManager
             catch (KeyNotFoundException) { }
 
             return defaultFilenamePriority;
+        }
+
+        public static Action GetAction(string key)
+        {
+            try
+            {
+                return mEmulatorPlatformConfig[key].Action;
+            }
+            catch (KeyNotFoundException) { }
+
+            try
+            {
+                return mEmulatorPlatformConfig[defaultEmulatorPlatform].Action;
+            }
+            catch (KeyNotFoundException) { }
+
+            return defaultAction;
         }
 
         public static LaunchPath GetLaunchPath(string key)
@@ -335,6 +368,17 @@ namespace ArchiveCacheManager
                                 mUpdateCheck = null;
                             }
 
+                            if (section.Keys.ContainsKey(nameof(StandaloneExtensions)))
+                            {
+                                mStandaloneExtensions = section.Keys[nameof(StandaloneExtensions)];
+                            }
+
+                            if (section.Keys.ContainsKey(nameof(MetadataExtensions)))
+                            {
+                                mMetadataExtensions = section.Keys[nameof(MetadataExtensions)];
+                            }
+
+
                             if (section.Keys.ContainsKey("MultiDiscSupport"))
                             {
                                 mMultiDiscSupport = Convert.ToBoolean(section.Keys["MultiDiscSupport"]);
@@ -479,6 +523,8 @@ namespace ArchiveCacheManager
             {
                 iniData[configSection][nameof(UpdateCheck)] = mUpdateCheck.ToString();
             }
+            iniData[configSection][nameof(StandaloneExtensions)] = mStandaloneExtensions;
+            iniData[configSection][nameof(MetadataExtensions)] = mMetadataExtensions;
 
             foreach (KeyValuePair<string, EmulatorPlatformConfig> priority in mEmulatorPlatformConfig)
             {
@@ -511,6 +557,8 @@ namespace ArchiveCacheManager
             mCachePath = defaultCachePath;
             mCacheSize = defaultCacheSize;
             mMinArchiveSize = defaultMinArchiveSize;
+            mStandaloneExtensions = defaultStandaloneExtensions;
+            mMetadataExtensions = defaultMetadataExtensions;
 
             mEmulatorPlatformConfig = new Dictionary<string, EmulatorPlatformConfig>();
             mEmulatorPlatformConfig.Add(defaultEmulatorPlatform, new EmulatorPlatformConfig());

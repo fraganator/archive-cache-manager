@@ -24,6 +24,11 @@ namespace ArchiveCacheManager
             Process.Start(ps);
         }
 
+        public static string GetArchivePath(IGame game, IAdditionalApplication app)
+        {
+            return PathUtils.GetAbsolutePath((app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath);
+        }
+
         public static bool GetEmulatorPlatformAutoExtract(string emulatorId, string platformName)
         {
             var emulator = PluginHelper.DataManager.GetEmulatorById(emulatorId);

@@ -30,17 +30,6 @@ namespace ArchiveCacheManager
             }
         };
 
-        public static Extractor Extractor = null;
-
-        /// <summary>
-        /// The extensions in this list can be extracted, copied, and run individually without dependence on other files.
-        /// </summary>
-        private static readonly List<string> StandaloneFileList = new List<string> { ".gb", ".gbc", ".gba", ".agb", ".nes", ".fds", ".smc", ".sfc", ".n64", ".z64", ".v64", ".ndd", ".md", ".smd", ".gen", ".iso", ".chd", ".rvn", ".gg", ".gcm", ".32x", ".bin" };
-        /// <summary>
-        /// The extensions in this list are considered metadata, and are not required by an emulator to play
-        /// </summary>
-        private static readonly List<string> MetadataFileList = new List<string> { ".nfo", ".txt", ".dat", ".xml", ".json" };
-
         private static GameInfo mGame;
         private static CacheData mGameCacheData;
         private static Dictionary<int, CacheData> mMultiDiscCacheData;
@@ -49,6 +38,7 @@ namespace ArchiveCacheManager
         /// The game info from LaunchBox.
         /// </summary>
         public static GameInfo Game => mGame;
+        public static Extractor Extractor = null;
         public static Config.LaunchPath LaunchPathConfig => mGameCacheData.Config.LaunchPath;
         public static bool MultiDiscSupport => mGameCacheData.Config.MultiDisc;
 
@@ -166,12 +156,14 @@ namespace ArchiveCacheManager
 
                 if (mGameCacheData.Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
                 {
-                    List<string> excludeList = new List<string>(MetadataFileList);
+                    List<string> standaloneList = Utils.SplitExtensions(Config.StandaloneExtensions).ToList();
+                    List<string> metadataList = Utils.SplitExtensions(Config.MetadataExtensions).ToList();
+                    List<string> excludeList = new List<string>(metadataList);
 
-                    string extension = Path.GetExtension(mGame.SelectedFile).ToLower();
-                    if (StandaloneFileList.Contains(extension))
+                    string extension = Path.GetExtension(mGame.SelectedFile).TrimStart(new char[] { '.' }).ToLower();
+                    if (standaloneList.Contains(extension))
                     {
-                        excludeList.AddRange(StandaloneFileList);
+                        excludeList.AddRange(standaloneList);
                     }
                     else
                     {

@@ -73,6 +73,8 @@ namespace ArchiveCacheManager
             extensionPriorityDataGridView.ClearSelection();
 
             updateCheckCheckBox.Checked = (bool)Config.UpdateCheck;
+            standaloneExtensions.Text = Config.StandaloneExtensions;
+            metadataExtensions.Text = Config.MetadataExtensions;
 
             updateCacheInfo(true);
             updateEnabledState();
@@ -200,6 +202,8 @@ namespace ArchiveCacheManager
             }
 
             Config.UpdateCheck = updateCheckCheckBox.Checked;
+            Config.StandaloneExtensions = standaloneExtensions.Text;
+            Config.MetadataExtensions = metadataExtensions.Text;
 
             Config.Save();
 

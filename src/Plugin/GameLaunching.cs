@@ -22,11 +22,63 @@ namespace ArchiveCacheManager
             }
         }
 
+        private static bool UseArchiveCacheManager(IGame game, IAdditionalApplication app, IEmulator emulator)
+        {
+            // Extract ROMs must be enabled for the emulator \ platform
+            if (!PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform))
+            {
+                return false;
+            }
+
+            string key = Config.EmulatorPlatformKey(emulator.Title, game.Platform);
+            string archivePath = PluginUtils.GetArchivePath(game, app);
+            bool extract = (Config.GetAction(key) == Config.Action.Extract || Config.GetAction(key) == Config.Action.ExtractCopy);
+            bool copy = (Config.GetAction(key) == Config.Action.Copy || Config.GetAction(key) == Config.Action.ExtractCopy);
+
+            if (extract && (Zip.SupportedType(archivePath) || (Config.GetChdman(key) && Chdman.SupportedType(archivePath))
+                            || (Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))))
+            {
+                return true;
+            }
+            else if (copy)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool RedirectApplicationPath(IGame game, IAdditionalApplication app, IEmulator emulator)
+        {
+            string archivePath = PluginUtils.GetArchivePath(game, app);
+            if (PathUtils.HasExtension(archivePath, new string[] { ".zip", ".7z", ".rar" }))
+            {
+                return false;
+            }
+
+            string key = Config.EmulatorPlatformKey(emulator.Title, game.Platform);
+            bool extract = (Config.GetAction(key) == Config.Action.Extract || Config.GetAction(key) == Config.Action.ExtractCopy);
+            bool copy = (Config.GetAction(key) == Config.Action.Copy || Config.GetAction(key) == Config.Action.ExtractCopy);
+
+            // Always redirect on copy or extract/copy when type isn't zip, 7z or rar (already checked above)
+            if (copy)
+            {
+                return true;
+            }
+            // Only redirect extract when the extrator is enabled and the file type matches
+            else if (extract && (Zip.SupportedType(archivePath) || (Config.GetChdman(key) && Chdman.SupportedType(archivePath))
+                            || (Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))))
+            {
+                return true;
+            }
+
+            // Only extract is enabled, but there's no corresponding extractor. Don't redirect and let the launch fail.
+            return false;
+        }
+
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
-            if (PluginUtils.GetEmulatorPlatformAutoExtract(emulator.Id, game.Platform))
-                /*&& (app != null && Zip.SupportedType(app.ApplicationPath)
-                || Zip.SupportedType(game.ApplicationPath)))*/
+            if (UseArchiveCacheManager(game, app, emulator))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
@@ -36,7 +88,7 @@ namespace ArchiveCacheManager
 
                 GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
                 gameInfo.GameId = game.Id;
-                gameInfo.ArchivePath = PathUtils.GetAbsolutePath((app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath);
+                gameInfo.ArchivePath = PluginUtils.GetArchivePath(game, app);
                 gameInfo.Emulator = emulator.Title;
                 gameInfo.Platform = game.Platform;
                 gameInfo.Title = game.Title;
@@ -71,20 +123,23 @@ namespace ArchiveCacheManager
                 }
                 #endregion
                 #region Game / App ApplicationPath
-                
-                if (app != null)
+
+                if (RedirectApplicationPath(game, app, emulator))
                 {
-                    DiskUtils.CreateFile(tempArchivePath);
-                    LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IAdditionalApplication_ApplicationPath, app.ApplicationPath);
-                    app.ApplicationPath = tempArchivePath;
-                    Logger.Log(string.Format("Temporarily IAdditionalApplication.ApplicationPath for {0} ({1} - {2}) to {3}.", app.Name, game.Title, game.Platform, app.ApplicationPath));
-                }
-                else
-                {
-                    DiskUtils.CreateFile(tempArchivePath);
-                    LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IGame_ApplicationPath, game.ApplicationPath);
-                    game.ApplicationPath = tempArchivePath;
-                    Logger.Log(string.Format("Temporarily set IGame.ApplicationPath for {0} ({1}) to {2}.", game.Title, game.Platform, game.ApplicationPath));
+                    if (app != null)
+                    {
+                        DiskUtils.CreateFile(tempArchivePath);
+                        LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IAdditionalApplication_ApplicationPath, app.ApplicationPath);
+                        app.ApplicationPath = tempArchivePath;
+                        Logger.Log(string.Format("Temporarily IAdditionalApplication.ApplicationPath for {0} ({1} - {2}) to {3}.", app.Name, game.Title, game.Platform, app.ApplicationPath));
+                    }
+                    else
+                    {
+                        DiskUtils.CreateFile(tempArchivePath);
+                        LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IGame_ApplicationPath, game.ApplicationPath);
+                        game.ApplicationPath = tempArchivePath;
+                        Logger.Log(string.Format("Temporarily set IGame.ApplicationPath for {0} ({1}) to {2}.", game.Title, game.Platform, game.ApplicationPath));
+                    }
                 }
                 
                 #endregion

@@ -16,5 +16,10 @@ namespace ArchiveCacheManager
         /// <param name="singleElement">The item which will be contained in the return array as its single item.</param>
         /// <returns>An array with <paramref name="singleElement"/> as its single item.</returns>
         public static T[] ToSingleArray<T>(this T singleElement) => singleElement != null ? new[] { singleElement } : null;
+
+        public static string[] SplitExtensions(string extensions)
+        {
+            return extensions.ToLower().Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ex => ex.Trim()).ToArray();
+        }
     }
 }

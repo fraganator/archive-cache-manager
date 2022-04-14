@@ -185,7 +185,7 @@ namespace ArchiveCacheManager
                 {
                     TextBox textBox = control as TextBox;
                     textBox.ForeColor = foreColor;
-                    textBox.BackColor = textBox.Parent.BackColor;
+                    textBox.BackColor = backColorContrast2;
                     if (textBox.BorderStyle == BorderStyle.Fixed3D)
                     {
                         textBox.BorderStyle = BorderStyle.FixedSingle;

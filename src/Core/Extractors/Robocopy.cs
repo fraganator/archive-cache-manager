@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ArchiveCacheManager
 {
-    class Robocopy : Extractor
+    public class Robocopy : Extractor
     {
         public Robocopy()
         {

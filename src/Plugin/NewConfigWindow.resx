@@ -165,6 +165,13 @@
   <metadata name="DolphinTool.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="label6.Text" xml:space="preserve">
+    <value>Smart Extract will extract and launch a single file from an archive if the following conditions are met:
+
+- An individual file has been selected through the "Select ROM in Archive..." rihgt-click menu.
+- All of the file types in an archive are the same, excluding files with Metadata Extensions.
+- All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.</value>
+  </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>68</value>
   </metadata>

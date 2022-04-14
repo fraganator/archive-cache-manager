@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ArchiveCacheManager
 {
-    class DolphinTool : Extractor
+    public class DolphinTool : Extractor
     {
         string executable = Path.Combine(PathUtils.GetExtractorRootPath(), "DolphinTool.exe");
 

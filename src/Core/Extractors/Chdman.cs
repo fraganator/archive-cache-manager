@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace ArchiveCacheManager
 {
-    class Chdman : Extractor
+    public class Chdman : Extractor
     {
         string executable = Path.Combine(PathUtils.GetExtractorRootPath(), "chdman.exe");
 

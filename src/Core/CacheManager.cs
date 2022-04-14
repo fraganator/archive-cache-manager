@@ -123,6 +123,8 @@ namespace ArchiveCacheManager
                 Dictionary<int, string> filePaths = new Dictionary<int, string>();
                 foreach (var discInfo in LaunchInfo.Game.Discs)
                 {
+                    // Delete any previously generated m3u file, so it doesn't get included in the subsequent archive listing
+                    DiskUtils.DeleteFile(LaunchInfo.GetM3uName(discInfo.Disc));
                     filePaths.Add(discInfo.Disc, ListCacheArchive(LaunchInfo.GetArchiveCachePath(discInfo.Disc), discInfo.Disc).FirstOrDefault());
                 }
 
@@ -144,7 +146,6 @@ namespace ArchiveCacheManager
                     string m3uPath = LaunchInfo.GetM3uName(discInfo.Disc);
                     try
                     {
-                        DiskUtils.DeleteFile(m3uPath);
                         File.WriteAllLines(m3uPath, multiDiscPaths);
                         DiskUtils.SetFileReadOnly(m3uPath);
                     }
@@ -298,17 +299,13 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
-        /// Lists all of the files in the cached archive path.
+        /// Lists the files in the cached archive path, excluding cache management files.
         /// </summary>
-        /// <returns>The file list for the cached archive in "Path = absolute\file\path.ext" format, with one entry per line.</returns>
+        /// <returns>The file list for the cached archive, with one entry per line. All paths are absolute.</returns>
         public static List<string> ListCacheArchive(string archiveCachePath, int? disc = null)
         {
             List<string> fileList = new List<string>();
-            string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(archiveCachePath),
-                                              PathUtils.GetArchiveCacheGameInfoPath(archiveCachePath),
-                                              PathUtils.GetArchiveCacheExtractingFlagPath(archiveCachePath),
-                                              PathUtils.GetArchiveCacheM3uGameIdPath(archiveCachePath, LaunchInfo.Game.GameId),
-                                              PathUtils.GetArchiveCacheM3uGameTitlePath(archiveCachePath, LaunchInfo.Game.GameId, LaunchInfo.Game.Title, LaunchInfo.Game.Version, disc) };
+            string[] managerFiles = PathUtils.GetManagerFiles(archiveCachePath);
 
             if (!string.IsNullOrEmpty(LaunchInfo.Game.SelectedFile) && !(LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport))
             {
@@ -328,21 +325,21 @@ namespace ArchiveCacheManager
             {
                 try
                 {
-                    string[] extensionPriority = Config.GetFilenamePriority(prioritySection).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] extensionPriority = Utils.SplitExtensions(Config.GetFilenamePriority(prioritySection));
 
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
                     {
-                        fileList = Directory.GetFiles(archiveCachePath, string.Format("*{0}", extension.Trim()), SearchOption.AllDirectories).ToList();
+                        fileList = Directory.GetFiles(archiveCachePath, string.Format("*{0}", extension), SearchOption.AllDirectories).ToList();
 
-                        foreach (string ex in exclude)
+                        foreach (string ex in managerFiles)
                         {
                             fileList.Remove(ex);
                         }
 
                         if (fileList.Count > 0)
                         {
-                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension.Trim()));
+                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension));
                             return fileList;
                         }
                     }
@@ -353,9 +350,9 @@ namespace ArchiveCacheManager
                 }
             }
 
-            fileList = Directory.GetFiles(LaunchInfo.GetArchiveCacheLaunchPath(disc), "*", SearchOption.AllDirectories).ToList();
+            fileList = Directory.GetFiles(archiveCachePath, "*", SearchOption.AllDirectories).ToList();
 
-            foreach (string ex in exclude)
+            foreach (string ex in managerFiles)
             {
                 fileList.Remove(ex);
             }

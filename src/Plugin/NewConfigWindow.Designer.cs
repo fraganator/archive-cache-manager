@@ -32,7 +32,8 @@ namespace ArchiveCacheManager
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Cache Settings");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Extraction Settings");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Plugin Settings");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Smart Extract Settings");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Plugin Settings");
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewConfigWindow));
@@ -76,7 +77,14 @@ namespace ArchiveCacheManager
             this.DolphinTool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.editPriorityButton = new System.Windows.Forms.Button();
             this.addPriorityButton = new System.Windows.Forms.Button();
-            this.tab3PluginSettings = new System.Windows.Forms.TabPage();
+            this.tab3SmartExtractSettings = new System.Windows.Forms.TabPage();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.metadataExtensions = new System.Windows.Forms.TextBox();
+            this.cachePathLabel = new System.Windows.Forms.Label();
+            this.standaloneExtensions = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.tab4PluginSettings = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
             this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
@@ -84,7 +92,8 @@ namespace ArchiveCacheManager
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
             this.tab2ExtractionSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).BeginInit();
-            this.tab3PluginSettings.SuspendLayout();
+            this.tab3SmartExtractSettings.SuspendLayout();
+            this.tab4PluginSettings.SuspendLayout();
             this.SuspendLayout();
             // 
             // openInExplorerButton
@@ -252,12 +261,15 @@ namespace ArchiveCacheManager
             treeNode1.Text = "Cache Settings";
             treeNode2.Name = "ExtractionSettings";
             treeNode2.Text = "Extraction Settings";
-            treeNode3.Name = "PluginSettings";
-            treeNode3.Text = "Plugin Settings";
+            treeNode3.Name = "SmartExtractSettings";
+            treeNode3.Text = "Smart Extract Settings";
+            treeNode4.Name = "PluginSettings";
+            treeNode4.Text = "Plugin Settings";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2,
-            treeNode3});
+            treeNode3,
+            treeNode4});
             this.treeView1.ShowLines = false;
             this.treeView1.Size = new System.Drawing.Size(166, 551);
             this.treeView1.TabIndex = 20;
@@ -270,7 +282,8 @@ namespace ArchiveCacheManager
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tab1CacheSettings);
             this.tabControl1.Controls.Add(this.tab2ExtractionSettings);
-            this.tabControl1.Controls.Add(this.tab3PluginSettings);
+            this.tabControl1.Controls.Add(this.tab3SmartExtractSettings);
+            this.tabControl1.Controls.Add(this.tab4PluginSettings);
             this.tabControl1.Location = new System.Drawing.Point(184, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -615,18 +628,96 @@ namespace ArchiveCacheManager
             this.addPriorityButton.UseVisualStyleBackColor = true;
             this.addPriorityButton.Click += new System.EventHandler(this.addPriorityButton_Click);
             // 
-            // tab3PluginSettings
+            // tab3SmartExtractSettings
             // 
-            this.tab3PluginSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tab3PluginSettings.Controls.Add(this.label3);
-            this.tab3PluginSettings.Controls.Add(this.updateCheckCheckBox);
-            this.tab3PluginSettings.Location = new System.Drawing.Point(4, 22);
-            this.tab3PluginSettings.Name = "tab3PluginSettings";
-            this.tab3PluginSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tab3PluginSettings.Size = new System.Drawing.Size(740, 524);
-            this.tab3PluginSettings.TabIndex = 2;
-            this.tab3PluginSettings.Text = "Plugin Settings";
-            this.tab3PluginSettings.UseVisualStyleBackColor = true;
+            this.tab3SmartExtractSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tab3SmartExtractSettings.Controls.Add(this.label6);
+            this.tab3SmartExtractSettings.Controls.Add(this.label5);
+            this.tab3SmartExtractSettings.Controls.Add(this.metadataExtensions);
+            this.tab3SmartExtractSettings.Controls.Add(this.cachePathLabel);
+            this.tab3SmartExtractSettings.Controls.Add(this.standaloneExtensions);
+            this.tab3SmartExtractSettings.Controls.Add(this.label4);
+            this.tab3SmartExtractSettings.Location = new System.Drawing.Point(4, 22);
+            this.tab3SmartExtractSettings.Name = "tab3SmartExtractSettings";
+            this.tab3SmartExtractSettings.Padding = new System.Windows.Forms.Padding(3);
+            this.tab3SmartExtractSettings.Size = new System.Drawing.Size(740, 524);
+            this.tab3SmartExtractSettings.TabIndex = 3;
+            this.tab3SmartExtractSettings.Text = "Smart Extract Settings";
+            this.tab3SmartExtractSettings.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 174);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(472, 65);
+            this.label6.TabIndex = 29;
+            this.label6.Text = resources.GetString("label6.Text");
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(7, 117);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(109, 13);
+            this.label5.TabIndex = 28;
+            this.label5.Text = "Metadata Extensions:";
+            // 
+            // metadataExtensions
+            // 
+            this.metadataExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.metadataExtensions.Location = new System.Drawing.Point(10, 133);
+            this.metadataExtensions.MaxLength = 260;
+            this.metadataExtensions.Name = "metadataExtensions";
+            this.metadataExtensions.Size = new System.Drawing.Size(721, 20);
+            this.metadataExtensions.TabIndex = 27;
+            // 
+            // cachePathLabel
+            // 
+            this.cachePathLabel.AutoSize = true;
+            this.cachePathLabel.Location = new System.Drawing.Point(7, 60);
+            this.cachePathLabel.Name = "cachePathLabel";
+            this.cachePathLabel.Size = new System.Drawing.Size(154, 13);
+            this.cachePathLabel.TabIndex = 26;
+            this.cachePathLabel.Text = "Stand-alone ROMs Extensions:";
+            // 
+            // standaloneExtensions
+            // 
+            this.standaloneExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.standaloneExtensions.Location = new System.Drawing.Point(10, 76);
+            this.standaloneExtensions.MaxLength = 260;
+            this.standaloneExtensions.Name = "standaloneExtensions";
+            this.standaloneExtensions.Size = new System.Drawing.Size(721, 20);
+            this.standaloneExtensions.TabIndex = 25;
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.label4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(6, 7);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(724, 43);
+            this.label4.TabIndex = 24;
+            this.label4.Text = "Smart Extract Settings";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // tab4PluginSettings
+            // 
+            this.tab4PluginSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tab4PluginSettings.Controls.Add(this.label3);
+            this.tab4PluginSettings.Controls.Add(this.updateCheckCheckBox);
+            this.tab4PluginSettings.Location = new System.Drawing.Point(4, 22);
+            this.tab4PluginSettings.Name = "tab4PluginSettings";
+            this.tab4PluginSettings.Padding = new System.Windows.Forms.Padding(3);
+            this.tab4PluginSettings.Size = new System.Drawing.Size(740, 524);
+            this.tab4PluginSettings.TabIndex = 2;
+            this.tab4PluginSettings.Text = "Plugin Settings";
+            this.tab4PluginSettings.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -645,7 +736,7 @@ namespace ArchiveCacheManager
             // updateCheckCheckBox
             // 
             this.updateCheckCheckBox.AutoSize = true;
-            this.updateCheckCheckBox.Location = new System.Drawing.Point(9, 62);
+            this.updateCheckCheckBox.Location = new System.Drawing.Point(7, 62);
             this.updateCheckCheckBox.Name = "updateCheckCheckBox";
             this.updateCheckCheckBox.Size = new System.Drawing.Size(172, 17);
             this.updateCheckCheckBox.TabIndex = 0;
@@ -685,8 +776,10 @@ namespace ArchiveCacheManager
             this.tab2ExtractionSettings.ResumeLayout(false);
             this.tab2ExtractionSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.extensionPriorityDataGridView)).EndInit();
-            this.tab3PluginSettings.ResumeLayout(false);
-            this.tab3PluginSettings.PerformLayout();
+            this.tab3SmartExtractSettings.ResumeLayout(false);
+            this.tab3SmartExtractSettings.PerformLayout();
+            this.tab4PluginSettings.ResumeLayout(false);
+            this.tab4PluginSettings.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -715,7 +808,7 @@ namespace ArchiveCacheManager
         private StackPanel tabControl1;
         private System.Windows.Forms.TabPage tab1CacheSettings;
         private System.Windows.Forms.TabPage tab2ExtractionSettings;
-        private System.Windows.Forms.TabPage tab3PluginSettings;
+        private System.Windows.Forms.TabPage tab4PluginSettings;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TreeView treeView1;
@@ -736,5 +829,12 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewCheckBoxColumn SmartExtract;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Chdman;
         private System.Windows.Forms.DataGridViewCheckBoxColumn DolphinTool;
+        private System.Windows.Forms.TabPage tab3SmartExtractSettings;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox standaloneExtensions;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox metadataExtensions;
+        private System.Windows.Forms.Label cachePathLabel;
     }
 }
