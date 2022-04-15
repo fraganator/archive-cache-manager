@@ -28,6 +28,7 @@ namespace ArchiveCacheManager
         public static int KeyboardBack = 13;
         public static int KeyboardPlay = 59;
 
+        // Default LaunchBox dialog dark theme
         public static Color DialogAccentColor = Color.FromArgb(65, 100, 148);
         public static Color DialogHighlightColor = Color.FromArgb(76, 79, 98);
         public static Color DialogBackgroundColor = Color.FromArgb(42, 43, 52);
@@ -73,6 +74,8 @@ namespace ArchiveCacheManager
             ControllerPlayButton = (node != null ? Convert.ToInt32(node.InnerText) : ControllerPlayButton);
             #endregion
 
+            // Disable theme colour loading, until light theme colour contrast calcs are implemented
+            /*
             #region Dialog Theme Colours
             node = settings.SelectSingleNode(xpathPrefix + nameof(DialogAccentColor));
             DialogAccentColor = (node != null ? Color.FromArgb(Convert.ToInt32(node.InnerText)) : DialogAccentColor);
@@ -92,6 +95,7 @@ namespace ArchiveCacheManager
             node = settings.SelectSingleNode(xpathPrefix + nameof(DialogContrastMultiplier));
             DialogContrastMultiplier = (node != null ? Convert.ToDouble(node.InnerText) : DialogContrastMultiplier);
             #endregion
+            */
     }
 
         private static void LoadBigBox(string settingsPath)

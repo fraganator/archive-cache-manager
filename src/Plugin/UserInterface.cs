@@ -135,19 +135,21 @@ namespace ArchiveCacheManager
 
                         // we need to do owner drawing only on a selected node
                         // and when the treeview is unfocused, else let the OS do it for us
+                        var font = e.Node.NodeFont ?? e.Node.TreeView.Font;
+                        Rectangle bounds = e.Bounds;
+                        bounds.X = e.Node.TreeView.Bounds.X - e.Node.TreeView.Indent;
+                        bounds.Width = e.Node.TreeView.Bounds.Width + e.Node.TreeView.Indent;
                         if (selected)
                         {
-                            var font = e.Node.NodeFont ?? e.Node.TreeView.Font;
-                            Rectangle bounds = e.Bounds;
-                            bounds.X = e.Node.TreeView.Bounds.X - e.Node.TreeView.Indent;
-                            bounds.Width = e.Node.TreeView.Bounds.Width + e.Node.TreeView.Indent;
                             e.Graphics.FillRectangle(new SolidBrush(LaunchBoxSettings.DialogAccentColor), bounds);
-                            TextRenderer.DrawText(e.Graphics, e.Node.Text, font, e.Bounds, foreColor, TextFormatFlags.GlyphOverhangPadding);
                         }
                         else
                         {
-                            e.DrawDefault = true;
+                            e.Graphics.FillRectangle(new SolidBrush(backColorContrast1), bounds);
                         }
+                        bounds = e.Bounds;
+                        bounds.Y += 8;
+                        TextRenderer.DrawText(e.Graphics, e.Node.Text, font, bounds, foreColor, TextFormatFlags.GlyphOverhangPadding);
                     });
                 }
                 else if (control is Button)

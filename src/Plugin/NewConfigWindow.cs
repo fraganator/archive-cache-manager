@@ -20,7 +20,7 @@ namespace ArchiveCacheManager
             {
                 UserInterface.SetColumnMinimumWidth(column);
             }
-            foreach (DataGridViewColumn column in extensionPriorityDataGridView.Columns)
+            foreach (DataGridViewColumn column in emulatorPlatformConfigDataGridView.Columns)
             {
                 UserInterface.SetColumnMinimumWidth(column);
             }
@@ -31,11 +31,11 @@ namespace ArchiveCacheManager
 
             versionLabel.Text = CacheManager.VersionString;
 
-            extensionPriorityDataGridView.Rows.Clear();
+            emulatorPlatformConfigDataGridView.Rows.Clear();
 
-            var actionItems = (extensionPriorityDataGridView.Columns["Action"] as DataGridViewComboBoxColumn).Items;
-            var launchPathItems = (extensionPriorityDataGridView.Columns["LaunchPath"] as DataGridViewComboBoxColumn).Items;
-            var m3uNameItems = (extensionPriorityDataGridView.Columns["M3uName"] as DataGridViewComboBoxColumn).Items;
+            var actionItems = (emulatorPlatformConfigDataGridView.Columns["Action"] as DataGridViewComboBoxColumn).Items;
+            var launchPathItems = (emulatorPlatformConfigDataGridView.Columns["LaunchPath"] as DataGridViewComboBoxColumn).Items;
+            var m3uNameItems = (emulatorPlatformConfigDataGridView.Columns["M3uName"] as DataGridViewComboBoxColumn).Items;
             foreach (var config in Config.GetAllEmulatorPlatformConfig())
             {
                 string[] priorityInfo = config.Key.Split(new string[] { @"\" }, StringSplitOptions.RemoveEmptyEntries);
@@ -45,7 +45,7 @@ namespace ArchiveCacheManager
                 if (string.Equals(priorityEmulator, "All", StringComparison.InvariantCultureIgnoreCase) &&
                     string.Equals(priorityPlatform, "All", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    extensionPriorityDataGridView.Rows.Insert(0, new object[] { priorityEmulator,
+                    emulatorPlatformConfigDataGridView.Rows.Insert(0, new object[] { priorityEmulator,
                                                                                 priorityPlatform,
                                                                                 config.Value.FilenamePriority,
                                                                                 actionItems[(int)config.Value.Action],
@@ -58,7 +58,7 @@ namespace ArchiveCacheManager
                 }
                 else
                 {
-                    extensionPriorityDataGridView.Rows.Add(new object[] { priorityEmulator,
+                    emulatorPlatformConfigDataGridView.Rows.Add(new object[] { priorityEmulator,
                                                                           priorityPlatform,
                                                                           config.Value.FilenamePriority,
                                                                           actionItems[(int)config.Value.Action],
@@ -70,7 +70,9 @@ namespace ArchiveCacheManager
                                                                           config.Value.DolphinTool });
                 }
             }
-            extensionPriorityDataGridView.ClearSelection();
+            emulatorPlatformConfigDataGridView.ClearSelection();
+
+            treeView1.SelectedNode = treeView1.Nodes[0];
 
             updateCheckCheckBox.Checked = (bool)Config.UpdateCheck;
             standaloneExtensions.Text = Config.StandaloneExtensions;
@@ -92,13 +94,11 @@ namespace ArchiveCacheManager
             deleteAllButton.Enabled = (cacheDataGridView.Rows.Count > 0);
             deleteSelectedButton.Enabled = (cacheDataGridView.SelectedRows.Count > 0);
 
-            if (extensionPriorityDataGridView.SelectedRows.Count == 1)
+            if (emulatorPlatformConfigDataGridView.SelectedRows.Count == 1)
             {
-                editPriorityButton.Enabled = true;
-
                 // Don't allow deletion of the default All / All file priority.
-                if (string.Equals(extensionPriorityDataGridView.SelectedRows[0].Cells[0].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase) &&
-                    string.Equals(extensionPriorityDataGridView.SelectedRows[0].Cells[1].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals(emulatorPlatformConfigDataGridView.SelectedRows[0].Cells[0].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase) &&
+                    string.Equals(emulatorPlatformConfigDataGridView.SelectedRows[0].Cells[1].Value.ToString(), "All", StringComparison.InvariantCultureIgnoreCase))
                 {
                     deletePriorityButton.Enabled = false;
                 }
@@ -109,7 +109,6 @@ namespace ArchiveCacheManager
             }
             else
             {
-                editPriorityButton.Enabled = false;
                 deletePriorityButton.Enabled = false;
             }
         }
@@ -177,6 +176,11 @@ namespace ArchiveCacheManager
             catch (Exception)
             {
             }
+
+            if (cacheDataGridView.RowCount > 0)
+            {
+                cacheDataGridView.Rows[0].Selected = true;
+            }
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -184,14 +188,14 @@ namespace ArchiveCacheManager
             var config = Config.GetAllEmulatorPlatformConfigByRef();
             config.Clear();
 
-            var actionItems = (extensionPriorityDataGridView.Columns["Action"] as DataGridViewComboBoxColumn).Items;
-            var launchPathItems = (extensionPriorityDataGridView.Columns["LaunchPath"] as DataGridViewComboBoxColumn).Items;
-            var m3uNameItems = (extensionPriorityDataGridView.Columns["M3uName"] as DataGridViewComboBoxColumn).Items;
-            foreach (DataGridViewRow row in extensionPriorityDataGridView.Rows)
+            var actionItems = (emulatorPlatformConfigDataGridView.Columns["Action"] as DataGridViewComboBoxColumn).Items;
+            var launchPathItems = (emulatorPlatformConfigDataGridView.Columns["LaunchPath"] as DataGridViewComboBoxColumn).Items;
+            var m3uNameItems = (emulatorPlatformConfigDataGridView.Columns["M3uName"] as DataGridViewComboBoxColumn).Items;
+            foreach (DataGridViewRow row in emulatorPlatformConfigDataGridView.Rows)
             {
                 string key = Config.EmulatorPlatformKey(row.Cells[0].Value.ToString(), row.Cells[1].Value.ToString());
                 config.Add(key, new Config.EmulatorPlatformConfig());
-                config[key].FilenamePriority = row.Cells[2].Value.ToString();
+                config[key].FilenamePriority = row.Cells[2].Value == null ? string.Empty : row.Cells[2].Value.ToString();
                 config[key].Action = (Config.Action)actionItems.IndexOf(row.Cells[3].Value);
                 config[key].LaunchPath = (Config.LaunchPath)launchPathItems.IndexOf(row.Cells[4].Value);
                 config[key].MultiDisc = Convert.ToBoolean(row.Cells[5].Value);
@@ -230,37 +234,30 @@ namespace ArchiveCacheManager
 
         private void addPriorityButton_Click(object sender, EventArgs e)
         {
-            PriorityEditWindow window = new PriorityEditWindow();
+            EmulatorPlatformSelectionWindow window = new EmulatorPlatformSelectionWindow();
 
             window.ShowDialog(this);
 
             if (window.DialogResult == DialogResult.OK)
             {
-                int index = extensionPriorityDataGridView.Rows.Add(new string[] { window.Emulator, window.Platform, window.PriorityList });
-                extensionPriorityDataGridView.Rows[index].Selected = true;
-            }
-        }
-
-        private void editPriorityButton_Click(object sender, EventArgs e)
-        {
-            DataGridViewCellCollection cells = extensionPriorityDataGridView.SelectedRows[0].Cells;
-
-            PriorityEditWindow window = new PriorityEditWindow(cells[0].Value.ToString(), cells[1].Value.ToString(), cells[2].Value.ToString());
-
-            window.ShowDialog(this);
-
-            if (window.DialogResult == DialogResult.OK)
-            {
-                extensionPriorityDataGridView.SelectedRows[0].Cells[0].Value = window.Emulator;
-                extensionPriorityDataGridView.SelectedRows[0].Cells[1].Value = window.Platform;
-                extensionPriorityDataGridView.SelectedRows[0].Cells[2].Value = window.PriorityList;
+                int index = emulatorPlatformConfigDataGridView.Rows.Add(new object[] { window.Emulator,
+                                                                                       window.Platform,
+                                                                                       string.Empty,
+                                                                                       emulatorPlatformConfigDataGridView[3, 0].Value,
+                                                                                       emulatorPlatformConfigDataGridView[4, 0].Value,
+                                                                                       emulatorPlatformConfigDataGridView[5, 0].Value,
+                                                                                       emulatorPlatformConfigDataGridView[6, 0].Value,
+                                                                                       emulatorPlatformConfigDataGridView[7, 0].Value,
+                                                                                       emulatorPlatformConfigDataGridView[8, 0].Value,
+                                                                                       emulatorPlatformConfigDataGridView[9, 0].Value });
+                emulatorPlatformConfigDataGridView.Rows[index].Selected = true;
             }
         }
 
         private void deletePriorityButton_Click(object sender, EventArgs e)
         {
-            extensionPriorityDataGridView.Rows.Remove(extensionPriorityDataGridView.SelectedRows[0]);
-            extensionPriorityDataGridView.ClearSelection();
+            emulatorPlatformConfigDataGridView.Rows.Remove(emulatorPlatformConfigDataGridView.SelectedRows[0]);
+            emulatorPlatformConfigDataGridView.ClearSelection();
         }
 
         private void extensionPriorityDataGridView_SelectionChanged(object sender, EventArgs e)
@@ -417,7 +414,7 @@ namespace ArchiveCacheManager
             tabControl1.SelectTab(e.Node.Index);
         }
 
-        private void extensionPriorityDataGridView_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        private void emulatorPlatformConfigDataGridView_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
         {
             DataGridView dataGridView = sender as DataGridView;
             if (dataGridView.Cursor != Cursors.IBeam &&
@@ -429,7 +426,7 @@ namespace ArchiveCacheManager
             }
         }
 
-        private void extensionPriorityDataGridView_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        private void emulatorPlatformConfigDataGridView_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
         {
             DataGridView dataGridView = sender as DataGridView;
             if (dataGridView.Cursor != Cursors.Default)

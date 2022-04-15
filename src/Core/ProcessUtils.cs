@@ -72,6 +72,11 @@ namespace ArchiveCacheManager
                 Logger.Log(e.ToString(), Logger.LogLevel.Exception);
             }
 
+            if (exitCode != 0)
+            {
+                Environment.ExitCode = exitCode;
+            }
+
             stdout = asyncOutput.ToString();
             stderr = asyncError.ToString();
 

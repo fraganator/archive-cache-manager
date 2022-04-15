@@ -135,6 +135,16 @@
   <metadata name="Keep.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="infoLabel.Text" xml:space="preserve">
+    <value>Priority Info:
+A comma delimited list of filenames or extensions, which can include the * wildcard. When a game is launched which matches the emulator and platform, the Priority will be applied to the files in the archive. Some example priorities include:
+
+bin, iso - Files ending with bin, then files ending in iso, then all other files.
+
+eboot.bin - Files named eboot.bin, then all other files.
+
+*(*E*)*[!].*, *(*U*)*[!].*, *[!].* - GoodMerged style - European 'good' ROM dumps, then USA 'good' ROM dumps, then other region 'good' ROM dumps, then all other files.</value>
+  </data>
   <metadata name="Emulator.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -168,12 +178,12 @@
   <data name="label6.Text" xml:space="preserve">
     <value>Smart Extract will extract and launch a single file from an archive if the following conditions are met:
 
-- An individual file has been selected through the "Select ROM in Archive..." rihgt-click menu.
+- An individual file has been selected through the "Select ROM in Archive..." right-click menu.
 - All of the file types in an archive are the same, excluding files with Metadata Extensions.
 - All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.</value>
   </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>68</value>
+    <value>50</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

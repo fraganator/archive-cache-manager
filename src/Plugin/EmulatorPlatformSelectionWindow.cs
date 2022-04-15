@@ -11,14 +11,12 @@ using Unbroken.LaunchBox.Plugins;
 
 namespace ArchiveCacheManager
 {
-    public partial class PriorityEditWindow : Form
+    public partial class EmulatorPlatformSelectionWindow : Form
     {
         public string Emulator = "";
         public string Platform = "";
-        public string PriorityList = "";
-        private bool editOnly = false;
 
-        public PriorityEditWindow(string emulator = null, string platform = null, string priorityList = null)
+        public EmulatorPlatformSelectionWindow(string emulator = null, string platform = null)
         {
             InitializeComponent();
 
@@ -29,10 +27,8 @@ namespace ArchiveCacheManager
             {
                 emulatorComboBox.Items.Add(emulator);
                 platformComboBox.Items.Add(platform);
-                extensionPriorityTextBox.Text = priorityList;
                 emulatorComboBox.SelectedIndex = 0;
                 platformComboBox.SelectedIndex = 0;
-                editOnly = true;
             }
             else
             {
@@ -67,19 +63,10 @@ namespace ArchiveCacheManager
             okButton.Enabled = (emulatorComboBox.Items.Count > 0 &&
                                 emulatorComboBox.SelectedIndex != -1 &&
                                 platformComboBox.Items.Count > 0 &&
-                                platformComboBox.SelectedIndex != -1 &&
-                                extensionPriorityTextBox.Text != string.Empty);
+                                platformComboBox.SelectedIndex != -1);
 
-            if (editOnly)
-            {
-                emulatorComboBox.Enabled = false;
-                platformComboBox.Enabled = false;
-            }
-            else
-            {
-                emulatorComboBox.Enabled = (emulatorComboBox.Items.Count != 0);
-                platformComboBox.Enabled = (platformComboBox.Items.Count != 0);
-            }
+            emulatorComboBox.Enabled = (emulatorComboBox.Items.Count != 0);
+            platformComboBox.Enabled = (platformComboBox.Items.Count != 0);
         }
 
         private void emulatorComboBox_SelectionChangeCommitted(object sender, EventArgs e)
@@ -94,16 +81,10 @@ namespace ArchiveCacheManager
             updateEnabledState();
         }
 
-        private void extensionPriorityTextBox_TextChanged(object sender, EventArgs e)
-        {
-            updateEnabledState();
-        }
-
         private void okButton_Click(object sender, EventArgs e)
         {
             Emulator = emulatorComboBox.SelectedItem.ToString();
             Platform = platformComboBox.SelectedItem.ToString();
-            PriorityList = extensionPriorityTextBox.Text;
         }
     }
 }
