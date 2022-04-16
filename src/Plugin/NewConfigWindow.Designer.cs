@@ -61,7 +61,6 @@ namespace ArchiveCacheManager
             this.ArchiveSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Keep = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tab2ExtractionSettings = new System.Windows.Forms.TabPage();
-            this.infoLabel = new System.Windows.Forms.Label();
             this.extractionSettingsTipLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.deletePriorityButton = new System.Windows.Forms.Button();
@@ -409,7 +408,6 @@ namespace ArchiveCacheManager
             // tab2ExtractionSettings
             // 
             this.tab2ExtractionSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tab2ExtractionSettings.Controls.Add(this.infoLabel);
             this.tab2ExtractionSettings.Controls.Add(this.extractionSettingsTipLabel);
             this.tab2ExtractionSettings.Controls.Add(this.label2);
             this.tab2ExtractionSettings.Controls.Add(this.deletePriorityButton);
@@ -422,16 +420,6 @@ namespace ArchiveCacheManager
             this.tab2ExtractionSettings.TabIndex = 1;
             this.tab2ExtractionSettings.Text = "Extraction Settings";
             this.tab2ExtractionSettings.UseVisualStyleBackColor = true;
-            // 
-            // infoLabel
-            // 
-            this.infoLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.infoLabel.Location = new System.Drawing.Point(9, 328);
-            this.infoLabel.Name = "infoLabel";
-            this.infoLabel.Size = new System.Drawing.Size(723, 157);
-            this.infoLabel.TabIndex = 25;
-            this.infoLabel.Text = resources.GetString("infoLabel.Text");
             // 
             // extractionSettingsTipLabel
             // 
@@ -503,7 +491,7 @@ namespace ArchiveCacheManager
             this.emulatorPlatformConfigDataGridView.Name = "emulatorPlatformConfigDataGridView";
             this.emulatorPlatformConfigDataGridView.RowHeadersVisible = false;
             this.emulatorPlatformConfigDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.emulatorPlatformConfigDataGridView.Size = new System.Drawing.Size(726, 263);
+            this.emulatorPlatformConfigDataGridView.Size = new System.Drawing.Size(726, 420);
             this.emulatorPlatformConfigDataGridView.StandardTab = true;
             this.emulatorPlatformConfigDataGridView.TabIndex = 13;
             this.emulatorPlatformConfigDataGridView.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.emulatorPlatformConfigDataGridView_CellMouseEnter);
@@ -831,6 +819,5 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox metadataExtensions;
         private System.Windows.Forms.Label cachePathLabel;
-        private System.Windows.Forms.Label infoLabel;
     }
 }

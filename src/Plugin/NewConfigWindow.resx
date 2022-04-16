@@ -135,16 +135,6 @@
   <metadata name="Keep.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="infoLabel.Text" xml:space="preserve">
-    <value>Priority Info:
-A comma delimited list of filenames or extensions, which can include the * wildcard. When a game is launched which matches the emulator and platform, the Priority will be applied to the files in the archive. Some example priorities include:
-
-bin, iso - Files ending with bin, then files ending in iso, then all other files.
-
-eboot.bin - Files named eboot.bin, then all other files.
-
-*(*E*)*[!].*, *(*U*)*[!].*, *[!].* - GoodMerged style - European 'good' ROM dumps, then USA 'good' ROM dumps, then other region 'good' ROM dumps, then all other files.</value>
-  </data>
   <metadata name="Emulator.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>

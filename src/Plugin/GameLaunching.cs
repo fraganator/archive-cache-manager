@@ -31,6 +31,13 @@ namespace ArchiveCacheManager
             }
 
             string key = Config.EmulatorPlatformKey(emulator.Title, game.Platform);
+            // In case where game is multi-disc, emulator supports m3u, and multi-disc support is disabled, don't try extract anything
+            // as it will be incompatible with LaunchBox's m3u creation.
+            if (!Config.GetMultiDisc(key) && PluginUtils.IsLaunchedGameMultiDisc(game, app) && PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform))
+            {
+                return false;
+            }
+
             string archivePath = PluginUtils.GetArchivePath(game, app);
             bool extract = (Config.GetAction(key) == Config.Action.Extract || Config.GetAction(key) == Config.Action.ExtractCopy);
             bool copy = (Config.GetAction(key) == Config.Action.Copy || Config.GetAction(key) == Config.Action.ExtractCopy);
@@ -131,7 +138,7 @@ namespace ArchiveCacheManager
                         DiskUtils.CreateFile(tempArchivePath);
                         LaunchBoxDataBackup.BackupSetting(LaunchBoxDataBackup.SettingName.IAdditionalApplication_ApplicationPath, app.ApplicationPath);
                         app.ApplicationPath = tempArchivePath;
-                        Logger.Log(string.Format("Temporarily IAdditionalApplication.ApplicationPath for {0} ({1} - {2}) to {3}.", app.Name, game.Title, game.Platform, app.ApplicationPath));
+                        Logger.Log(string.Format("Temporarily set IAdditionalApplication.ApplicationPath for {0} ({1} - {2}) to {3}.", app.Name, game.Title, game.Platform, app.ApplicationPath));
                     }
                     else
                     {

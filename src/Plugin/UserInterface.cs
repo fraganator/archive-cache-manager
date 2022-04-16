@@ -123,34 +123,7 @@ namespace ArchiveCacheManager
                     treeView.ForeColor = foreColor;
                     treeView.BackColor = backColorContrast1;
                     treeView.DrawMode = TreeViewDrawMode.OwnerDrawText;
-                    treeView.DrawNode += new DrawTreeNodeEventHandler((sender, e) =>
-                    {
-                        if (e.Node == null) return;
-
-                        // if treeview's HideSelection property is "True", 
-                        // this will always returns "False" on unfocused treeview
-                        var selected = (e.State & TreeNodeStates.Selected) == TreeNodeStates.Selected ||
-                                       (e.State & TreeNodeStates.Focused) == TreeNodeStates.Focused;
-                        var unfocused = !e.Node.TreeView.Focused;
-
-                        // we need to do owner drawing only on a selected node
-                        // and when the treeview is unfocused, else let the OS do it for us
-                        var font = e.Node.NodeFont ?? e.Node.TreeView.Font;
-                        Rectangle bounds = e.Bounds;
-                        bounds.X = e.Node.TreeView.Bounds.X - e.Node.TreeView.Indent;
-                        bounds.Width = e.Node.TreeView.Bounds.Width + e.Node.TreeView.Indent;
-                        if (selected)
-                        {
-                            e.Graphics.FillRectangle(new SolidBrush(LaunchBoxSettings.DialogAccentColor), bounds);
-                        }
-                        else
-                        {
-                            e.Graphics.FillRectangle(new SolidBrush(backColorContrast1), bounds);
-                        }
-                        bounds = e.Bounds;
-                        bounds.Y += 8;
-                        TextRenderer.DrawText(e.Graphics, e.Node.Text, font, bounds, foreColor, TextFormatFlags.GlyphOverhangPadding);
-                    });
+                    treeView.DrawNode += TreeView_DrawNode;
                 }
                 else if (control is Button)
                 {
@@ -210,24 +183,7 @@ namespace ArchiveCacheManager
                     comboBox.BackColor = backColor;
                     comboBox.FlatStyle = FlatStyle.Flat;
                     comboBox.DrawMode = DrawMode.OwnerDrawFixed;
-                    comboBox.DrawItem += new DrawItemEventHandler((sender, e) =>
-                    {
-                        var combo = sender as ComboBox;
-
-                        if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                        {
-                            e.Graphics.FillRectangle(new SolidBrush(LaunchBoxSettings.DialogAccentColor), e.Bounds);
-                        }
-                        else
-                        {
-                            e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
-                        }
-
-                        if (e.Index < combo.Items.Count && e.Index >= 0)
-                        {
-                            e.Graphics.DrawString(combo.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), new Point(e.Bounds.X, e.Bounds.Y));
-                        }
-                    });
+                    comboBox.DrawItem += ComboBox_DrawItem;
                 }
                 else if (control is Panel)
                 {
@@ -245,24 +201,7 @@ namespace ArchiveCacheManager
                         listBox.BorderStyle = BorderStyle.FixedSingle;
                     }
                     listBox.DrawMode = DrawMode.OwnerDrawFixed;
-                    listBox.DrawItem += new DrawItemEventHandler((sender, e) =>
-                    {
-                        var list = sender as ListBox;
-
-                        if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-                        {
-                            e.Graphics.FillRectangle(new SolidBrush(LaunchBoxSettings.DialogAccentColor), e.Bounds);
-                        }
-                        else
-                        {
-                            e.Graphics.FillRectangle(new SolidBrush(backColorContrast1), e.Bounds);
-                        }
-
-                        if (e.Index < list.Items.Count && e.Index >= 0)
-                        {
-                            e.Graphics.DrawString(list.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), new Point(e.Bounds.X, e.Bounds.Y));
-                        }
-                    });
+                    listBox.DrawItem += ListBox_DrawItem;
                 }
                 else if (control is DataGridView)
                 {
@@ -283,6 +222,73 @@ namespace ArchiveCacheManager
                     dataGridView.EnableHeadersVisualStyles = false;
                 }
             }
+        }
+
+        private static void ListBox_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            var list = sender as ListBox;
+
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                e.Graphics.FillRectangle(new SolidBrush(LaunchBoxSettings.DialogAccentColor), e.Bounds);
+            }
+            else
+            {
+                e.Graphics.FillRectangle(new SolidBrush(backColorContrast1), e.Bounds);
+            }
+
+            if (e.Index < list.Items.Count && e.Index >= 0)
+            {
+                e.Graphics.DrawString(list.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), new Point(e.Bounds.X, e.Bounds.Y));
+            }
+        }
+
+        private static void ComboBox_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            var combo = sender as ComboBox;
+
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                e.Graphics.FillRectangle(new SolidBrush(LaunchBoxSettings.DialogAccentColor), e.Bounds);
+            }
+            else
+            {
+                e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
+            }
+
+            if (e.Index < combo.Items.Count && e.Index >= 0)
+            {
+                e.Graphics.DrawString(combo.Items[e.Index].ToString(), e.Font, new SolidBrush(foreColor), new Point(e.Bounds.X, e.Bounds.Y));
+            }
+        }
+
+        private static void TreeView_DrawNode(object sender, DrawTreeNodeEventArgs e)
+        {
+            if (e.Node == null) return;
+
+            // if treeview's HideSelection property is "True", 
+            // this will always returns "False" on unfocused treeview
+            var selected = (e.State & TreeNodeStates.Selected) == TreeNodeStates.Selected ||
+                            (e.State & TreeNodeStates.Focused) == TreeNodeStates.Focused;
+            var unfocused = !e.Node.TreeView.Focused;
+
+            // we need to do owner drawing only on a selected node
+            // and when the treeview is unfocused, else let the OS do it for us
+            var font = e.Node.NodeFont ?? e.Node.TreeView.Font;
+            Rectangle bounds = e.Bounds;
+            bounds.X = e.Node.TreeView.Bounds.X - e.Node.TreeView.Indent;
+            bounds.Width = e.Node.TreeView.Bounds.Width + e.Node.TreeView.Indent;
+            if (selected)
+            {
+                e.Graphics.FillRectangle(new SolidBrush(LaunchBoxSettings.DialogAccentColor), bounds);
+            }
+            else
+            {
+                e.Graphics.FillRectangle(new SolidBrush(backColorContrast1), bounds);
+            }
+            bounds = e.Bounds;
+            bounds.Y += 8;
+            TextRenderer.DrawText(e.Graphics, e.Node.Text, font, bounds, foreColor, TextFormatFlags.GlyphOverhangPadding);
         }
     }
 

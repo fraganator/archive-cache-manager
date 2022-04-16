@@ -119,6 +119,7 @@ namespace ArchiveCacheManager
             else
             {
                 Logger.Log(string.Format("Error listing archive {0}.", archivePath));
+                Environment.ExitCode = exitCode;
             }
 
             return fileList;
@@ -219,6 +220,7 @@ namespace ArchiveCacheManager
             if (exitCode != 0)
             {
                 Logger.Log(string.Format("7-Zip returned exit code {0} with error output:\r\n{1}", exitCode, stderr));
+                Environment.ExitCode = exitCode;
             }
 
             return (stdout, stderr, exitCode);

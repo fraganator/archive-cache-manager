@@ -24,6 +24,7 @@ namespace ArchiveCacheManager
             if (exitCode >= 8)
             {
                 Logger.Log(string.Format("Robocopy returned exit code {0} with error output:\r\n{1}", exitCode, stdout));
+                Environment.ExitCode = exitCode;
             }
 
             return exitCode < 8;

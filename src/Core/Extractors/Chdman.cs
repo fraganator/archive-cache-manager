@@ -32,6 +32,7 @@ namespace ArchiveCacheManager
             if (exitCode != 0)
             {
                 Logger.Log(string.Format("chdman returned exit code {0} with error output:\r\n{1}", exitCode, stderr));
+                Environment.ExitCode = exitCode;
             }
 
             return exitCode == 0;
@@ -46,6 +47,7 @@ namespace ArchiveCacheManager
             if (exitCode != 0)
             {
                 Logger.Log(string.Format("chdman returned exit code {0} with error output:\r\n{1}", exitCode, stderr));
+                Environment.ExitCode = exitCode;
             }
 
             /*
