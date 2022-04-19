@@ -242,12 +242,12 @@ Smart Extract will extract and launch a single file from an archive if the follo
 * All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.
 
 #### Stand-alone ROM Extensions
-A comma delimeted list of file extensions which can run stand-alone (no dependencies on other files).
+A comma delimited list of file extensions which can run stand-alone (no dependencies on other files).
 
 Default: _`gb, gbc, gba, agb, nes, fds, smc, sfc, n64, z64, v64, ndd, md, smd, gen, iso, chd, gg, gcm, 32x, bin`_
 
 #### Metadata Extensions
-A comma delimeted list of file extensions which indicate ROM metadata, and aren't required to play a ROM file.
+A comma delimited list of file extensions which indicate ROM metadata, and aren't required to play a ROM file.
 
 Default: _`nfo, txt, dat, xml, json`_
 
