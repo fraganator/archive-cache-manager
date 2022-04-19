@@ -77,6 +77,7 @@ namespace ArchiveCacheManager
             updateCheckCheckBox.Checked = (bool)Config.UpdateCheck;
             standaloneExtensions.Text = Config.StandaloneExtensions;
             metadataExtensions.Text = Config.MetadataExtensions;
+            bypassPathCheckCheckBox.Checked = Config.BypassPathCheck;
 
             updateCacheInfo(true);
             updateEnabledState();
@@ -208,6 +209,7 @@ namespace ArchiveCacheManager
             Config.UpdateCheck = updateCheckCheckBox.Checked;
             Config.StandaloneExtensions = standaloneExtensions.Text;
             Config.MetadataExtensions = metadataExtensions.Text;
+            Config.BypassPathCheck = bypassPathCheckCheckBox.Checked;
 
             Config.Save();
 

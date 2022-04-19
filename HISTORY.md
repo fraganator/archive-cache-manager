@@ -1,9 +1,19 @@
 # Archive Cache Manager change history
 ## v2.12 (2022-04-xx)
-* Smart Extract option to only extract required files from an archive
 * Option to copy non-archive files to cache
-* Option to extract CHD, RVZ, GZ
+* Support for extracting additional formats
+    * Option to extract chd to cue+bin using chdman
+	* Option to extract rvz, wia, gcz to iso using DolphinTool
+* Option to specify a launch folder for cached games (game platform, game title, or emulator title)
+    * Useful for managing common RetroArch settings
+* Smart Extract option to only extract required files from an archive
+    * Useful for merged ROM sets
 * Emulator selection when launching a file from "Select ROM In Archive" list
+* Option to bypass LaunchBox's check the ROM file exists when launching a game
+    * Allows launching cached game immediately - no waiting for slow disk spin-up or network latency
+	* Allows playing cached games 'offline' if NAS or cloud storage unavailable
+* Config window and UI overhaul
+* Minor bug fixes
 
 ## v2.11 (2022-03-25)
 * Multi-disc support and automatic M3U generation

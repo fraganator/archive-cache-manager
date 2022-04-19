@@ -172,6 +172,12 @@
 - All of the file types in an archive are the same, excluding files with Metadata Extensions.
 - All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.</value>
   </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>Bypass LaunchBox's check that a game's application path (ROM file) exists before launch.
+If a game is cached and the source ROM storage is slow or unavailable, the game will still launch immediately.
+
+NOTE: The bypass check happens automatically if the extract action is Copy, or the file is not zip, 7z, or rar.</value>
+  </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>50</value>
   </metadata>

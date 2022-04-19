@@ -61,10 +61,25 @@ namespace ArchiveCacheManager
             this.ArchiveSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Keep = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tab2ExtractionSettings = new System.Windows.Forms.TabPage();
+            this.label9 = new System.Windows.Forms.Label();
             this.extractionSettingsTipLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.deletePriorityButton = new System.Windows.Forms.Button();
             this.emulatorPlatformConfigDataGridView = new System.Windows.Forms.DataGridView();
+            this.addPriorityButton = new System.Windows.Forms.Button();
+            this.tab3SmartExtractSettings = new System.Windows.Forms.TabPage();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.metadataExtensions = new System.Windows.Forms.TextBox();
+            this.cachePathLabel = new System.Windows.Forms.Label();
+            this.standaloneExtensions = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.tab4PluginSettings = new System.Windows.Forms.TabPage();
+            this.label8 = new System.Windows.Forms.Label();
+            this.bypassPathCheckCheckBox = new System.Windows.Forms.CheckBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
             this.Emulator = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Platform = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -75,17 +90,6 @@ namespace ArchiveCacheManager
             this.SmartExtract = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Chdman = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.DolphinTool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.addPriorityButton = new System.Windows.Forms.Button();
-            this.tab3SmartExtractSettings = new System.Windows.Forms.TabPage();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.metadataExtensions = new System.Windows.Forms.TextBox();
-            this.cachePathLabel = new System.Windows.Forms.Label();
-            this.standaloneExtensions = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.tab4PluginSettings = new System.Windows.Forms.TabPage();
-            this.label3 = new System.Windows.Forms.Label();
-            this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tab1CacheSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
@@ -408,6 +412,7 @@ namespace ArchiveCacheManager
             // tab2ExtractionSettings
             // 
             this.tab2ExtractionSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tab2ExtractionSettings.Controls.Add(this.label9);
             this.tab2ExtractionSettings.Controls.Add(this.extractionSettingsTipLabel);
             this.tab2ExtractionSettings.Controls.Add(this.label2);
             this.tab2ExtractionSettings.Controls.Add(this.deletePriorityButton);
@@ -420,6 +425,18 @@ namespace ArchiveCacheManager
             this.tab2ExtractionSettings.TabIndex = 1;
             this.tab2ExtractionSettings.Text = "Extraction Settings";
             this.tab2ExtractionSettings.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 451);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(460, 26);
+            this.label9.TabIndex = 31;
+            this.label9.Text = "If chdman or DolphinTool is checked, ensure the corresponding chdman.exe or Dolph" +
+    "inTool.exe\r\napplication is placed in the LaunchBox\\Plugins\\ArchiveCacheManager\\E" +
+    "xtractors folder.";
             // 
             // extractionSettingsTipLabel
             // 
@@ -491,112 +508,12 @@ namespace ArchiveCacheManager
             this.emulatorPlatformConfigDataGridView.Name = "emulatorPlatformConfigDataGridView";
             this.emulatorPlatformConfigDataGridView.RowHeadersVisible = false;
             this.emulatorPlatformConfigDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.emulatorPlatformConfigDataGridView.Size = new System.Drawing.Size(726, 420);
+            this.emulatorPlatformConfigDataGridView.Size = new System.Drawing.Size(726, 375);
             this.emulatorPlatformConfigDataGridView.StandardTab = true;
             this.emulatorPlatformConfigDataGridView.TabIndex = 13;
             this.emulatorPlatformConfigDataGridView.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.emulatorPlatformConfigDataGridView_CellMouseEnter);
             this.emulatorPlatformConfigDataGridView.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.emulatorPlatformConfigDataGridView_CellMouseLeave);
             this.emulatorPlatformConfigDataGridView.SelectionChanged += new System.EventHandler(this.extensionPriorityDataGridView_SelectionChanged);
-            // 
-            // Emulator
-            // 
-            this.Emulator.HeaderText = "Emulator";
-            this.Emulator.MinimumWidth = 150;
-            this.Emulator.Name = "Emulator";
-            this.Emulator.ReadOnly = true;
-            this.Emulator.Width = 150;
-            // 
-            // Platform
-            // 
-            this.Platform.HeaderText = "Platform";
-            this.Platform.MinimumWidth = 150;
-            this.Platform.Name = "Platform";
-            this.Platform.ReadOnly = true;
-            this.Platform.Width = 150;
-            // 
-            // Priority
-            // 
-            this.Priority.HeaderText = "Priority";
-            this.Priority.MinimumWidth = 150;
-            this.Priority.Name = "Priority";
-            this.Priority.ToolTipText = "Filename \\ extension priority within an archive.";
-            this.Priority.Width = 150;
-            // 
-            // Action
-            // 
-            this.Action.FillWeight = 50F;
-            this.Action.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Action.HeaderText = "Action";
-            this.Action.Items.AddRange(new object[] {
-            "Extract",
-            "Copy",
-            "Extract or Copy"});
-            this.Action.Name = "Action";
-            this.Action.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Action.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.Action.ToolTipText = "Extract archive files to the cache, extract archives or copy non-archive files to" +
-    " the cache, or just copy files to the cache (even if they\'re archives).";
-            this.Action.Width = 62;
-            // 
-            // LaunchPath
-            // 
-            this.LaunchPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.LaunchPath.HeaderText = "Launch Path";
-            this.LaunchPath.Items.AddRange(new object[] {
-            "Default",
-            "Title",
-            "Platform",
-            "Emulator"});
-            this.LaunchPath.Name = "LaunchPath";
-            this.LaunchPath.ToolTipText = "Launch games from a common path within the cache. Useful for RetroArch common set" +
-    "tings.";
-            this.LaunchPath.Width = 74;
-            // 
-            // MultiDisc
-            // 
-            this.MultiDisc.FillWeight = 50F;
-            this.MultiDisc.HeaderText = "Multi-Disc";
-            this.MultiDisc.Name = "MultiDisc";
-            this.MultiDisc.ToolTipText = "Cache all discs in a multi-disc game. Generates and launches an M3U file if suppo" +
-    "rted by the emulator.";
-            this.MultiDisc.Width = 59;
-            // 
-            // M3uName
-            // 
-            this.M3uName.FillWeight = 50F;
-            this.M3uName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.M3uName.HeaderText = "M3U Name";
-            this.M3uName.Items.AddRange(new object[] {
-            "Game ID",
-            "Title + Version"});
-            this.M3uName.MinimumWidth = 100;
-            this.M3uName.Name = "M3uName";
-            this.M3uName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.M3uName.ToolTipText = "Name of the M3U file to save. Game ID is LaunchBox\'s default.";
-            // 
-            // SmartExtract
-            // 
-            this.SmartExtract.FillWeight = 50F;
-            this.SmartExtract.HeaderText = "Smart Extract";
-            this.SmartExtract.Name = "SmartExtract";
-            this.SmartExtract.ToolTipText = "Only extract a single ROM from an archive if certain conditions are met.";
-            this.SmartExtract.Width = 76;
-            // 
-            // Chdman
-            // 
-            this.Chdman.HeaderText = "chdman";
-            this.Chdman.Name = "Chdman";
-            this.Chdman.ToolTipText = "Extract CHD files to CUE+BIN files. chdman.exe must be saved in the ArchiveCacheM" +
-    "anager\\Extractors folder.";
-            this.Chdman.Width = 51;
-            // 
-            // DolphinTool
-            // 
-            this.DolphinTool.HeaderText = "DolphinTool";
-            this.DolphinTool.Name = "DolphinTool";
-            this.DolphinTool.ToolTipText = "Extract RVZ, WIA, and GCZ files to ISO files. DolphinTool.exe must be saved in th" +
-    "e ArchiveCacheManager\\Extractors folder.";
-            this.DolphinTool.Width = 70;
             // 
             // addPriorityButton
             // 
@@ -693,6 +610,9 @@ namespace ArchiveCacheManager
             // tab4PluginSettings
             // 
             this.tab4PluginSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tab4PluginSettings.Controls.Add(this.label8);
+            this.tab4PluginSettings.Controls.Add(this.bypassPathCheckCheckBox);
+            this.tab4PluginSettings.Controls.Add(this.label7);
             this.tab4PluginSettings.Controls.Add(this.label3);
             this.tab4PluginSettings.Controls.Add(this.updateCheckCheckBox);
             this.tab4PluginSettings.Location = new System.Drawing.Point(4, 22);
@@ -702,6 +622,35 @@ namespace ArchiveCacheManager
             this.tab4PluginSettings.TabIndex = 2;
             this.tab4PluginSettings.Text = "Plugin Settings";
             this.tab4PluginSettings.UseVisualStyleBackColor = true;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 91);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(522, 52);
+            this.label8.TabIndex = 32;
+            this.label8.Text = resources.GetString("label8.Text");
+            // 
+            // bypassPathCheckCheckBox
+            // 
+            this.bypassPathCheckCheckBox.AutoSize = true;
+            this.bypassPathCheckCheckBox.Location = new System.Drawing.Point(7, 62);
+            this.bypassPathCheckCheckBox.Name = "bypassPathCheckCheckBox";
+            this.bypassPathCheckCheckBox.Size = new System.Drawing.Size(212, 17);
+            this.bypassPathCheckCheckBox.TabIndex = 31;
+            this.bypassPathCheckCheckBox.Text = "Always Bypass LaunchBox Path Check";
+            this.bypassPathCheckCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 193);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(489, 13);
+            this.label7.TabIndex = 30;
+            this.label7.Text = "Be notified of plugin updates when LaunchBox starts. Nothing is automatically dow" +
+    "nloaded or installed.";
             // 
             // label3
             // 
@@ -720,13 +669,111 @@ namespace ArchiveCacheManager
             // updateCheckCheckBox
             // 
             this.updateCheckCheckBox.AutoSize = true;
-            this.updateCheckCheckBox.Location = new System.Drawing.Point(7, 62);
+            this.updateCheckCheckBox.Location = new System.Drawing.Point(7, 164);
             this.updateCheckCheckBox.Name = "updateCheckCheckBox";
             this.updateCheckCheckBox.Size = new System.Drawing.Size(172, 17);
             this.updateCheckCheckBox.TabIndex = 0;
             this.updateCheckCheckBox.Text = "Check For Updates On Startup";
             this.updateCheckCheckBox.UseVisualStyleBackColor = true;
             this.updateCheckCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
+            // 
+            // Emulator
+            // 
+            this.Emulator.HeaderText = "Emulator";
+            this.Emulator.MinimumWidth = 150;
+            this.Emulator.Name = "Emulator";
+            this.Emulator.ReadOnly = true;
+            this.Emulator.Width = 150;
+            // 
+            // Platform
+            // 
+            this.Platform.HeaderText = "Platform";
+            this.Platform.MinimumWidth = 150;
+            this.Platform.Name = "Platform";
+            this.Platform.ReadOnly = true;
+            this.Platform.Width = 150;
+            // 
+            // Priority
+            // 
+            this.Priority.HeaderText = "Priority";
+            this.Priority.MinimumWidth = 150;
+            this.Priority.Name = "Priority";
+            this.Priority.ToolTipText = "Filename \\ extension priority within an archive.";
+            this.Priority.Width = 150;
+            // 
+            // Action
+            // 
+            this.Action.FillWeight = 50F;
+            this.Action.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Action.HeaderText = "Action";
+            this.Action.Items.AddRange(new object[] {
+            "Extract",
+            "Copy",
+            "Extract or Copy"});
+            this.Action.Name = "Action";
+            this.Action.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Action.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.Action.ToolTipText = "Extract archive files to the cache, extract archives or copy non-archive files to" +
+    " the cache, or just copy files to the cache (even if they\'re archives).";
+            this.Action.Width = 62;
+            // 
+            // LaunchPath
+            // 
+            this.LaunchPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.LaunchPath.HeaderText = "Launch Path";
+            this.LaunchPath.Items.AddRange(new object[] {
+            "Default",
+            "Title",
+            "Platform",
+            "Emulator"});
+            this.LaunchPath.Name = "LaunchPath";
+            this.LaunchPath.ToolTipText = "Launch games from a common path within the cache. Useful for RetroArch common set" +
+    "tings.";
+            this.LaunchPath.Width = 74;
+            // 
+            // MultiDisc
+            // 
+            this.MultiDisc.FillWeight = 50F;
+            this.MultiDisc.HeaderText = "Multi-Disc";
+            this.MultiDisc.Name = "MultiDisc";
+            this.MultiDisc.ToolTipText = "Cache all discs in a multi-disc game. Generates and launches an M3U file if suppo" +
+    "rted by the emulator.";
+            this.MultiDisc.Width = 59;
+            // 
+            // M3uName
+            // 
+            this.M3uName.FillWeight = 50F;
+            this.M3uName.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.M3uName.HeaderText = "M3U Name";
+            this.M3uName.Items.AddRange(new object[] {
+            "Game ID",
+            "Title + Version"});
+            this.M3uName.MinimumWidth = 100;
+            this.M3uName.Name = "M3uName";
+            this.M3uName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.M3uName.ToolTipText = "Name of the M3U file to save. Game ID is LaunchBox\'s default.";
+            // 
+            // SmartExtract
+            // 
+            this.SmartExtract.FillWeight = 50F;
+            this.SmartExtract.HeaderText = "Smart Extract";
+            this.SmartExtract.Name = "SmartExtract";
+            this.SmartExtract.ToolTipText = "Only extract a single ROM from an archive if certain conditions are met.";
+            this.SmartExtract.Width = 76;
+            // 
+            // Chdman
+            // 
+            this.Chdman.HeaderText = "chdman";
+            this.Chdman.Name = "Chdman";
+            this.Chdman.ToolTipText = "Extract CHD files to CUE+BIN files.";
+            this.Chdman.Width = 51;
+            // 
+            // DolphinTool
+            // 
+            this.DolphinTool.HeaderText = "DolphinTool";
+            this.DolphinTool.Name = "DolphinTool";
+            this.DolphinTool.ToolTipText = "Extract RVZ, WIA, and GCZ files to ISO files.";
+            this.DolphinTool.Width = 70;
             // 
             // NewConfigWindow
             // 
@@ -748,7 +795,7 @@ namespace ArchiveCacheManager
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(640, 480);
+            this.MinimumSize = new System.Drawing.Size(960, 480);
             this.Name = "NewConfigWindow";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -802,6 +849,17 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewCheckBoxColumn Keep;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label extractionSettingsTipLabel;
+        private System.Windows.Forms.TabPage tab3SmartExtractSettings;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox standaloneExtensions;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox metadataExtensions;
+        private System.Windows.Forms.Label cachePathLabel;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.CheckBox bypassPathCheckCheckBox;
+        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.DataGridViewTextBoxColumn Emulator;
         private System.Windows.Forms.DataGridViewTextBoxColumn Platform;
         private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
@@ -812,12 +870,5 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewCheckBoxColumn SmartExtract;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Chdman;
         private System.Windows.Forms.DataGridViewCheckBoxColumn DolphinTool;
-        private System.Windows.Forms.TabPage tab3SmartExtractSettings;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox standaloneExtensions;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox metadataExtensions;
-        private System.Windows.Forms.Label cachePathLabel;
     }
 }

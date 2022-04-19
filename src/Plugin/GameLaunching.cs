@@ -57,6 +57,11 @@ namespace ArchiveCacheManager
 
         private static bool RedirectApplicationPath(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
+            if (Config.BypassPathCheck)
+            {
+                return true;
+            }
+
             string archivePath = PluginUtils.GetArchivePath(game, app);
             if (PathUtils.HasExtension(archivePath, new string[] { ".zip", ".7z", ".rar" }))
             {
