@@ -10,7 +10,7 @@ namespace ArchiveCacheManager
 {
     public class Chdman : Extractor
     {
-        string executable = Path.Combine(PathUtils.GetExtractorRootPath(), "chdman.exe");
+        string executablePath = Path.Combine(PathUtils.GetExtractorRootPath(), "chdman.exe");
 
         public Chdman()
         {
@@ -22,12 +22,12 @@ namespace ArchiveCacheManager
             return PathUtils.HasExtension(archivePath, new string[] { ".chd" });
         }
 
-        override public bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
+        public override bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
         {
             string args = string.Format("extractcd -i \"{0}\" -o \"{1}\" -f", archivePath, Path.Combine(cachePath, Path.GetFileNameWithoutExtension(archivePath) + ".cue"));
             
             // chdman reports the progress status on stderr, not stdout
-            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executable, args, false, null, true, ExtractionProgress);
+            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executablePath, args, false, null, true, ExtractionProgress);
 
             if (exitCode != 0)
             {
@@ -38,11 +38,11 @@ namespace ArchiveCacheManager
             return exitCode == 0;
         }
 
-        override public long GetSize(string archivePath, string fileInArchive = null)
+        public override long GetSize(string archivePath, string fileInArchive = null)
         {
             string args = string.Format("info -i \"{0}\"", archivePath);
 
-            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executable, args);
+            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executablePath, args);
 
             if (exitCode != 0)
             {
@@ -102,7 +102,7 @@ namespace ArchiveCacheManager
             return size;
         }
 
-        override public string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
         {
             string[] fileList = new string[2];
             fileList[0] = Path.GetFileNameWithoutExtension(archivePath) + ".cue";
@@ -110,9 +110,14 @@ namespace ArchiveCacheManager
             return fileList;
         }
 
-        override public string Name()
+        public override string Name()
         {
             return "chdman";
+        }
+
+        public override string GetExtractorPath()
+        {
+            return executablePath;
         }
     }
 }

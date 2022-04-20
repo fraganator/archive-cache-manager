@@ -70,24 +70,22 @@ namespace ArchiveCacheManager
 
         private static Extractor GetExtractor(string archivePath)
         {
-            if ((mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
-                && Zip.SupportedType(archivePath))
+            bool extract = (mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy);
+            bool copy = (mGameCacheData.Config.Action == Config.Action.Copy || mGameCacheData.Config.Action == Config.Action.ExtractCopy);
+
+            if (extract && Zip.SupportedType(archivePath))
             {
                 return new Zip();
             }
-            else if ((mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
-                && mGameCacheData.Config.Chdman
-                && Chdman.SupportedType(archivePath))
+            else if (extract && mGameCacheData.Config.Chdman && Chdman.SupportedType(archivePath))
             {
                 return new Chdman();
             }
-            else if ((mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
-                && mGameCacheData.Config.DolphinTool
-                && DolphinTool.SupportedType(archivePath))
+            else if (extract && mGameCacheData.Config.DolphinTool && DolphinTool.SupportedType(archivePath))
             {
                 return new DolphinTool();
             }
-            else if (mGameCacheData.Config.Action == Config.Action.Copy || mGameCacheData.Config.Action == Config.Action.ExtractCopy)
+            else if (copy)
             {
                 return new Robocopy();
             }

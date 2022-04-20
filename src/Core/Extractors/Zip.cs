@@ -225,5 +225,10 @@ namespace ArchiveCacheManager
 
             return (stdout, stderr, exitCode);
         }
+
+        public override string GetExtractorPath()
+        {
+            return PathUtils.GetLaunchBox7zPath();
+        }
     }
 }

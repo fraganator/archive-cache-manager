@@ -10,7 +10,7 @@ namespace ArchiveCacheManager
 {
     public class DolphinTool : Extractor
     {
-        string executable = Path.Combine(PathUtils.GetExtractorRootPath(), "DolphinTool.exe");
+        string executablePath = Path.Combine(PathUtils.GetExtractorRootPath(), "DolphinTool.exe");
 
         public DolphinTool()
         {
@@ -22,12 +22,12 @@ namespace ArchiveCacheManager
             return PathUtils.HasExtension(archivePath, new string[] { ".rvz", ".wia", ".gcz" });
         }
 
-        override public bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
+        public override bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
         {
             string args = string.Format("convert -i \"{0}\" -o \"{1}\" -f iso", archivePath, Path.Combine(cachePath, Path.GetFileNameWithoutExtension(archivePath) + ".iso"));
             
             // chdman reports the progress status on stderr, not stdout
-            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executable, args);
+            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executablePath, args);
 
             if (exitCode != 0)
             {
@@ -38,19 +38,24 @@ namespace ArchiveCacheManager
             return exitCode == 0;
         }
 
-        override public long GetSize(string archivePath, string fileInArchive = null)
+        public override long GetSize(string archivePath, string fileInArchive = null)
         {
             return new FileInfo(archivePath).Length;
         }
 
-        override public string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
         {
             return string.Format("{0}.iso", Path.GetFileNameWithoutExtension(archivePath)).ToSingleArray();
         }
 
-        override public string Name()
+        public override string Name()
         {
             return "DolphinTool";
+        }
+
+        public override string GetExtractorPath()
+        {
+            return executablePath;
         }
     }
 }

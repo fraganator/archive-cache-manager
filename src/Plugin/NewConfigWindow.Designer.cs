@@ -66,6 +66,16 @@ namespace ArchiveCacheManager
             this.label2 = new System.Windows.Forms.Label();
             this.deletePriorityButton = new System.Windows.Forms.Button();
             this.emulatorPlatformConfigDataGridView = new System.Windows.Forms.DataGridView();
+            this.Emulator = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Platform = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Action = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.LaunchPath = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.MultiDisc = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.M3uName = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.SmartExtract = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Chdman = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.DolphinTool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.addPriorityButton = new System.Windows.Forms.Button();
             this.tab3SmartExtractSettings = new System.Windows.Forms.TabPage();
             this.label6 = new System.Windows.Forms.Label();
@@ -80,16 +90,6 @@ namespace ArchiveCacheManager
             this.label7 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
-            this.Emulator = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Platform = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Priority = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Action = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.LaunchPath = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.MultiDisc = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.M3uName = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.SmartExtract = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.Chdman = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.DolphinTool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tab1CacheSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cacheDataGridView)).BeginInit();
@@ -106,7 +106,7 @@ namespace ArchiveCacheManager
             this.openInExplorerButton.Location = new System.Drawing.Point(576, 92);
             this.openInExplorerButton.Name = "openInExplorerButton";
             this.openInExplorerButton.Size = new System.Drawing.Size(156, 28);
-            this.openInExplorerButton.TabIndex = 18;
+            this.openInExplorerButton.TabIndex = 6;
             this.openInExplorerButton.Text = "Open In Explorer";
             this.openInExplorerButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.openInExplorerButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -121,7 +121,7 @@ namespace ArchiveCacheManager
             this.configureCacheButton.Location = new System.Drawing.Point(576, 58);
             this.configureCacheButton.Name = "configureCacheButton";
             this.configureCacheButton.Size = new System.Drawing.Size(156, 28);
-            this.configureCacheButton.TabIndex = 15;
+            this.configureCacheButton.TabIndex = 5;
             this.configureCacheButton.Text = "Configure Cache...";
             this.configureCacheButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.configureCacheButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -137,7 +137,7 @@ namespace ArchiveCacheManager
             this.deleteAllButton.Location = new System.Drawing.Point(616, 488);
             this.deleteAllButton.Name = "deleteAllButton";
             this.deleteAllButton.Size = new System.Drawing.Size(116, 28);
-            this.deleteAllButton.TabIndex = 21;
+            this.deleteAllButton.TabIndex = 10;
             this.deleteAllButton.Text = "Delete All";
             this.deleteAllButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.deleteAllButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -152,7 +152,7 @@ namespace ArchiveCacheManager
             this.refreshButton.Location = new System.Drawing.Point(6, 488);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(80, 28);
-            this.refreshButton.TabIndex = 19;
+            this.refreshButton.TabIndex = 8;
             this.refreshButton.Text = "Refresh";
             this.refreshButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.refreshButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -168,7 +168,7 @@ namespace ArchiveCacheManager
             this.deleteSelectedButton.Location = new System.Drawing.Point(494, 488);
             this.deleteSelectedButton.Name = "deleteSelectedButton";
             this.deleteSelectedButton.Size = new System.Drawing.Size(116, 28);
-            this.deleteSelectedButton.TabIndex = 17;
+            this.deleteSelectedButton.TabIndex = 9;
             this.deleteSelectedButton.Text = "Delete";
             this.deleteSelectedButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.deleteSelectedButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -193,7 +193,7 @@ namespace ArchiveCacheManager
             this.forumLink.Location = new System.Drawing.Point(651, 583);
             this.forumLink.Name = "forumLink";
             this.forumLink.Size = new System.Drawing.Size(76, 13);
-            this.forumLink.TabIndex = 10;
+            this.forumLink.TabIndex = 31;
             this.forumLink.TabStop = true;
             this.forumLink.Text = "Forum Support";
             this.forumLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.forumLink_LinkClicked);
@@ -205,7 +205,7 @@ namespace ArchiveCacheManager
             this.sourceLink.Location = new System.Drawing.Point(733, 583);
             this.sourceLink.Name = "sourceLink";
             this.sourceLink.Size = new System.Drawing.Size(93, 13);
-            this.sourceLink.TabIndex = 11;
+            this.sourceLink.TabIndex = 32;
             this.sourceLink.TabStop = true;
             this.sourceLink.Text = "GitHub Repository";
             this.sourceLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.sourceLink_LinkClicked);
@@ -217,7 +217,7 @@ namespace ArchiveCacheManager
             this.pluginLink.Location = new System.Drawing.Point(554, 583);
             this.pluginLink.Name = "pluginLink";
             this.pluginLink.Size = new System.Drawing.Size(91, 13);
-            this.pluginLink.TabIndex = 10;
+            this.pluginLink.TabIndex = 30;
             this.pluginLink.TabStop = true;
             this.pluginLink.Text = "Plugin Homepage";
             this.pluginLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.pluginLink_LinkClicked);
@@ -275,7 +275,7 @@ namespace ArchiveCacheManager
             treeNode4});
             this.treeView1.ShowLines = false;
             this.treeView1.Size = new System.Drawing.Size(166, 551);
-            this.treeView1.TabIndex = 20;
+            this.treeView1.TabIndex = 3;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // tabControl1
@@ -291,7 +291,8 @@ namespace ArchiveCacheManager
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(748, 550);
-            this.tabControl1.TabIndex = 19;
+            this.tabControl1.TabIndex = 4;
+            this.tabControl1.TabStop = false;
             // 
             // tab1CacheSettings
             // 
@@ -322,7 +323,7 @@ namespace ArchiveCacheManager
             this.label1.Location = new System.Drawing.Point(6, 7);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(726, 43);
-            this.label1.TabIndex = 22;
+            this.label1.TabIndex = 99;
             this.label1.Text = "Cache Settings";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -336,7 +337,8 @@ namespace ArchiveCacheManager
             this.cacheSummaryTextBox.Name = "cacheSummaryTextBox";
             this.cacheSummaryTextBox.ReadOnly = true;
             this.cacheSummaryTextBox.Size = new System.Drawing.Size(561, 62);
-            this.cacheSummaryTextBox.TabIndex = 20;
+            this.cacheSummaryTextBox.TabIndex = 99;
+            this.cacheSummaryTextBox.TabStop = false;
             this.cacheSummaryTextBox.Text = "";
             // 
             // cacheDataGridView
@@ -364,7 +366,7 @@ namespace ArchiveCacheManager
             this.cacheDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.cacheDataGridView.Size = new System.Drawing.Size(726, 352);
             this.cacheDataGridView.StandardTab = true;
-            this.cacheDataGridView.TabIndex = 14;
+            this.cacheDataGridView.TabIndex = 7;
             this.cacheDataGridView.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.cacheDataGridView_CellPainting);
             this.cacheDataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.cacheDataGridView_CurrentCellDirtyStateChanged);
             // 
@@ -433,7 +435,7 @@ namespace ArchiveCacheManager
             this.label9.Location = new System.Drawing.Point(6, 451);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(460, 26);
-            this.label9.TabIndex = 31;
+            this.label9.TabIndex = 99;
             this.label9.Text = "If chdman or DolphinTool is checked, ensure the corresponding chdman.exe or Dolph" +
     "inTool.exe\r\napplication is placed in the LaunchBox\\Plugins\\ArchiveCacheManager\\E" +
     "xtractors folder.";
@@ -446,7 +448,7 @@ namespace ArchiveCacheManager
             this.extractionSettingsTipLabel.Location = new System.Drawing.Point(6, 496);
             this.extractionSettingsTipLabel.Name = "extractionSettingsTipLabel";
             this.extractionSettingsTipLabel.Size = new System.Drawing.Size(392, 13);
-            this.extractionSettingsTipLabel.TabIndex = 24;
+            this.extractionSettingsTipLabel.TabIndex = 99;
             this.extractionSettingsTipLabel.Text = "Tip: Hover the mouse cursor over a column header for a description of the setting" +
     ".";
             // 
@@ -460,7 +462,7 @@ namespace ArchiveCacheManager
             this.label2.Location = new System.Drawing.Point(6, 7);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(726, 43);
-            this.label2.TabIndex = 23;
+            this.label2.TabIndex = 99;
             this.label2.Text = "Extraction Settings";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -472,7 +474,7 @@ namespace ArchiveCacheManager
             this.deletePriorityButton.Location = new System.Drawing.Point(616, 488);
             this.deletePriorityButton.Name = "deletePriorityButton";
             this.deletePriorityButton.Size = new System.Drawing.Size(116, 28);
-            this.deletePriorityButton.TabIndex = 0;
+            this.deletePriorityButton.TabIndex = 13;
             this.deletePriorityButton.Text = "Delete";
             this.deletePriorityButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.deletePriorityButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -510,172 +512,10 @@ namespace ArchiveCacheManager
             this.emulatorPlatformConfigDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.emulatorPlatformConfigDataGridView.Size = new System.Drawing.Size(726, 375);
             this.emulatorPlatformConfigDataGridView.StandardTab = true;
-            this.emulatorPlatformConfigDataGridView.TabIndex = 13;
+            this.emulatorPlatformConfigDataGridView.TabIndex = 11;
             this.emulatorPlatformConfigDataGridView.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.emulatorPlatformConfigDataGridView_CellMouseEnter);
             this.emulatorPlatformConfigDataGridView.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.emulatorPlatformConfigDataGridView_CellMouseLeave);
             this.emulatorPlatformConfigDataGridView.SelectionChanged += new System.EventHandler(this.extensionPriorityDataGridView_SelectionChanged);
-            // 
-            // addPriorityButton
-            // 
-            this.addPriorityButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.addPriorityButton.Image = global::ArchiveCacheManager.Resources.plus;
-            this.addPriorityButton.Location = new System.Drawing.Point(494, 488);
-            this.addPriorityButton.Name = "addPriorityButton";
-            this.addPriorityButton.Size = new System.Drawing.Size(116, 28);
-            this.addPriorityButton.TabIndex = 0;
-            this.addPriorityButton.Text = "Add...";
-            this.addPriorityButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.addPriorityButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.addPriorityButton.UseVisualStyleBackColor = true;
-            this.addPriorityButton.Click += new System.EventHandler(this.addPriorityButton_Click);
-            // 
-            // tab3SmartExtractSettings
-            // 
-            this.tab3SmartExtractSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tab3SmartExtractSettings.Controls.Add(this.label6);
-            this.tab3SmartExtractSettings.Controls.Add(this.label5);
-            this.tab3SmartExtractSettings.Controls.Add(this.metadataExtensions);
-            this.tab3SmartExtractSettings.Controls.Add(this.cachePathLabel);
-            this.tab3SmartExtractSettings.Controls.Add(this.standaloneExtensions);
-            this.tab3SmartExtractSettings.Controls.Add(this.label4);
-            this.tab3SmartExtractSettings.Location = new System.Drawing.Point(4, 22);
-            this.tab3SmartExtractSettings.Name = "tab3SmartExtractSettings";
-            this.tab3SmartExtractSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tab3SmartExtractSettings.Size = new System.Drawing.Size(740, 524);
-            this.tab3SmartExtractSettings.TabIndex = 3;
-            this.tab3SmartExtractSettings.Text = "Smart Extract Settings";
-            this.tab3SmartExtractSettings.UseVisualStyleBackColor = true;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 174);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(472, 65);
-            this.label6.TabIndex = 29;
-            this.label6.Text = resources.GetString("label6.Text");
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 117);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(109, 13);
-            this.label5.TabIndex = 28;
-            this.label5.Text = "Metadata Extensions:";
-            // 
-            // metadataExtensions
-            // 
-            this.metadataExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.metadataExtensions.Location = new System.Drawing.Point(10, 133);
-            this.metadataExtensions.MaxLength = 260;
-            this.metadataExtensions.Name = "metadataExtensions";
-            this.metadataExtensions.Size = new System.Drawing.Size(721, 20);
-            this.metadataExtensions.TabIndex = 27;
-            // 
-            // cachePathLabel
-            // 
-            this.cachePathLabel.AutoSize = true;
-            this.cachePathLabel.Location = new System.Drawing.Point(7, 60);
-            this.cachePathLabel.Name = "cachePathLabel";
-            this.cachePathLabel.Size = new System.Drawing.Size(149, 13);
-            this.cachePathLabel.TabIndex = 26;
-            this.cachePathLabel.Text = "Stand-alone ROM Extensions:";
-            // 
-            // standaloneExtensions
-            // 
-            this.standaloneExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.standaloneExtensions.Location = new System.Drawing.Point(10, 76);
-            this.standaloneExtensions.MaxLength = 260;
-            this.standaloneExtensions.Name = "standaloneExtensions";
-            this.standaloneExtensions.Size = new System.Drawing.Size(721, 20);
-            this.standaloneExtensions.TabIndex = 25;
-            // 
-            // label4
-            // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.label4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(6, 7);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(724, 43);
-            this.label4.TabIndex = 24;
-            this.label4.Text = "Smart Extract Settings";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // tab4PluginSettings
-            // 
-            this.tab4PluginSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tab4PluginSettings.Controls.Add(this.label8);
-            this.tab4PluginSettings.Controls.Add(this.bypassPathCheckCheckBox);
-            this.tab4PluginSettings.Controls.Add(this.label7);
-            this.tab4PluginSettings.Controls.Add(this.label3);
-            this.tab4PluginSettings.Controls.Add(this.updateCheckCheckBox);
-            this.tab4PluginSettings.Location = new System.Drawing.Point(4, 22);
-            this.tab4PluginSettings.Name = "tab4PluginSettings";
-            this.tab4PluginSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.tab4PluginSettings.Size = new System.Drawing.Size(740, 524);
-            this.tab4PluginSettings.TabIndex = 2;
-            this.tab4PluginSettings.Text = "Plugin Settings";
-            this.tab4PluginSettings.UseVisualStyleBackColor = true;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 91);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(522, 52);
-            this.label8.TabIndex = 32;
-            this.label8.Text = resources.GetString("label8.Text");
-            // 
-            // bypassPathCheckCheckBox
-            // 
-            this.bypassPathCheckCheckBox.AutoSize = true;
-            this.bypassPathCheckCheckBox.Location = new System.Drawing.Point(7, 62);
-            this.bypassPathCheckCheckBox.Name = "bypassPathCheckCheckBox";
-            this.bypassPathCheckCheckBox.Size = new System.Drawing.Size(212, 17);
-            this.bypassPathCheckCheckBox.TabIndex = 31;
-            this.bypassPathCheckCheckBox.Text = "Always Bypass LaunchBox Path Check";
-            this.bypassPathCheckCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 193);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(489, 13);
-            this.label7.TabIndex = 30;
-            this.label7.Text = "Be notified of plugin updates when LaunchBox starts. Nothing is automatically dow" +
-    "nloaded or installed.";
-            // 
-            // label3
-            // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.label3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(6, 7);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(726, 43);
-            this.label3.TabIndex = 24;
-            this.label3.Text = "Plugin Settings";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // updateCheckCheckBox
-            // 
-            this.updateCheckCheckBox.AutoSize = true;
-            this.updateCheckCheckBox.Location = new System.Drawing.Point(7, 164);
-            this.updateCheckCheckBox.Name = "updateCheckCheckBox";
-            this.updateCheckCheckBox.Size = new System.Drawing.Size(172, 17);
-            this.updateCheckCheckBox.TabIndex = 0;
-            this.updateCheckCheckBox.Text = "Check For Updates On Startup";
-            this.updateCheckCheckBox.UseVisualStyleBackColor = true;
-            this.updateCheckCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
             // 
             // Emulator
             // 
@@ -775,12 +615,173 @@ namespace ArchiveCacheManager
             this.DolphinTool.ToolTipText = "Extract RVZ, WIA, and GCZ files to ISO files.";
             this.DolphinTool.Width = 70;
             // 
+            // addPriorityButton
+            // 
+            this.addPriorityButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.addPriorityButton.Image = global::ArchiveCacheManager.Resources.plus;
+            this.addPriorityButton.Location = new System.Drawing.Point(494, 488);
+            this.addPriorityButton.Name = "addPriorityButton";
+            this.addPriorityButton.Size = new System.Drawing.Size(116, 28);
+            this.addPriorityButton.TabIndex = 12;
+            this.addPriorityButton.Text = "Add...";
+            this.addPriorityButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.addPriorityButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.addPriorityButton.UseVisualStyleBackColor = true;
+            this.addPriorityButton.Click += new System.EventHandler(this.addPriorityButton_Click);
+            // 
+            // tab3SmartExtractSettings
+            // 
+            this.tab3SmartExtractSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tab3SmartExtractSettings.Controls.Add(this.label6);
+            this.tab3SmartExtractSettings.Controls.Add(this.label5);
+            this.tab3SmartExtractSettings.Controls.Add(this.metadataExtensions);
+            this.tab3SmartExtractSettings.Controls.Add(this.cachePathLabel);
+            this.tab3SmartExtractSettings.Controls.Add(this.standaloneExtensions);
+            this.tab3SmartExtractSettings.Controls.Add(this.label4);
+            this.tab3SmartExtractSettings.Location = new System.Drawing.Point(4, 22);
+            this.tab3SmartExtractSettings.Name = "tab3SmartExtractSettings";
+            this.tab3SmartExtractSettings.Padding = new System.Windows.Forms.Padding(3);
+            this.tab3SmartExtractSettings.Size = new System.Drawing.Size(740, 524);
+            this.tab3SmartExtractSettings.TabIndex = 3;
+            this.tab3SmartExtractSettings.Text = "Smart Extract Settings";
+            this.tab3SmartExtractSettings.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 174);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(472, 65);
+            this.label6.TabIndex = 99;
+            this.label6.Text = resources.GetString("label6.Text");
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(7, 117);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(109, 13);
+            this.label5.TabIndex = 99;
+            this.label5.Text = "Metadata Extensions:";
+            // 
+            // metadataExtensions
+            // 
+            this.metadataExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.metadataExtensions.Location = new System.Drawing.Point(10, 133);
+            this.metadataExtensions.MaxLength = 260;
+            this.metadataExtensions.Name = "metadataExtensions";
+            this.metadataExtensions.Size = new System.Drawing.Size(721, 20);
+            this.metadataExtensions.TabIndex = 15;
+            // 
+            // cachePathLabel
+            // 
+            this.cachePathLabel.AutoSize = true;
+            this.cachePathLabel.Location = new System.Drawing.Point(7, 60);
+            this.cachePathLabel.Name = "cachePathLabel";
+            this.cachePathLabel.Size = new System.Drawing.Size(149, 13);
+            this.cachePathLabel.TabIndex = 99;
+            this.cachePathLabel.Text = "Stand-alone ROM Extensions:";
+            // 
+            // standaloneExtensions
+            // 
+            this.standaloneExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.standaloneExtensions.Location = new System.Drawing.Point(10, 76);
+            this.standaloneExtensions.MaxLength = 260;
+            this.standaloneExtensions.Name = "standaloneExtensions";
+            this.standaloneExtensions.Size = new System.Drawing.Size(721, 20);
+            this.standaloneExtensions.TabIndex = 14;
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.label4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(6, 7);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(724, 43);
+            this.label4.TabIndex = 99;
+            this.label4.Text = "Smart Extract Settings";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // tab4PluginSettings
+            // 
+            this.tab4PluginSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tab4PluginSettings.Controls.Add(this.label8);
+            this.tab4PluginSettings.Controls.Add(this.bypassPathCheckCheckBox);
+            this.tab4PluginSettings.Controls.Add(this.label7);
+            this.tab4PluginSettings.Controls.Add(this.label3);
+            this.tab4PluginSettings.Controls.Add(this.updateCheckCheckBox);
+            this.tab4PluginSettings.Location = new System.Drawing.Point(4, 22);
+            this.tab4PluginSettings.Name = "tab4PluginSettings";
+            this.tab4PluginSettings.Padding = new System.Windows.Forms.Padding(3);
+            this.tab4PluginSettings.Size = new System.Drawing.Size(740, 524);
+            this.tab4PluginSettings.TabIndex = 2;
+            this.tab4PluginSettings.Text = "Plugin Settings";
+            this.tab4PluginSettings.UseVisualStyleBackColor = true;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 91);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(522, 52);
+            this.label8.TabIndex = 99;
+            this.label8.Text = resources.GetString("label8.Text");
+            // 
+            // bypassPathCheckCheckBox
+            // 
+            this.bypassPathCheckCheckBox.AutoSize = true;
+            this.bypassPathCheckCheckBox.Location = new System.Drawing.Point(7, 62);
+            this.bypassPathCheckCheckBox.Name = "bypassPathCheckCheckBox";
+            this.bypassPathCheckCheckBox.Size = new System.Drawing.Size(212, 17);
+            this.bypassPathCheckCheckBox.TabIndex = 16;
+            this.bypassPathCheckCheckBox.Text = "Always Bypass LaunchBox Path Check";
+            this.bypassPathCheckCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 193);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(489, 13);
+            this.label7.TabIndex = 99;
+            this.label7.Text = "Be notified of plugin updates when LaunchBox starts. Nothing is automatically dow" +
+    "nloaded or installed.";
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.label3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(6, 7);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(726, 43);
+            this.label3.TabIndex = 99;
+            this.label3.Text = "Plugin Settings";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // updateCheckCheckBox
+            // 
+            this.updateCheckCheckBox.AutoSize = true;
+            this.updateCheckCheckBox.Location = new System.Drawing.Point(7, 164);
+            this.updateCheckCheckBox.Name = "updateCheckCheckBox";
+            this.updateCheckCheckBox.Size = new System.Drawing.Size(172, 17);
+            this.updateCheckCheckBox.TabIndex = 17;
+            this.updateCheckCheckBox.Text = "Check For Updates On Startup";
+            this.updateCheckCheckBox.UseVisualStyleBackColor = true;
+            this.updateCheckCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
+            // 
             // NewConfigWindow
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(944, 613);
@@ -793,7 +794,6 @@ namespace ArchiveCacheManager
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(960, 480);
             this.Name = "NewConfigWindow";

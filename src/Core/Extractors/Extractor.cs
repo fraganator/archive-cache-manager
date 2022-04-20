@@ -88,5 +88,7 @@ namespace ArchiveCacheManager
         /// <param name="prefixWildcard">Option to prefix all include and exclude lists with a "*" wildcard.</param>
         /// <returns>The list of files in an archive, filtered using include and exclude lists when specified.</returns>
         public abstract string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false);
+
+        public abstract string GetExtractorPath();
     }
 }

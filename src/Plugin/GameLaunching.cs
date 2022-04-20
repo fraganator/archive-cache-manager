@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 using System.IO;
+using System.Windows.Forms;
 using System.Threading.Tasks;
 
 namespace ArchiveCacheManager
@@ -88,12 +89,57 @@ namespace ArchiveCacheManager
             return false;
         }
 
+        private static (bool, string, string) GetExtractorExists(IGame game, IAdditionalApplication app, IEmulator emulator)
+        {
+            string archivePath = PluginUtils.GetArchivePath(game, app);
+            string key = Config.EmulatorPlatformKey(emulator.Title, game.Platform);
+            bool extract = (Config.GetAction(key) == Config.Action.Extract || Config.GetAction(key) == Config.Action.ExtractCopy);
+            bool copy = (Config.GetAction(key) == Config.Action.Copy || Config.GetAction(key) == Config.Action.ExtractCopy);
+            Extractor extractor;
+
+            if (extract && Zip.SupportedType(archivePath))
+            {
+                extractor = new Zip();
+            }
+            else if (extract && Config.GetChdman(key) && Chdman.SupportedType(archivePath))
+            {
+                extractor = new Chdman();
+            }
+            else if (extract && Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))
+            {
+                extractor = new DolphinTool();
+            }
+            else if (copy)
+            {
+                extractor = new Robocopy();
+            }
+            else
+            {
+                extractor = new Zip();
+            }
+
+            string extractorPath = extractor.GetExtractorPath();
+            bool extractorExists = string.IsNullOrEmpty(extractorPath) ? true : File.Exists(extractorPath);
+
+            return (extractorExists, extractor.Name(), extractorPath);
+        }
+
         public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
             if (UseArchiveCacheManager(game, app, emulator))
             {
                 Logger.Log(string.Format("-------- {0} --------", game.Title.ToUpper()));
                 Logger.Log(string.Format("Preparing cache for {0} ({1}) running with {2}.", game.Title, game.Platform, emulator.Title));
+
+                (bool extractorExists, string extractorName, string extractorPath) = GetExtractorExists(game, app, emulator);
+                if (!extractorExists)
+                {
+                    FlexibleMessageBox.Show(string.Format("Attempting to extract using {0}, but couldn't find {1} in {2}.\r\n\r\n"
+                                            + "Please place a copy of {1} in this folder and try again, or disable the {0} option.\r\n\r\n"
+                                            + "Game launch will continue without extraction or caching.", extractorName, Path.GetFileName(extractorPath), Path.GetDirectoryName(extractorPath)),
+                                            "Archive Cache Manager Extractor Check", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
                 LaunchBoxDataBackup.RestoreAllSettings();
                 cacheManagerActive = true;
