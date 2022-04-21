@@ -65,7 +65,8 @@ namespace ArchiveCacheManager
 #if DEBUG
             Debugger.Launch();
 #endif
-            DateTime startTime = DateTime.Now;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             Logger.Log("========");
             Logger.Log(string.Format("Archive Cache Manager started with arguments: {0}", string.Join(" ", args)));
@@ -101,8 +102,7 @@ namespace ArchiveCacheManager
                 }
             }
 
-            TimeSpan ts = DateTime.Now - startTime;
-            Logger.Log(string.Format("Completed in {0}ms.", ts.TotalMilliseconds));
+            Logger.Log($"Completed in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
         /// <summary>
