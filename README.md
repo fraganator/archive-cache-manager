@@ -179,8 +179,8 @@ Default:
 #### Action
 The action to take when processing a ROM file.
 
-* `Extract` - Extract an archive to the cache. If a non-archive file is launched, Archive Cache Manager won't run.
-* `Copy` - Copy the game file to the cache. Archive files will not be extracted, only copied.
+* `Extract` - Extract an archive to the cache. Non-archive files will be passed directly to the emulator.
+* `Copy` - Copy the game file to the cache. Archive files will copied, but not extracted.
 * `Extract or Copy` - If the game file is an archive, extract it to the cache. Otherwise copy the game file to the cache.
 
 Default: _`Extract`_
@@ -193,7 +193,7 @@ The path within the cache to launch the game from. Useful for managing common se
 * `Platform` - The game's platform set in LaunchBox (e.g. _Sony Playstation_)
 * `Emulator` - The emulator title set in LaunchBox (e.g. _RetroArch_)
 
-Games will always be extracted \ copied to the _\<Filename\> - \<MD5 Hash\>_ location. If the Launch Path is set to something other than `Default`, the corresponding folder will be created (or cleared if it exists), and NTFS hardlinks will be created which point to the extracted \ copied files.
+Games will always be extracted \ copied to the _\<Filename\> - \<MD5 Hash\>_ location. If the Launch Path is set to something other than `Default`, the corresponding folder will be created within the cache, and NTFS hardlinks will be created which point to the extracted \ copied files.
 
 Default: _`Default`_
 
