@@ -120,25 +120,6 @@
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <data name="infoLabel.Text" xml:space="preserve">
-    <value>Instructions:
-
-1. Select the desired emulator and platform (e.g. PCSX2 and Sony Playstation 2).
-2. Enter a comma delimited list of filenames or extensions in the Filename Priority box. Note that filenames can include the * wildcard.
-3. Press OK.
-
-The next time a game is launched which matches the platform and emulator combo, the Filename Priority will be applied to the archive. If an archive doesn't contain one of the defined filenames or extensions, no priority is applied, and LaunchBox's built in priority will apply.
-
-Some example Filename Priorities:
-bin, iso
-- Files ending with bin, then files ending in iso, then all other files.
-
-eboot.bin
-- Files named eboot.bin, then all other files.
-
-*(*E*)*[!].*, *(*U*)*[!].*, *[!].*
-- GoodMerged style - European 'good' ROM dumps, then USA 'good' ROM dumps, then other region 'good' ROM dumps, then all other files.</value>
-  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

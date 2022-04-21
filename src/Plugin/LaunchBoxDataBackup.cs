@@ -9,6 +9,7 @@ using Unbroken.LaunchBox.Plugins;
 using Unbroken.LaunchBox.Plugins.Data;
 using IniParser;
 using IniParser.Model;
+using System.Windows.Forms;
 
 namespace ArchiveCacheManager
 {
@@ -20,9 +21,11 @@ namespace ArchiveCacheManager
         private static readonly string launchInfoSection = "LaunchInfo";
         private static readonly string valueKey = "Value";
 
-        private static string mSettingsPath = PathUtils.GetPluginSettingsFilenamePath();
+        private static string mSettingsPath = PathUtils.GetRestoreSettingsFilenamePath();
         private static string mGameId = string.Empty;
+        private static string mTitle = string.Empty;
         private static string mApplicationId = string.Empty;
+        private static string mApplicationName = string.Empty;
         private static string mEmulator = string.Empty;
         private static string mEmulatorId = string.Empty;
         private static string mPlatform = string.Empty;
@@ -32,7 +35,9 @@ namespace ArchiveCacheManager
         private static CancellationTokenSource restoreSettingsDelayToken = null;
 
         public static string GameId => mGameId;
+        public static string Title => mTitle;
         public static string ApplicationId => mApplicationId;
+        public static string ApplicationName => mApplicationName;
         public static string Emulator => mEmulator;
         public static string EmulatorId => mEmulatorId;
         public static string Platform => mPlatform;
@@ -65,7 +70,9 @@ namespace ArchiveCacheManager
         public static void SetLaunchDetails(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
             mGameId = game.Id;
+            mTitle = game.Title;
             mApplicationId = app != null ? app.Id : null;
+            mApplicationName = app != null ? app.Name : null;
             mEmulator = emulator.Title;
             mEmulatorId = emulator.Id;
             mPlatform = game.Platform;
@@ -84,7 +91,7 @@ namespace ArchiveCacheManager
         /// <summary>
         /// Restore all of the stored LaunchBox settings. Once restored, will remove the stored settings file.
         /// </summary>
-        private static void RestoreAllSettingsSync()
+        private static void RestoreAllSettingsSync(int retries = 5)
         {
             foreach (var setting in mSettings)
             {
@@ -92,23 +99,43 @@ namespace ArchiveCacheManager
                 {
                     case SettingName.IEmulatorPlatform_M3uDiscLoadEnabled:
                         PluginUtils.SetEmulatorPlatformM3uDiscLoadEnabled(mEmulatorId, mPlatform, Convert.ToBoolean(setting.Value));
-                        Logger.Log(string.Format("Restored M3uDiscLoadEnabled to {0} for {1} \\ {2}.", Convert.ToBoolean(setting.Value), mEmulator, mPlatform));
+                        Logger.Log(string.Format("Restored IEmulatorPlatform.M3uDiscLoadEnabled for {0} \\ {1} to {2}.", mEmulator, mPlatform, Convert.ToBoolean(setting.Value)));
                         break;
-                    case SettingName.IGame_ApplicationPath: break;
-                    case SettingName.IAdditionalApplication_ApplicationPath: break;
+                    case SettingName.IGame_ApplicationPath:
+                        PluginHelper.DataManager.GetGameById(GameId).ApplicationPath = Convert.ToString(setting.Value);
+                        Logger.Log(string.Format("Restored IGame.ApplicationPath for {0} ({1}) to {2}.", mTitle, mPlatform, Convert.ToString(setting.Value)));
+                        break;
+                    case SettingName.IAdditionalApplication_ApplicationPath:
+                        PluginUtils.GetAdditionalApplicationById(mGameId, mApplicationId).ApplicationPath = Convert.ToString(setting.Value);
+                        Logger.Log(string.Format("Restored IAdditionalApplication.ApplicationPath for {0} ({1} - {2}) to {3}.", mApplicationName, mTitle, mPlatform, Convert.ToString(setting.Value)));
+                        break;
                     default: break;
                 }
             }
 
             if (mSettings.Count > 0)
             {
+                string message;
                 PluginHelper.DataManager.Save();
 
-                if (VerifySettingsRestored())
+                if (VerifySettingsRestored(out message))
                 {
-                    mSettings.Clear();
                     File.Delete(mSettingsPath);
                     Logger.Log("Temporary settings changes restored.");
+                }
+                else if (retries > 0)
+                {
+                    retries--;
+                    Logger.Log(string.Format("Failed to restore temporary settings changes, retrying... ({0} retries left)", retries));
+                    Task.Delay(500).Wait();
+                    RestoreAllSettingsSync(retries);
+                }
+                else if (retries <= 0)
+                {
+                    FlexibleMessageBox.Show(string.Format("Archive Cache Manager:\r\nError restoring temporary settings changes.\r\n" +
+                                                  "Please review the items below and manually restore them, or restore a Data Backup created by LaunchBox.\r\n\r\n{0}", message),
+                                    "Archive Cache Manager Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    File.Delete(mSettingsPath);
                 }
             }
         }
@@ -117,11 +144,12 @@ namespace ArchiveCacheManager
         /// Verify the stored settings match those in LaunchBox.
         /// </summary>
         /// <returns>True on successful verification, false on failure.</returns>
-        private static bool VerifySettingsRestored()
+        private static bool VerifySettingsRestored(out string message)
         {
-            bool verificationError = false;
+            List<SettingName> verifiedSettings = new List<SettingName>();
             bool boolValue;
-            string message;
+            string stringValue;
+            message = string.Empty;
 
             PluginHelper.DataManager.ReloadIfNeeded();
 
@@ -133,19 +161,48 @@ namespace ArchiveCacheManager
                         boolValue = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(mEmulatorId, mPlatform);
                         if (Convert.ToBoolean(setting.Value) != boolValue)
                         {
-                            verificationError = true;
-                            message = string.Format("Failed to verify M3uDiscLoadEnabled for {0} \\ {1}.\r\nValue is {2} and should be {3}.", mEmulator, mEmulatorId, boolValue, Convert.ToBoolean(setting.Value));
+                            message += string.Format("Failed to verify IEmulatorPlatform.M3uDiscLoadEnabled for {0} \\ {1}.\r\nCurrent value = {2}\r\nCorrect value = {3}.\r\n\r\n", mEmulator, mEmulatorId, boolValue, Convert.ToBoolean(setting.Value));
                             Logger.Log(message);
-                            throw new ApplicationException(message);
+                        }
+                        else
+                        {
+                            verifiedSettings.Add(setting.Key);
                         }
                         break;
-                    case SettingName.IGame_ApplicationPath: break;
-                    case SettingName.IAdditionalApplication_ApplicationPath: break;
+                    case SettingName.IGame_ApplicationPath:
+                        stringValue = PluginHelper.DataManager.GetGameById(mGameId).ApplicationPath;
+                        if (!string.Equals(Convert.ToString(setting.Value), stringValue))
+                        {
+                            message += string.Format("Failed to verify IGame.ApplicationPath for {0} ({1}).\r\nCurrent value = {2}\r\nCorrect value = {3}.\r\n\r\n", mTitle, mPlatform, stringValue, Convert.ToString(setting.Value));
+                            Logger.Log(message);
+                        }
+                        else
+                        {
+                            verifiedSettings.Add(setting.Key);
+                        }
+                        break;
+                    case SettingName.IAdditionalApplication_ApplicationPath:
+                        stringValue = PluginUtils.GetAdditionalApplicationById(mGameId, mApplicationId).ApplicationPath;
+                        if (!string.Equals(Convert.ToString(setting.Value), stringValue))
+                        {
+                            message += string.Format("Failed to verify IAdditionalApplication.ApplicationPath for {0} ({1} - {2}).\r\nCurrent value = {3}\r\nCorrect value = {4}.\r\n\r\n", mApplicationName, mTitle, mPlatform, stringValue, Convert.ToString(setting.Value));
+                            Logger.Log(message);
+                        }
+                        else
+                        {
+                            verifiedSettings.Add(setting.Key);
+                        }
+                        break;
                     default: break;
                 }
             }
 
-            return !verificationError;
+            foreach (var setting in verifiedSettings)
+            {
+                mSettings.Remove(setting);
+            }
+
+            return (mSettings.Count == 0);
         }
 
         /// <summary>
@@ -202,7 +259,7 @@ namespace ArchiveCacheManager
         /// Restore the stored settings after the specified delay. The delay and restore operation run as an asynchronous task.
         /// </summary>
         /// <param name="delay"></param>
-        public static void RestoreAllSettingsDelay(int delay = 0)
+        public static void RestoreAllSettingsDelay(int delay)
         {
             restoreSettingsDelayToken = new CancellationTokenSource();
             restoreSettingsTask = Task.Run(() => RestoreAllSettingsAsync(delay));
@@ -217,7 +274,9 @@ namespace ArchiveCacheManager
             IniData iniData = new IniData();
 
             iniData[launchInfoSection][nameof(GameId)] = GameId;
+            iniData[launchInfoSection][nameof(Title)] = Title;
             iniData[launchInfoSection][nameof(ApplicationId)] = ApplicationId;
+            iniData[launchInfoSection][nameof(ApplicationName)] = ApplicationName;
             iniData[launchInfoSection][nameof(EmulatorId)] = EmulatorId;
             iniData[launchInfoSection][nameof(Platform)] = Platform;
 
@@ -254,7 +313,9 @@ namespace ArchiveCacheManager
                         if (string.Equals(section.SectionName, launchInfoSection))
                         {
                             mGameId = iniData[launchInfoSection][nameof(GameId)];
+                            mTitle = iniData[launchInfoSection][nameof(Title)];
                             mApplicationId = iniData[launchInfoSection][nameof(ApplicationId)];
+                            mApplicationName = iniData[launchInfoSection][nameof(ApplicationName)];
                             mEmulatorId = iniData[launchInfoSection][nameof(EmulatorId)];
                             mPlatform = iniData[launchInfoSection][nameof(Platform)];
                         }

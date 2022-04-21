@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Linq;
 
 namespace ArchiveCacheManager
 {
@@ -21,11 +22,14 @@ namespace ArchiveCacheManager
         private static readonly string configFileName = @"config.ini";
         private static readonly string gameIndexFileName = @"game-index.ini";
         private static readonly string gameInfoFileName = @"game.ini";
-        private static readonly string settingsOverrideFileName = @"settings-override.ini";
         private static readonly string default7zFileName = @"7z.exe";
         private static readonly string alt7zFileName = @"7-zip.exe";
+        private static readonly string tempPath = @"Temp";
+        private static readonly string tempArchiveFilename = @"temp.zip";
+        private static readonly string restoreSettingsFileName = @"restore-settings.ini";
         private static readonly string relativePluginPath = @"Plugins\ArchiveCacheManager";
         private static readonly string relative7zPath = @"ThirdParty\7-Zip";
+        private static readonly string relativeExtractorPath = Path.Combine(relativePluginPath, "Extractors");
         private static readonly string relativeLogPath = Path.Combine(relativePluginPath, "Logs");
         private static readonly DateTime dateTimeNow = DateTime.Now;
         private static readonly string logFileName = string.Format("events-{0}-{1:00}-{2:00}.log", dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day);
@@ -101,16 +105,6 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
-        /// Returns lower case file extension with leading period removed.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string GetExtension(string path)
-        {
-            return Path.GetExtension(path).Trim(new char[] { '.' }).ToLower();
-        }
-
-        /// <summary>
         /// Determine the LaunchBox root path based on whether this function was called by the plugin, or the Archive Cache Manager exe.
         /// </summary>
         /// <returns></returns>
@@ -146,11 +140,15 @@ namespace ArchiveCacheManager
         /// <returns>Absolute path to plugin game index info file.</returns>
         public static string GetPluginGameIndexPath() => Path.Combine(launchBoxRootPath, relativePluginPath, gameIndexFileName);
 
+        public static string GetTempPath() => Path.Combine(launchBoxRootPath, relativePluginPath, tempPath);
+
+        public static string GetTempArchivePath() => Path.Combine(GetTempPath(), tempArchiveFilename);
+
         /// <summary>
         /// Absolute path to file which stores temporary settings changes.
         /// </summary>
         /// <returns>Absolute path to temporary settings file.</returns>
-        public static string GetPluginSettingsFilenamePath() => Path.Combine(launchBoxRootPath, relativePluginPath, settingsOverrideFileName);
+        public static string GetRestoreSettingsFilenamePath() => Path.Combine(GetTempPath(), restoreSettingsFileName);
 
         /// <summary>
         /// Absolute path to 7z.exe.
@@ -217,6 +215,12 @@ namespace ArchiveCacheManager
         public static string GetPlugin7zRootPath() => Path.Combine(launchBoxRootPath, relativePluginPath, "7-Zip");
 
         /// <summary>
+        /// Absolute path to the folder containing the plugin's extractors.
+        /// </summary>
+        /// <returns>Absolute path to the folder containing the plugin's extractors.</returns>
+        public static string GetExtractorRootPath() => Path.Combine(launchBoxRootPath, relativeExtractorPath);
+
+        /// <summary>
         /// Absolute path to the last played file for the given archive cache path.
         /// </summary>
         /// <param name="archiveCachePath">Location of the cached archive.</param>
@@ -236,6 +240,13 @@ namespace ArchiveCacheManager
         /// <param name="archiveCachePath">Location of the cached archive.</param>
         /// <returns>Absolute path to the extracting flag file.</returns>
         public static string GetArchiveCacheExtractingFlagPath(string archiveCachePath) => Path.Combine(archiveCachePath, "extracting");
+
+        /// <summary>
+        /// Absolute path to the link flag file for the given archive cache path.
+        /// </summary>
+        /// <param name="archiveLaunchPath">Location of the launch path in the cache.</param>
+        /// <returns>Absolute path to the link flag file.</returns>
+        public static string GetArchiveCacheLinkFlagPath(string archiveLaunchPath) => Path.Combine(archiveLaunchPath, "link");
 
         /// <summary>
         /// Absolute path to the m3u file for the given archive cache path. Filename includes the game ID.
@@ -273,6 +284,11 @@ namespace ArchiveCacheManager
         /// <param name="filename"></param>
         /// <returns></returns>
         private static string GetArchiveCacheM3uPath(string archiveCachePath, string filename) => Path.Combine(archiveCachePath, string.Format("{0}.m3u", filename));
+
+        public static string[] GetManagerFiles(string archiveCachePath) => new string[] { GetArchiveCachePlaytimePath(archiveCachePath),
+                                                                                          GetArchiveCacheGameInfoPath(archiveCachePath),
+                                                                                          GetArchiveCacheExtractingFlagPath(archiveCachePath),
+                                                                                          GetArchiveCacheLinkFlagPath(archiveCachePath) };
 
         /// <summary>
         /// Game info filename.
@@ -323,7 +339,7 @@ namespace ArchiveCacheManager
         /// <summary>
         /// Absolute path to the supplied cache path, or to the configured cache if cachePath omitted.
         /// </summary>
-        /// <param name="cachePath">The path to the cache lcation.</param>
+        /// <param name="cachePath">The path to the cache location.</param>
         /// <returns>Absolute path of the cache.</returns>
         public static string CachePath(string cachePath = null)
         {
@@ -353,7 +369,7 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
-        /// Get a valid filename from the input string. Will replace invalid characters with '-'.
+        /// Get a valid filename from the input string. Will replace invalid characters with '_'.
         /// If the filename is reserved or otherwise generates an exception, safeFilename will be used.
         /// </summary>
         /// <param name="filenameToValidate">The filename to validate.</param>
@@ -389,6 +405,45 @@ namespace ArchiveCacheManager
             }
 
             return validFilename;
+        }
+
+        /// <summary>
+        /// Get a valid path from the input string. Will replace invalid characters with '_'.
+        /// If the path is reserved or otherwise generates an exception, safePath will be used.
+        /// </summary>
+        /// <param name="pathToValidate">The path to validate.</param>
+        /// <param name="safePath">The fallback path to use if path validation fails.</param>
+        /// <returns>The validated filename.</returns>
+        public static string GetValidPath(string pathToValidate, string safePath)
+        {
+            var invalidChars = Path.GetInvalidPathChars();
+            var validPath = String.Join("_", pathToValidate.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+            var reservedNames = new[]
+            {
+                "CON", "PRN", "AUX", "CLOCK$", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4",
+                "COM5", "COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4",
+                "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+            };
+
+            foreach (var reserved in reservedNames)
+            {
+                if (String.Equals(validPath, reserved, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    validPath = safePath;
+                    break;
+                }
+            }
+
+            try
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(validPath);
+            }
+            catch
+            {
+                validPath = safePath;
+            }
+
+            return validPath;
         }
 
         /// <summary>
@@ -456,6 +511,18 @@ namespace ArchiveCacheManager
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Check if the launched game is a compressed archive based on the file extension.
+        /// Extensions checked are zip, 7z, rar.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static bool HasExtension(string filename, string[] extensions)
+        {
+            string extension = Path.GetExtension(filename).ToLower();
+            return extensions.Contains(extension);
         }
     }
 }

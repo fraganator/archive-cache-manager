@@ -62,7 +62,12 @@ namespace ArchiveCacheManager
     {
         static void Main(string[] args)
         {
-            // Debugger.Launch();
+#if DEBUG
+            Debugger.Launch();
+#endif
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             Logger.Log("========");
             Logger.Log(string.Format("Archive Cache Manager started with arguments: {0}", string.Join(" ", args)));
 
@@ -96,6 +101,8 @@ namespace ArchiveCacheManager
                     Environment.ExitCode = 1;
                 }
             }
+
+            Logger.Log($"Completed in {stopwatch.ElapsedMilliseconds}ms.");
         }
 
         /// <summary>

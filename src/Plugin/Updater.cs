@@ -25,8 +25,8 @@ namespace ArchiveCacheManager
                 {
                     Logger.Log(string.Format("Update check found new version: {0}", latestRelease.TagName));
 
-                    var result = MessageBox.Show(string.Format("Version {0} of Archive Cache Manager is now available for download.\r\n\r\nView release page now?", latestReleaseString),
-                                                    "Archive Cache Manager Update Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                    var result = FlexibleMessageBox.Show(string.Format("Version {0} of Archive Cache Manager is now available for download. New features include:\r\n\r\n{1}\r\n\r\nView download page now?", latestReleaseString, latestRelease.Body),
+                                                    "Update Check", MessageBoxButtons.YesNo, Resources.icon32x32, MessageBoxDefaultButton.Button2);
                     if (result == DialogResult.Yes)
                     {
                         PluginUtils.OpenURL("https://forums.launchbox-app.com/files/file/234-archive-cache-manager/");
@@ -47,8 +47,8 @@ namespace ArchiveCacheManager
         {
             await Task.Delay(delay);
 
-            var result = MessageBox.Show("Archive Cache Manager can notify you when a new update is available. Nothing is automatically downloaded or installed.\r\n\r\nEnable update check on startup?",
-                                         "Enable update check?", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+            var result = FlexibleMessageBox.Show("Archive Cache Manager can notify you when a new update is available.\r\nNothing will be automatically downloaded or installed.\r\n\r\nEnable update check on startup?",
+                                         "Enable update check?", MessageBoxButtons.YesNo, Resources.icon32x32, MessageBoxDefaultButton.Button2);
 
             Config.UpdateCheck = (result == DialogResult.Yes);
             Config.Save();

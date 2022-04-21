@@ -48,13 +48,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LaunchGameInfo.cs" />
+    <Compile Include="Extractors\Chdman.cs" />
+    <Compile Include="Extractors\DolphinTool.cs" />
+    <Compile Include="Extractors\Robocopy.cs" />
+    <Compile Include="Extractors\Extractor.cs" />
+    <Compile Include="LaunchInfo.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="GameIndex.cs" />
     <Compile Include="GameInfo.cs" />
-    <Compile Include="ChildProcessTracker.cs" />
+    <Compile Include="ProcessUtils.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="Zip.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="Extractors\Zip.cs" />
     <Compile Include="CacheManager.cs" />
     <Compile Include="DiskUtils.cs" />
     <Compile Include="PathUtils.cs" />
@@ -63,6 +68,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y $(TargetDir)*.dll c:\LaunchBox\Plugins\ArchiveCacheManager

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,11 @@ namespace ArchiveCacheManager
             ps.UseShellExecute = true;
             ps.Verb = "Open";
             Process.Start(ps);
+        }
+
+        public static string GetArchivePath(IGame game, IAdditionalApplication app)
+        {
+            return PathUtils.GetAbsolutePath((app != null && app.ApplicationPath != string.Empty) ? app.ApplicationPath : game.ApplicationPath);
         }
 
         public static bool GetEmulatorPlatformAutoExtract(string emulatorId, string platformName)
@@ -87,35 +93,26 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
-        /// Check if the launched game is a compressed archive based on the file extension.
-        /// Extensions checked are zip, 7z, rar.
-        /// </summary>
-        /// <param name="applicationPath"></param>
-        /// <returns></returns>
-        public static bool IsApplicationPathCompressedArchive(string applicationPath)
-        {
-            string[] archiveExtensions = { "zip", "7z", "rar" };
-            string extension = PathUtils.GetExtension(applicationPath);
-            return archiveExtensions.Contains(extension);
-        }
-
-        /// <summary>
         /// Get info on a multi-disc game.
+        /// 
+        /// totalDiscs is the total number of discs in a game. Determined by counting additional apps with Disc property set. Will be 0 if not a multi-dsc game.
+        /// selectedDisc is the selected disc, based on the additional app Disc property. Will be 1 if additional app is null, and 0 if not a multi-disc game.
+        /// discs is a list of discs and associated info in disc order. Will be empty if not a multi-disc game.
         /// </summary>
         /// <param name="game"></param>
         /// <param name="app"></param>
-        /// <param name="totalDiscs">The total number of discs in a game. Determined by counting additional apps with Disc property set. Will be 0 if not a multi-dsc game.</param>
-        /// <param name="selectedDisc">The selected disc, based on the additional app Disc property. Will be 1 if additional app is null, and 0 if not a multi-disc game.</param>
-        /// <param name="discs">List of discs and associated info in disc order. Will be empty if not a multi-disc game.</param>
-        /// <returns>True if multi-disc info populated, False otherwise.</returns>
-        public static bool GetMultiDiscInfo(IGame game, IAdditionalApplication app, ref int totalDiscs, ref int selectedDisc, ref List<DiscInfo> discs)
+        /// <returns>Tuple of (totalDiscs, selectedDisc, discs).</returns>
+        public static (int, int, List<DiscInfo>) GetMultiDiscInfo(IGame game, IAdditionalApplication app)
         {
+            int totalDiscs = 0;
+            int selectedDisc = 0;
+            List<DiscInfo> discs = new List<DiscInfo>();
+
             if (!IsLaunchedGameMultiDisc(game, app))
             {
                 totalDiscs = 0;
                 selectedDisc = 0;
                 discs.Clear();
-                return false;
             }
 
             var additionalApps = game.GetAllAdditionalApplications();
@@ -141,7 +138,79 @@ namespace ArchiveCacheManager
             }
 
             totalDiscs = discs.Count;
-            return true;
+
+            return (totalDiscs, selectedDisc, discs);
+        }
+
+        public static IAdditionalApplication GetAdditionalApplicationById(string gameId, string appId)
+        {
+            var additionalApps = PluginHelper.DataManager.GetGameById(gameId).GetAllAdditionalApplications();
+            return Array.Find(additionalApps, app => app.Id == appId);
+        }
+
+        /// <summary>
+        /// Get a list of (emulator, emulator platform) tuples for a given platform.
+        /// If the default emulator ID is specified, the resulting list will include the default emulator at index 0.
+        /// </summary>
+        /// <param name="platform"></param>
+        /// <param name="defaultEmulatorId"></param>
+        /// <returns>A list of (IEmulator, IEmulatorPlatform) tuples.</returns>
+        public static List<(IEmulator, IEmulatorPlatform)> GetPlatformEmulators(string platform, string defaultEmulatorId = null)
+        {
+            List<(IEmulator, IEmulatorPlatform)> emulators = new List<(IEmulator, IEmulatorPlatform)>();
+
+            foreach (var emulator in PluginHelper.DataManager.GetAllEmulators())
+            {
+                foreach (var emulatorPlatform in emulator.GetAllEmulatorPlatforms())
+                {
+                    if (string.Equals(emulatorPlatform.Platform, platform))
+                    {
+                        if (string.Equals(emulator.Id, defaultEmulatorId))
+                        {
+                            if (!emulators.Select(emu => emu.Item1.Id).Contains(defaultEmulatorId) || emulatorPlatform.IsDefault)
+                            {
+                                emulators.Insert(0, (emulator, emulatorPlatform));
+                            }
+                            else
+                            {
+                                emulators.Add((emulator, emulatorPlatform));
+                            }
+                        }
+                        else
+                        {
+                            emulators.Add((emulator, emulatorPlatform));
+                        }
+                    }
+                }
+            }
+
+            return emulators;
+        }
+
+        /// <summary>
+        /// Get the emulator title. If the emulator is RetroArch, also gets the core in use
+        /// </summary>
+        /// <param name="emulator"></param>
+        /// <param name="emulatorPlatform"></param>
+        /// <returns>The emulator title, plus the core where applicable.</returns>
+        public static string GetEmulatorTitle(IEmulator emulator, IEmulatorPlatform emulatorPlatform)
+        {
+            string title = emulator.Title;
+
+            if (string.Equals(emulator.Title, "Retroarch", StringComparison.InvariantCultureIgnoreCase))
+            {
+                try
+                {
+                    string corePath = emulatorPlatform.CommandLine.Split(new[] { ' ' })[1].Trim(new[] { '"' });
+                    string core = Path.GetFileNameWithoutExtension(Path.GetFileName(corePath));
+                    title = string.Format("{0} ({1})", title, core);
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            return title;
         }
     }
 }

@@ -20,7 +20,8 @@ namespace ArchiveCacheManager
         public bool ShowInLaunchBox => true;
         public bool ShowInBigBox => true;
 
-        public bool GetIsValidForGame(IGame selectedGame) => PluginUtils.GetEmulatorPlatformAutoExtract(selectedGame.EmulatorId, selectedGame.Platform);
+        public bool GetIsValidForGame(IGame selectedGame) => Zip.SupportedType(selectedGame.ApplicationPath)
+                                                             && PluginUtils.GetEmulatorPlatformAutoExtract(selectedGame.EmulatorId, selectedGame.Platform);
         public bool GetIsValidForGames(IGame[] selectedGames) => false;
 
         public void OnSelected(IGame selectedGame)
@@ -31,7 +32,7 @@ namespace ArchiveCacheManager
             // and the first file listing removed. Restore 7z here, just in case it wasn't cleaned up properly previously.
             GameLaunching.Restore7z();
 
-            string[] fileList = Zip.GetFileList(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
+            string[] fileList = new Zip().List(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
 
             if (fileList.Count() == 0)
             {
@@ -44,11 +45,13 @@ namespace ArchiveCacheManager
                 }
                 else
                 {
-                    MessageBox.Show(errorMessage, "Archive Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    FlexibleMessageBox.Show(errorMessage, "Archive Cache Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 
                 return;
             }
+
+            var emulatorsTuple = PluginUtils.GetPlatformEmulators(selectedGame.Platform, selectedGame.EmulatorId);
 
             Form window;
             if (PluginHelper.StateManager.IsBigBox)
@@ -57,7 +60,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
+                window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, emulatorsTuple.Select(emu => PluginUtils.GetEmulatorTitle(emu.Item1, emu.Item2)).ToArray(), GameIndex.GetSelectedFile(selectedGame.Id));
             }
             //NativeWindow parent = new NativeWindow();
 
@@ -74,8 +77,16 @@ namespace ArchiveCacheManager
                 }
                 else
                 {
+                    int emulatorIndex = (window as ArchiveListWindow).EmulatorIndex;
+                    // Use a specific command line for the IEmulatorPlatform. This covers the case where RetroArch has more than one core configured for the same platform.
+                    string commandLine = emulatorsTuple[emulatorIndex].Item2.CommandLine;
+                    // Use the game's custom command line if it exists and we're running with the game's emulator (index 0)
+                    if (emulatorIndex == 0 && !string.IsNullOrEmpty(selectedGame.CommandLine))
+                    {
+                        commandLine = selectedGame.CommandLine;
+                    }
                     GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindow).SelectedFile);
-                    PluginHelper.LaunchBoxMainViewModel.PlayGame(selectedGame, null, PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId), null);
+                    PluginHelper.LaunchBoxMainViewModel.PlayGame(selectedGame, null, emulatorsTuple[emulatorIndex].Item1, commandLine);
                 }
             }
         }

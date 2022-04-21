@@ -15,7 +15,8 @@ namespace ArchiveCacheManager
 
         public void OnSelected()
         {
-            ConfigWindow window = new ConfigWindow();
+            //ConfigWindow window = new ConfigWindow();
+            NewConfigWindow window = new NewConfigWindow();
             NativeWindow parent = new NativeWindow();
 
             // Glue between the main app window (WPF) and this window (WinForms)

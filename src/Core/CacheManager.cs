@@ -65,16 +65,16 @@ namespace ArchiveCacheManager
         /// </summary>
         public static void AddArchiveToCache(int? disc = null)
         {
-            if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport && disc == null)
+            if (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport && disc == null)
             {
-                Zip.ProgressDivisor = LaunchGameInfo.Game.TotalDiscs - LaunchGameInfo.GetDiscCountInCache();
+                LaunchInfo.Extractor.ProgressDivisor = LaunchInfo.Game.TotalDiscs - LaunchInfo.GetDiscCountInCache();
 
                 int discIndex = 0;
-                foreach (var discInfo in LaunchGameInfo.Game.Discs)
+                foreach (var discInfo in LaunchInfo.Game.Discs)
                 {
-                    if (!LaunchGameInfo.GetArchiveInCache(discInfo.Disc))
+                    if (!LaunchInfo.GetArchiveInCache(discInfo.Disc))
                     {
-                        Zip.ProgressOffset = (100 / Zip.ProgressDivisor) * discIndex;
+                        LaunchInfo.Extractor.ProgressOffset = (100 / LaunchInfo.Extractor.ProgressDivisor) * discIndex;
                         AddArchiveToCache(discInfo.Disc);
                         discIndex++;
                     }
@@ -83,46 +83,52 @@ namespace ArchiveCacheManager
                 return;
             }
 
-            string stdout = string.Empty;
-            string stderr = string.Empty;
-            int exitCode = 0;
-
             if (CreateCache())
             {
-                DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.GetArchiveCachePath(disc)));
-                ClearCacheSpace(LaunchGameInfo.GetDecompressedSize(disc));
-                Logger.Log(string.Format("Extracting archive to \"{0}\".", LaunchGameInfo.GetArchiveCachePath(disc)));
-                Zip.Extract(LaunchGameInfo.GetArchivePath(disc), LaunchGameInfo.GetArchiveCachePath(disc), ref stdout, ref stderr, ref exitCode);
-                if (exitCode == 0)
+                string singleFile = LaunchInfo.GetExtractSingleFile();
+                if (!string.IsNullOrEmpty(singleFile))
                 {
-                    LaunchGameInfo.SaveToCache(disc);
-                    DiskUtils.SetDirectoryContentsReadOnly(LaunchGameInfo.GetArchiveCachePath(disc));
-                    File.Delete(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.GetArchiveCachePath(disc)));
+                    // Delete previous directory contents. Don't want a build up of old individually extracted files.
+                    DiskUtils.DeleteDirectory(LaunchInfo.GetArchiveCachePath(disc), true);
+                }
+
+                DiskUtils.CreateFile(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchInfo.GetArchiveCachePath(disc)));
+                ClearCacheSpace(LaunchInfo.GetSize(disc));
+                Logger.Log(string.Format("Extracting archive to \"{0}\".", LaunchInfo.GetArchiveCachePath(disc)));
+
+                var result = LaunchInfo.Extractor.Extract(LaunchInfo.GetArchivePath(disc), LaunchInfo.GetArchiveCachePath(disc), singleFile.ToSingleArray());
+                if (result)
+                {
+                    LaunchInfo.SaveToCache(disc);
+                    DiskUtils.SetDirectoryContentsReadOnly(LaunchInfo.GetArchiveCachePath(disc));
+                    File.Delete(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchInfo.GetArchiveCachePath(disc)));
                 }
                 else
                 {
                     Logger.Log("Extraction error, removing output files from cache.");
-                    DiskUtils.DeleteDirectory(LaunchGameInfo.GetArchiveCachePath(disc));
+                    DiskUtils.DeleteDirectory(LaunchInfo.GetArchiveCachePath(disc));
                 }
             }
             else
             {
                 Logger.Log(@"Error creating or accessing cache location. Archive will be extracted to LaunchBox\ThirdParty\7-Zip\Temp.");
-                Zip.Extract(LaunchGameInfo.GetArchivePath(disc), PathUtils.GetLaunchBox7zTempPath(), ref stdout, ref stderr, ref exitCode);
+                LaunchInfo.Extractor.Extract(LaunchInfo.GetArchivePath(disc), PathUtils.GetLaunchBox7zTempPath(), LaunchInfo.GetExtractSingleFile().ToSingleArray());
             }
         }
 
         public static void GenerateM3u()
         {
-            if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport)
+            if (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport)
             {
                 Dictionary<int, string> filePaths = new Dictionary<int, string>();
-                foreach (var discInfo in LaunchGameInfo.Game.Discs)
+                foreach (var discInfo in LaunchInfo.Game.Discs)
                 {
-                    filePaths.Add(discInfo.Disc, ListCacheArchive(discInfo.Disc).FirstOrDefault());
+                    // Delete any previously generated m3u file, so it doesn't get included in the subsequent archive listing
+                    DiskUtils.DeleteFile(LaunchInfo.GetM3uName(discInfo.Disc));
+                    filePaths.Add(discInfo.Disc, ListCacheArchive(LaunchInfo.GetArchiveCachePath(discInfo.Disc), discInfo.Disc).FirstOrDefault());
                 }
 
-                foreach (var discInfo in LaunchGameInfo.Game.Discs)
+                foreach (var discInfo in LaunchInfo.Game.Discs)
                 {
                     List<string> multiDiscPaths = new List<string>();
                     foreach (var path in filePaths)
@@ -137,13 +143,9 @@ namespace ArchiveCacheManager
                         }
                     }
 
-                    string m3uPathGameId = PathUtils.GetArchiveCacheM3uGameIdPath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.GameId);
-                    string m3uPathGameTitle = PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc), LaunchGameInfo.Game.GameId, LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Version, discInfo.Disc);
-                    string m3uPath = Config.UseGameIdAsM3uFilename ? m3uPathGameId : m3uPathGameTitle;
+                    string m3uPath = LaunchInfo.GetM3uName(discInfo.Disc);
                     try
                     {
-                        DiskUtils.DeleteFile(m3uPathGameId);
-                        DiskUtils.DeleteFile(m3uPathGameTitle);
                         File.WriteAllLines(m3uPath, multiDiscPaths);
                         DiskUtils.SetFileReadOnly(m3uPath);
                     }
@@ -184,7 +186,7 @@ namespace ArchiveCacheManager
                         if (!gameInfo.InfoLoaded)
                         {
                             Logger.Log(string.Format("Error loading game.ini, deleting cached item \"{0}\".", dir));
-                            DiskUtils.DeleteDirectory(dir);
+                            DiskUtils.DeleteDirectory(dir, false, true);
                             continue;
                         }
 
@@ -211,23 +213,21 @@ namespace ArchiveCacheManager
             int exitCode = 0;
             List<string> fileList = new List<string>();
 
-            if (LaunchGameInfo.GetArchiveInCache())
+            if (LaunchInfo.GetArchiveInCache())
             {
-                if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport && LaunchGameInfo.Game.EmulatorPlatformM3u)
+                if (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport && LaunchInfo.Game.EmulatorPlatformM3u)
                 {
-                    string m3uPath = Config.UseGameIdAsM3uFilename ? PathUtils.GetArchiveCacheM3uGameIdPath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), LaunchGameInfo.Game.GameId)
-                                                                   : PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(LaunchGameInfo.Game.SelectedDisc), LaunchGameInfo.Game.GameId, LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Version, LaunchGameInfo.Game.SelectedDisc);
                     // This is a multi-disc game, and the emulator supports m3u files. Set the file list to the generated m3u file.
-                    fileList.Add(m3uPath);
+                    fileList.Add(LaunchInfo.GetM3uName(LaunchInfo.Game.SelectedDisc));
                 }
                 else
                 {
-                    fileList = ListCacheArchive();
+                    fileList = ListCacheArchive(LaunchInfo.GetArchiveCacheLaunchPath());
                 }
             }
             else
             {
-                fileList = ListFileArchive(ref stderr, ref exitCode);
+                fileList = ListFileArchive();
             }
 
             if (fileList.Count > 0)
@@ -249,36 +249,36 @@ namespace ArchiveCacheManager
         /// Lists all of the files in the archive.
         /// </summary>
         /// <returns>The file list for the archive in "Path = absolute\file\path.ext" format, with one entry per line.</returns>
-        public static List<string> ListFileArchive(ref string stderr, ref int exitCode)
+        public static List<string> ListFileArchive()
         {
             string stdout = string.Empty;
             string selectedFilePath = string.Empty;
             List<string> fileList = new List<string>();
 
-            if (!LaunchGameInfo.Game.SelectedFile.Equals(string.Empty))
+            if (!LaunchInfo.Game.SelectedFile.Equals(string.Empty))
             {
-                if (Zip.GetFileList(LaunchGameInfo.GetArchivePath(), LaunchGameInfo.Game.SelectedFile).Length > 0)
+                if (LaunchInfo.Extractor.List(LaunchInfo.GetArchivePath(), LaunchInfo.Game.SelectedFile.ToSingleArray()).Length > 0)
                 {
-                    fileList.Add(LaunchGameInfo.Game.SelectedFile);
-                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchGameInfo.Game.SelectedFile));
+                    fileList.Add(LaunchInfo.Game.SelectedFile);
+                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchInfo.Game.SelectedFile));
                     return fileList;
                 }
             }
 
             List<string> prioritySections = new List<string>();
-            prioritySections.Add(string.Format(@"{0} \ {1}", LaunchGameInfo.Game.Emulator, LaunchGameInfo.Game.Platform));
-            prioritySections.Add(@"All \ All");
+            prioritySections.Add(Config.EmulatorPlatformKey(LaunchInfo.Game.Emulator, LaunchInfo.Game.Platform));
+            prioritySections.Add(Config.EmulatorPlatformKey("All", "All"));
 
             foreach (var prioritySection in prioritySections)
             {
                 try
                 {
-                    string[] extensionPriority = Config.FilenamePriority[prioritySection].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] extensionPriority = Config.GetFilenamePriority(prioritySection).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
                     {
-                        fileList = Zip.GetFileList(LaunchGameInfo.GetArchivePath(), string.Format("*{0}", extension.Trim())).ToList();
+                        fileList = LaunchInfo.Extractor.List(LaunchInfo.GetArchivePath(), string.Format("{0}", extension.Trim()).ToSingleArray(), null, true).ToList();
 
                         if (fileList.Count > 0)
                         {
@@ -293,62 +293,53 @@ namespace ArchiveCacheManager
                 }
             }
 
-            fileList = Zip.GetFileList(LaunchGameInfo.GetArchivePath()).ToList();
+            fileList = LaunchInfo.Extractor.List(LaunchInfo.GetArchivePath()).ToList();
 
             return fileList;
         }
 
         /// <summary>
-        /// Lists all of the files in the cached archive path.
+        /// Lists the files in the cached archive path, excluding cache management files.
         /// </summary>
-        /// <returns>The file list for the cached archive in "Path = absolute\file\path.ext" format, with one entry per line.</returns>
-        public static List<string> ListCacheArchive(int? disc = null)
+        /// <returns>The file list for the cached archive, with one entry per line. All paths are absolute.</returns>
+        public static List<string> ListCacheArchive(string archiveCachePath, int? disc = null)
         {
             List<string> fileList = new List<string>();
-            string[] exclude = new string[] { PathUtils.GetArchiveCachePlaytimePath(LaunchGameInfo.GetArchiveCachePath(disc)),
-                                              PathUtils.GetArchiveCacheGameInfoPath(LaunchGameInfo.GetArchiveCachePath(disc)),
-                                              PathUtils.GetArchiveCacheExtractingFlagPath(LaunchGameInfo.GetArchiveCachePath(disc)),
-                                              PathUtils.GetArchiveCacheM3uGameIdPath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.GameId),
-                                              PathUtils.GetArchiveCacheM3uGameTitlePath(LaunchGameInfo.GetArchiveCachePath(disc), LaunchGameInfo.Game.GameId, LaunchGameInfo.Game.Title, LaunchGameInfo.Game.Version, disc) };
+            string[] managerFiles = PathUtils.GetManagerFiles(archiveCachePath);
 
-            if (!LaunchGameInfo.Game.SelectedFile.Equals(string.Empty) && disc == null)
+            if (!string.IsNullOrEmpty(LaunchInfo.Game.SelectedFile) && !(LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport))
             {
-                if (Directory.GetFiles(LaunchGameInfo.GetArchiveCachePath(), LaunchGameInfo.Game.SelectedFile, SearchOption.AllDirectories).Length > 0)
+                if (Directory.GetFiles(archiveCachePath, LaunchInfo.Game.SelectedFile, SearchOption.AllDirectories).Length > 0)
                 {
-                    fileList.Add(Path.Combine(LaunchGameInfo.GetArchiveCachePath(), LaunchGameInfo.Game.SelectedFile));
-                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchGameInfo.Game.SelectedFile));
+                    fileList.Add(Path.Combine(archiveCachePath, LaunchInfo.Game.SelectedFile));
+                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchInfo.Game.SelectedFile));
                     return fileList;
                 }
             }
 
             List<string> prioritySections = new List<string>();
-            prioritySections.Add(string.Format(@"{0} \ {1}", LaunchGameInfo.Game.Emulator, LaunchGameInfo.Game.Platform));
-            prioritySections.Add(@"All \ All");
+            prioritySections.Add(Config.EmulatorPlatformKey(LaunchInfo.Game.Emulator, LaunchInfo.Game.Platform));
+            prioritySections.Add(Config.EmulatorPlatformKey("All", "All"));
 
             foreach (var prioritySection in prioritySections)
             {
                 try
                 {
-                    string[] extensionPriority = Config.FilenamePriority[prioritySection].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] extensionPriority = Utils.SplitExtensions(Config.GetFilenamePriority(prioritySection));
 
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
                     {
-                        fileList = Directory.GetFiles(LaunchGameInfo.GetArchiveCachePath(disc), string.Format("*{0}", extension.Trim()), SearchOption.AllDirectories).ToList();
+                        fileList = Directory.GetFiles(archiveCachePath, string.Format("*{0}", extension), SearchOption.AllDirectories).ToList();
 
-                        foreach (string ex in exclude)
+                        foreach (string ex in managerFiles)
                         {
                             fileList.Remove(ex);
                         }
 
                         if (fileList.Count > 0)
                         {
-                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension.Trim()));
-                            // If we're listing a disc from a multi-disc game, only return a single file
-                            if (disc != null)
-                            {
-                                fileList.RemoveRange(1, fileList.Count() - 1);
-                            }
+                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension));
                             return fileList;
                         }
                     }
@@ -359,9 +350,9 @@ namespace ArchiveCacheManager
                 }
             }
 
-            fileList = Directory.GetFiles(LaunchGameInfo.GetArchiveCachePath(disc), "*", SearchOption.AllDirectories).ToList();
+            fileList = Directory.GetFiles(archiveCachePath, "*", SearchOption.AllDirectories).ToList();
 
-            foreach (string ex in exclude)
+            foreach (string ex in managerFiles)
             {
                 fileList.Remove(ex);
             }
@@ -432,12 +423,12 @@ namespace ArchiveCacheManager
                 // Get a list of directories in the cache, sorted by last played date\time
                 string[] dirs = Directory.GetDirectories(PathUtils.CachePath());
                 // Ignore any of the archive cache paths for the same multi-disc game
-                if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport)
+                if (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport)
                 {
                     List<string> dirsToExclude = new List<string>();
-                    foreach (var disc in LaunchGameInfo.Game.Discs)
+                    foreach (var disc in LaunchInfo.Game.Discs)
                     {
-                        dirsToExclude.Add(LaunchGameInfo.GetArchiveCachePath(disc.Disc));
+                        dirsToExclude.Add(LaunchInfo.GetArchiveCachePath(disc.Disc));
                     }
                     dirs = dirs.Except(dirsToExclude).ToArray();
                 }
@@ -509,7 +500,7 @@ namespace ArchiveCacheManager
         /// <param name="archiveCachePath">The path of the cached archive.</param>
         public static void UpdateArchiveCachePlaytime()
         {
-            string lastPlayedPath = PathUtils.GetArchiveCachePlaytimePath(LaunchGameInfo.GetArchiveCachePath());
+            string lastPlayedPath = PathUtils.GetArchiveCachePlaytimePath(LaunchInfo.GetArchiveCachePath());
 
             try
             {
@@ -519,12 +510,12 @@ namespace ArchiveCacheManager
                 writer.Flush();
                 writer.Close();
 
-                if (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport)
+                if (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport)
                 {
                     string dest = string.Empty;
-                    foreach (var discInfo in LaunchGameInfo.Game.Discs)
+                    foreach (var discInfo in LaunchInfo.Game.Discs)
                     {
-                        dest = PathUtils.GetArchiveCachePlaytimePath(LaunchGameInfo.GetArchiveCachePath(discInfo.Disc));
+                        dest = PathUtils.GetArchiveCachePlaytimePath(LaunchInfo.GetArchiveCachePath(discInfo.Disc));
                         if (!string.Equals(lastPlayedPath, dest, StringComparison.InvariantCultureIgnoreCase))
                         {
                             File.Copy(lastPlayedPath, dest, true);
@@ -541,33 +532,81 @@ namespace ArchiveCacheManager
             }
         }
 
+        public static void LinkCacheToLaunchFolder()
+        {
+            string launchPath = LaunchInfo.GetArchiveCacheLaunchPath();
+            if (LaunchInfo.LaunchPathConfig != Config.LaunchPath.Default)
+            {
+                Logger.Log(string.Format("Linking {0} to cached archive.", launchPath));
+                try
+                {
+                    if (!Directory.Exists(launchPath))
+                    {
+                        Directory.CreateDirectory(launchPath);
+                    }
+
+                    // Delete the old directory contents
+                    DiskUtils.DeleteDirectory(launchPath, true, true);
+
+                    string[] managerFiles = PathUtils.GetManagerFiles(LaunchInfo.GetArchiveCachePath());
+                    
+                    foreach (var dir in Directory.GetDirectories(LaunchInfo.GetArchiveCachePath(), "*", SearchOption.AllDirectories))
+                    {
+                        string relativeDir = PathUtils.GetRelativePath(LaunchInfo.GetArchiveCachePath(), dir);
+                        Directory.CreateDirectory(Path.Combine(launchPath, relativeDir));
+                    }
+
+                    foreach (var file in Directory.GetFiles(LaunchInfo.GetArchiveCachePath(), "*", SearchOption.AllDirectories))
+                    {
+                        if (!managerFiles.Contains(file))
+                        {
+                            string relativeFilePath = PathUtils.GetRelativePath(LaunchInfo.GetArchiveCachePath(), file);
+                            DiskUtils.HardLink(Path.Combine(launchPath, relativeFilePath), file);
+                        }
+                    }
+
+                    File.WriteAllText(PathUtils.GetArchiveCacheLinkFlagPath(launchPath), LaunchInfo.GetArchiveCachePath());
+                    File.WriteAllText(PathUtils.GetArchiveCacheLinkFlagPath(LaunchInfo.GetArchiveCachePath()), launchPath);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(e.ToString());
+                }
+            }
+        }
+
         /// <summary>
         /// Checks for and extracts an archive to the archive cache if it is not already in there. Updates the last played time of the cached archive.
         /// </summary>
         public static void ExtractArchive(string[] args)
         {
-            if (LaunchGameInfo.GetArchiveInCache())
+            if (LaunchInfo.GetArchiveInCache())
             {
                 Logger.Log("Archive found in cache, bypassing extraction.");
-                LaunchGameInfo.SaveToCache();
+                LaunchInfo.SaveToCache();
                 GenerateM3u();
                 UpdateArchiveCachePlaytime();
+                LinkCacheToLaunchFolder();
             }
             else
             {
                 // Only now do we calculate the decompressed size, as can be very time consuming when large number of files in archive.
                 // MinArchiveSize is megabytes, multiply to convert to bytes.
                 // Always store multi-disc games in the cache, regardless of minimum size.
-                if ((LaunchGameInfo.GetDecompressedSize() > Config.MinArchiveSize * 1048576) || (LaunchGameInfo.Game.MultiDisc && Config.MultiDiscSupport))
+                // Always store games if LaunchPath is non-default, regardless of minimum size.
+                if ((LaunchInfo.GetSize() > Config.MinArchiveSize * 1048576)
+                    || (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport)
+                    || (LaunchInfo.LaunchPathConfig != Config.LaunchPath.Default))
                 {
                     AddArchiveToCache();
                     GenerateM3u();
                     UpdateArchiveCachePlaytime();
+                    LinkCacheToLaunchFolder();
                 }
                 else
                 {
                     Logger.Log("Archive smaller than MinArchiveSize, bypassing extraction to cache.");
-                    Zip.Call7z(args);
+                    LaunchInfo.Extractor.Extract(LaunchInfo.GetArchivePath(), PathUtils.GetLaunchBox7zTempPath(), LaunchInfo.GetExtractSingleFile().ToSingleArray());
                 }
             }
         }
