@@ -702,7 +702,7 @@ namespace ArchiveCacheManager
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(6, 7);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(724, 43);
+            this.label4.Size = new System.Drawing.Size(726, 43);
             this.label4.TabIndex = 99;
             this.label4.Text = "Smart Extract Settings";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

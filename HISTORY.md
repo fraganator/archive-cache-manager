@@ -1,5 +1,5 @@
 # Archive Cache Manager change history
-## v2.12 (2022-04-xx)
+## v2.12 (2022-04-21)
 * Option to copy non-archive files to cache
 * Support for extracting additional formats
     * Option to extract chd to cue+bin using chdman
