@@ -549,8 +549,14 @@ namespace ArchiveCacheManager
                     DiskUtils.DeleteDirectory(launchPath, true, true);
 
                     string[] managerFiles = PathUtils.GetManagerFiles(LaunchInfo.GetArchiveCachePath());
+                    
+                    foreach (var dir in Directory.GetDirectories(LaunchInfo.GetArchiveCachePath(), "*", SearchOption.AllDirectories))
+                    {
+                        string relativeDir = PathUtils.GetRelativePath(LaunchInfo.GetArchiveCachePath(), dir);
+                        Directory.CreateDirectory(Path.Combine(launchPath, relativeDir));
+                    }
 
-                    foreach (var file in Directory.GetFiles(LaunchInfo.GetArchiveCachePath()))
+                    foreach (var file in Directory.GetFiles(LaunchInfo.GetArchiveCachePath(), "*", SearchOption.AllDirectories))
                     {
                         if (!managerFiles.Contains(file))
                         {
