@@ -1,5 +1,5 @@
 # Archive Cache Manager
-![Achive Cache Manager logo](images/logo-v2-title.png?raw=true "Achive Cache Manager")
+![Archive Cache Manager logo](images/logo-v2-title.png?raw=true "Archive Cache Manager")
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
@@ -267,6 +267,7 @@ Enable this option to check for plugin updates when LaunchBox starts up. This is
 
 Default: _On first run, a message box will appear asking the user if they'd like to enable the update check._
 
+![Archive Cache Manager update check prompt](images/update-check.png?raw=true "Archive Cache Manager update check prompt")
 
 ## Building
 The project is built with Visual Studio Community 2019 and .NET Framework 4.7.2.
