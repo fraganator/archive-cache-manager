@@ -15,7 +15,11 @@ namespace ArchiveCacheManager
         public NewConfigWindow()
         {
             InitializeComponent();
+
+            UserInterface.SetDoubleBuffered(cacheDataGridView, true);
+            UserInterface.SetDoubleBuffered(emulatorPlatformConfigDataGridView, true);
             UserInterface.ApplyTheme(this);
+
             foreach (DataGridViewColumn column in cacheDataGridView.Columns)
             {
                 UserInterface.SetColumnMinimumWidth(column);

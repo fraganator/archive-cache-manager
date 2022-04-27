@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -35,6 +36,17 @@ namespace ArchiveCacheManager
                     }
                 }
             }
+        }
+
+        // https://stackoverflow.com/questions/118528/horrible-redraw-performance-of-the-datagridview-on-one-of-my-two-screens
+        public static void SetDoubleBuffered(Control control, bool doubleBuffer)
+        {
+            typeof(Control).InvokeMember(
+               "DoubleBuffered",
+               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
+               null,
+               control,
+               new object[] { doubleBuffer });
         }
 
         public static void SetColumnMinimumWidth(DataGridViewColumn column)
@@ -120,6 +132,8 @@ namespace ArchiveCacheManager
                 else if (control is TreeView)
                 {
                     TreeView treeView = control as TreeView;
+                    double scale = treeView.DeviceDpi / 96.0;
+                    treeView.ItemHeight = Convert.ToInt32(treeView.ItemHeight * scale);
                     treeView.ForeColor = foreColor;
                     treeView.BackColor = backColorContrast1;
                     treeView.DrawMode = TreeViewDrawMode.OwnerDrawText;
@@ -180,10 +194,16 @@ namespace ArchiveCacheManager
                 {
                     ComboBox comboBox = control as ComboBox;
                     comboBox.ForeColor = foreColor;
-                    comboBox.BackColor = backColor;
+                    comboBox.BackColor = GetBackgroundColor(comboBox);
                     comboBox.FlatStyle = FlatStyle.Flat;
                     comboBox.DrawMode = DrawMode.OwnerDrawFixed;
                     comboBox.DrawItem += ComboBox_DrawItem;
+                }
+                else if (control is FlowLayoutPanel)
+                {
+                    FlowLayoutPanel flowLayoutPanel = control as FlowLayoutPanel;
+                    flowLayoutPanel.ForeColor = foreColor;
+                    flowLayoutPanel.BackColor = control.Parent.BackColor;
                 }
                 else if (control is Panel)
                 {
@@ -194,6 +214,8 @@ namespace ArchiveCacheManager
                 else if (control is ListBox)
                 {
                     ListBox listBox = control as ListBox;
+                    double scale = listBox.DeviceDpi / 96.0;
+                    listBox.ItemHeight = Convert.ToInt32(listBox.ItemHeight * scale);
                     listBox.ForeColor = foreColor;
                     listBox.BackColor = GetBackgroundColor(listBox);
                     if (listBox.BorderStyle == BorderStyle.Fixed3D)
@@ -206,20 +228,50 @@ namespace ArchiveCacheManager
                 else if (control is DataGridView)
                 {
                     DataGridView dataGridView = control as DataGridView;
+                    dataGridView.BorderStyle = BorderStyle.FixedSingle;
                     dataGridView.ForeColor = foreColor;
-                    dataGridView.BackColor = backColor;
-                    dataGridView.BackgroundColor = backColor;
-                    dataGridView.DefaultCellStyle.BackColor = backColor;
+                    dataGridView.BackColor = backColorContrast2;
+                    dataGridView.BackgroundColor = backColorContrast2;
+                    dataGridView.DefaultCellStyle.BackColor = backColorContrast2;
                     dataGridView.DefaultCellStyle.ForeColor = foreColor;
                     dataGridView.DefaultCellStyle.SelectionBackColor = LaunchBoxSettings.DialogAccentColor;
                     dataGridView.DefaultCellStyle.SelectionForeColor = foreColor;
                     dataGridView.GridColor = backColorContrast1;
                     dataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-                    dataGridView.ColumnHeadersDefaultCellStyle.BackColor = backColorContrast2;
+                    double colorDiv = 1.15;
+                    Color headerColor = Color.FromArgb((int)(dataGridView.BackColor.R / colorDiv), (int)(dataGridView.BackColor.G / colorDiv), (int)(dataGridView.BackColor.B / colorDiv));
+                    dataGridView.ColumnHeadersDefaultCellStyle.BackColor = headerColor;
                     dataGridView.ColumnHeadersDefaultCellStyle.ForeColor = foreColor;
-                    dataGridView.ColumnHeadersDefaultCellStyle.SelectionBackColor = backColorContrast2;
+                    dataGridView.ColumnHeadersDefaultCellStyle.SelectionBackColor = headerColor;
                     dataGridView.ColumnHeadersDefaultCellStyle.SelectionForeColor = foreColor;
                     dataGridView.EnableHeadersVisualStyles = false;
+
+                    dataGridView.CellMouseEnter += DataGridView_CellMouseEnter;
+                    dataGridView.CellMouseLeave += DataGridView_CellMouseLeave;
+                }
+            }
+        }
+
+        private static void DataGridView_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                var dataGridView = sender as DataGridView;
+                foreach (DataGridViewCell cell in dataGridView.Rows[e.RowIndex].Cells)
+                {
+                    cell.Style.BackColor = dataGridView.DefaultCellStyle.BackColor;
+                }
+            }
+        }
+
+        private static void DataGridView_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                var dataGridView = sender as DataGridView;
+                foreach (DataGridViewCell cell in dataGridView.Rows[e.RowIndex].Cells)
+                {
+                    cell.Style.BackColor = LaunchBoxSettings.DialogHighlightColor;
                 }
             }
         }
@@ -234,7 +286,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                e.Graphics.FillRectangle(new SolidBrush(backColorContrast1), e.Bounds);
+                e.Graphics.FillRectangle(new SolidBrush(list.BackColor), e.Bounds);
             }
 
             if (e.Index < list.Items.Count && e.Index >= 0)
@@ -253,7 +305,7 @@ namespace ArchiveCacheManager
             }
             else
             {
-                e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
+                e.Graphics.FillRectangle(new SolidBrush(combo.BackColor), e.Bounds);
             }
 
             if (e.Index < combo.Items.Count && e.Index >= 0)

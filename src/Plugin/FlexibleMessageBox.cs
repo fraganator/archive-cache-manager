@@ -262,9 +262,9 @@ namespace ArchiveCacheManager
         /// <param name="icon">The icon.</param>
         /// <param name="defaultButton">The default button.</param>
         /// <returns>The dialog result.</returns>
-        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, Bitmap icon, MessageBoxDefaultButton defaultButton)
+        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, Bitmap icon, MessageBoxDefaultButton defaultButton, string button1Text = null, string button2Text = null, string button3Text = null)
         {
-            return FlexibleMessageBoxForm.Show(null, text, caption, buttons, MessageBoxIcon.None, defaultButton, icon);
+            return FlexibleMessageBoxForm.Show(null, text, caption, buttons, MessageBoxIcon.None, defaultButton, icon, button1Text, button2Text, button3Text);
         }
 
         /// <summary>
@@ -341,9 +341,11 @@ namespace ArchiveCacheManager
                 this.pictureBoxForIcon = new System.Windows.Forms.PictureBox();
                 this.button2 = new System.Windows.Forms.Button();
                 this.button3 = new System.Windows.Forms.Button();
+                this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
                 ((System.ComponentModel.ISupportInitialize)(this.FlexibleMessageBoxFormBindingSource)).BeginInit();
                 this.panel1.SuspendLayout();
                 ((System.ComponentModel.ISupportInitialize)(this.pictureBoxForIcon)).BeginInit();
+                this.flowLayoutPanel1.SuspendLayout();
                 this.SuspendLayout();
                 // 
                 // button1
@@ -405,6 +407,7 @@ namespace ArchiveCacheManager
                 // button2
                 // 
                 this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+                this.button2.AutoSize = true;
                 this.button2.DialogResult = System.Windows.Forms.DialogResult.OK;
                 this.button2.Location = new System.Drawing.Point(92, 67);
                 this.button2.MinimumSize = new System.Drawing.Size(0, 24);
@@ -429,15 +432,26 @@ namespace ArchiveCacheManager
                 this.button3.UseVisualStyleBackColor = true;
                 this.button3.Visible = false;
                 // 
+                // flowLayoutPanel1
+                // 
+                this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+                this.flowLayoutPanel1.Controls.Add(this.button3);
+                this.flowLayoutPanel1.Controls.Add(this.button2);
+                this.flowLayoutPanel1.Controls.Add(this.button1);
+                this.flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
+                this.flowLayoutPanel1.Location = new System.Drawing.Point(10, 63);
+                this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+                this.flowLayoutPanel1.Size = new System.Drawing.Size(240, 30);
+                this.flowLayoutPanel1.TabIndex = 33;
+                this.flowLayoutPanel1.WrapContents = false;
+                // 
                 // FlexibleMessageBoxForm
                 // 
-                this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-                this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+                this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+                this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
                 this.ClientSize = new System.Drawing.Size(260, 102);
-                this.Controls.Add(this.button3);
-                this.Controls.Add(this.button2);
                 this.Controls.Add(this.panel1);
-                this.Controls.Add(this.button1);
+                this.Controls.Add(this.flowLayoutPanel1);
                 this.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.FlexibleMessageBoxFormBindingSource, "CaptionText", true));
                 this.MaximizeBox = false;
                 this.MinimizeBox = false;
@@ -451,6 +465,8 @@ namespace ArchiveCacheManager
                 ((System.ComponentModel.ISupportInitialize)(this.FlexibleMessageBoxFormBindingSource)).EndInit();
                 this.panel1.ResumeLayout(false);
                 ((System.ComponentModel.ISupportInitialize)(this.pictureBoxForIcon)).EndInit();
+                this.flowLayoutPanel1.ResumeLayout(false);
+                this.flowLayoutPanel1.PerformLayout();
                 this.ResumeLayout(false);
                 this.PerformLayout();
             }
@@ -462,6 +478,7 @@ namespace ArchiveCacheManager
             private System.Windows.Forms.PictureBox pictureBoxForIcon;
             private System.Windows.Forms.Button button2;
             private System.Windows.Forms.Button button3;
+            private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
 
             #endregion
 
@@ -662,7 +679,7 @@ namespace ArchiveCacheManager
             /// <param name="flexibleMessageBoxForm">The FlexibleMessageBox dialog.</param>
             /// <param name="buttons">The buttons.</param>
             /// <param name="defaultButton">The default button.</param>
-            private static void SetDialogButtons(FlexibleMessageBoxForm flexibleMessageBoxForm, MessageBoxButtons buttons, MessageBoxDefaultButton defaultButton)
+            private static void SetDialogButtons(FlexibleMessageBoxForm flexibleMessageBoxForm, MessageBoxButtons buttons, MessageBoxDefaultButton defaultButton, string button1Text = null, string button2Text = null, string button3Text = null)
             {
                 //Set the buttons visibilities and texts
                 switch (buttons)
@@ -671,15 +688,15 @@ namespace ArchiveCacheManager
                         flexibleMessageBoxForm.visibleButtonsCount = 3;
 
                         flexibleMessageBoxForm.button1.Visible = true;
-                        flexibleMessageBoxForm.button1.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.ABORT);
+                        flexibleMessageBoxForm.button1.Text = button1Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.ABORT);
                         flexibleMessageBoxForm.button1.DialogResult = DialogResult.Abort;
 
                         flexibleMessageBoxForm.button2.Visible = true;
-                        flexibleMessageBoxForm.button2.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.RETRY);
+                        flexibleMessageBoxForm.button2.Text = button2Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.RETRY);
                         flexibleMessageBoxForm.button2.DialogResult = DialogResult.Retry;
 
                         flexibleMessageBoxForm.button3.Visible = true;
-                        flexibleMessageBoxForm.button3.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.IGNORE);
+                        flexibleMessageBoxForm.button3.Text = button3Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.IGNORE);
                         flexibleMessageBoxForm.button3.DialogResult = DialogResult.Ignore;
                         
                         flexibleMessageBoxForm.ControlBox = false;
@@ -689,11 +706,11 @@ namespace ArchiveCacheManager
                         flexibleMessageBoxForm.visibleButtonsCount = 2;
 
                         flexibleMessageBoxForm.button2.Visible = true;
-                        flexibleMessageBoxForm.button2.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.OK);
+                        flexibleMessageBoxForm.button2.Text = button2Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.OK);
                         flexibleMessageBoxForm.button2.DialogResult = DialogResult.OK;
 
                         flexibleMessageBoxForm.button3.Visible = true;
-                        flexibleMessageBoxForm.button3.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.CANCEL);
+                        flexibleMessageBoxForm.button3.Text = button3Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.CANCEL);
                         flexibleMessageBoxForm.button3.DialogResult = DialogResult.Cancel;
 
                         flexibleMessageBoxForm.CancelButton = flexibleMessageBoxForm.button3;
@@ -703,11 +720,11 @@ namespace ArchiveCacheManager
                         flexibleMessageBoxForm.visibleButtonsCount = 2;
 
                         flexibleMessageBoxForm.button2.Visible = true;
-                        flexibleMessageBoxForm.button2.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.RETRY);
+                        flexibleMessageBoxForm.button2.Text = button2Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.RETRY);
                         flexibleMessageBoxForm.button2.DialogResult = DialogResult.Retry;
 
                         flexibleMessageBoxForm.button3.Visible = true;
-                        flexibleMessageBoxForm.button3.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.CANCEL);
+                        flexibleMessageBoxForm.button3.Text = button3Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.CANCEL);
                         flexibleMessageBoxForm.button3.DialogResult = DialogResult.Cancel;
 
                         flexibleMessageBoxForm.CancelButton = flexibleMessageBoxForm.button3;
@@ -717,11 +734,11 @@ namespace ArchiveCacheManager
                         flexibleMessageBoxForm.visibleButtonsCount = 2;
 
                         flexibleMessageBoxForm.button2.Visible = true;
-                        flexibleMessageBoxForm.button2.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.YES);
+                        flexibleMessageBoxForm.button2.Text = button2Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.YES);
                         flexibleMessageBoxForm.button2.DialogResult = DialogResult.Yes;
 
                         flexibleMessageBoxForm.button3.Visible = true;
-                        flexibleMessageBoxForm.button3.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.NO);
+                        flexibleMessageBoxForm.button3.Text = button3Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.NO);
                         flexibleMessageBoxForm.button3.DialogResult = DialogResult.No;
 
                         flexibleMessageBoxForm.ControlBox = false;
@@ -731,15 +748,15 @@ namespace ArchiveCacheManager
                         flexibleMessageBoxForm.visibleButtonsCount = 3;
 
                         flexibleMessageBoxForm.button1.Visible = true;
-                        flexibleMessageBoxForm.button1.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.YES);
+                        flexibleMessageBoxForm.button1.Text = button1Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.YES);
                         flexibleMessageBoxForm.button1.DialogResult = DialogResult.Yes;
 
                         flexibleMessageBoxForm.button2.Visible = true;
-                        flexibleMessageBoxForm.button2.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.NO);
+                        flexibleMessageBoxForm.button2.Text = button2Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.NO);
                         flexibleMessageBoxForm.button2.DialogResult = DialogResult.No;
 
                         flexibleMessageBoxForm.button3.Visible = true;
-                        flexibleMessageBoxForm.button3.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.CANCEL);
+                        flexibleMessageBoxForm.button3.Text = button3Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.CANCEL);
                         flexibleMessageBoxForm.button3.DialogResult = DialogResult.Cancel;
 
                         flexibleMessageBoxForm.CancelButton = flexibleMessageBoxForm.button3;
@@ -749,7 +766,7 @@ namespace ArchiveCacheManager
                     default:
                         flexibleMessageBoxForm.visibleButtonsCount = 1;
                         flexibleMessageBoxForm.button3.Visible = true;
-                        flexibleMessageBoxForm.button3.Text = flexibleMessageBoxForm.GetButtonText(ButtonID.OK);
+                        flexibleMessageBoxForm.button3.Text = button3Text ?? flexibleMessageBoxForm.GetButtonText(ButtonID.OK);
                         flexibleMessageBoxForm.button3.DialogResult = DialogResult.OK;
 
                         flexibleMessageBoxForm.CancelButton = flexibleMessageBoxForm.button3;
@@ -883,7 +900,7 @@ namespace ArchiveCacheManager
             /// <param name="icon">The icon.</param>
             /// <param name="defaultButton">The default button.</param>
             /// <returns>The dialog result.</returns>
-            public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton, Bitmap bitmapIcon = null)
+            public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton, Bitmap bitmapIcon = null, string button1Text = null, string button2Text = null, string button3Text = null)
             {
                 //Create a new instance of the FlexibleMessageBox form
                 var flexibleMessageBoxForm = new FlexibleMessageBoxForm();
@@ -895,7 +912,7 @@ namespace ArchiveCacheManager
                 flexibleMessageBoxForm.FlexibleMessageBoxFormBindingSource.DataSource = flexibleMessageBoxForm;
 
                 //Set the buttons visibilities and texts. Also set a default button.
-                SetDialogButtons(flexibleMessageBoxForm, buttons, defaultButton);
+                SetDialogButtons(flexibleMessageBoxForm, buttons, defaultButton, button1Text, button2Text, button3Text);
 
                 //Set the dialogs icon. When no icon is used: Correct placement and width of rich text box.
                 SetDialogIcon(flexibleMessageBoxForm, icon, bitmapIcon);

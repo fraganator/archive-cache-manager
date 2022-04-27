@@ -25,11 +25,20 @@ namespace ArchiveCacheManager
                 {
                     Logger.Log(string.Format("Update check found new version: {0}", latestRelease.TagName));
 
-                    var result = FlexibleMessageBox.Show(string.Format("Version {0} of Archive Cache Manager is now available for download. New features include:\r\n\r\n{1}\r\n\r\nView download page now?", latestReleaseString, latestRelease.Body),
-                                                    "Update Check", MessageBoxButtons.YesNo, Resources.icon32x32, MessageBoxDefaultButton.Button2);
-                    if (result == DialogResult.Yes)
+                    if (string.IsNullOrEmpty(Config.SkipUpdate) || latestVersion > new Version(Config.SkipUpdate))
                     {
-                        PluginUtils.OpenURL("https://forums.launchbox-app.com/files/file/234-archive-cache-manager/");
+                        var result = FlexibleMessageBox.Show(string.Format("Version {0} of Archive Cache Manager is now available for download. New features include:\r\n\r\n{1}\r\n", latestReleaseString, latestRelease.Body),
+                                                        "Update Check", MessageBoxButtons.YesNoCancel, Resources.icon32x32, MessageBoxDefaultButton.Button1,
+                                                        "View Homepage", "Skip This Version", "Remind Me Later");
+                        if (result == DialogResult.Yes)
+                        {
+                            PluginUtils.OpenURL("https://forums.launchbox-app.com/files/file/234-archive-cache-manager/");
+                        }
+                        else if (result == DialogResult.No)
+                        {
+                            Config.SkipUpdate = latestVersion.ToString();
+                            Config.Save();
+                        }
                     }
                 }
                 else
