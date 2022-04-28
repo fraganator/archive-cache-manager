@@ -39,6 +39,7 @@ namespace ArchiveCacheManager
         private static readonly string defaultStandaloneExtensions = "gb, gbc, gba, agb, nes, fds, smc, sfc, n64, z64, v64, ndd, md, smd, gen, iso, chd, gg, gcm, 32x, bin";
         private static readonly string defaultMetadataExtensions = "nfo, txt, dat, xml, json";
         private static readonly bool? defaultUpdateCheck = null;
+        private static readonly string defaultSkipUpdate = null;
         private static readonly bool defaultBypassPathCheck = false;
         private static readonly string defaultEmulatorPlatform = @"All \ All";
         // Priorities determined by launching zip game from LaunchBox, where zip contains common rom and disc file types.
@@ -84,6 +85,7 @@ namespace ArchiveCacheManager
         private static bool mMultiDiscSupport = defaultMultiDisc;
         private static bool mUseGameIdAsM3uFilename = defaultUseGameIdAsM3uFilename;
         private static bool? mUpdateCheck = defaultUpdateCheck;
+        private static string mSkipUpdate = defaultSkipUpdate;
         private static string mStandaloneExtensions = defaultStandaloneExtensions;
         private static string mMetadataExtensions = defaultMetadataExtensions;
         private static bool mBypassPathCheck = defaultBypassPathCheck;
@@ -130,6 +132,12 @@ namespace ArchiveCacheManager
         {
             get => mUpdateCheck;
             set => mUpdateCheck = value;
+        }
+
+        public static string SkipUpdate
+        {
+            get => mSkipUpdate;
+            set => mSkipUpdate = value;
         }
 
         public static string StandaloneExtensions
@@ -376,6 +384,11 @@ namespace ArchiveCacheManager
                                 mUpdateCheck = null;
                             }
 
+                            if (section.Keys.ContainsKey(nameof(SkipUpdate)))
+                            {
+                                mSkipUpdate = section.Keys[nameof(SkipUpdate)];
+                            }
+
                             if (section.Keys.ContainsKey(nameof(StandaloneExtensions)))
                             {
                                 mStandaloneExtensions = section.Keys[nameof(StandaloneExtensions)];
@@ -535,6 +548,10 @@ namespace ArchiveCacheManager
             if (mUpdateCheck != null)
             {
                 iniData[configSection][nameof(UpdateCheck)] = mUpdateCheck.ToString();
+            }
+            if (!string.IsNullOrEmpty(mSkipUpdate))
+            {
+                iniData[configSection][nameof(SkipUpdate)] = mSkipUpdate;
             }
             iniData[configSection][nameof(StandaloneExtensions)] = mStandaloneExtensions;
             iniData[configSection][nameof(MetadataExtensions)] = mMetadataExtensions;

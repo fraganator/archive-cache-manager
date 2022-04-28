@@ -1,4 +1,9 @@
 # Archive Cache Manager change history
+## v2.13 (2022-04-28)
+* Fix config window DPI scaling issue
+* Config window performance improvements
+* Option to skip version during update check
+
 ## v2.12 (2022-04-21)
 * Option to copy non-archive files to cache
 * Support for extracting additional formats

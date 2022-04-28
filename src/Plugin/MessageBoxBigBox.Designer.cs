@@ -34,14 +34,14 @@ namespace ArchiveCacheManager
             this.okButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // archiveNameLabel
+            // message
             // 
             this.message.BackColor = System.Drawing.Color.Black;
             this.message.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.message.ForeColor = System.Drawing.Color.White;
             this.message.Location = new System.Drawing.Point(3, 3);
             this.message.Margin = new System.Windows.Forms.Padding(0);
-            this.message.Name = "archiveNameLabel";
+            this.message.Name = "message";
             this.message.Size = new System.Drawing.Size(794, 294);
             this.message.TabIndex = 5;
             this.message.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -77,8 +77,8 @@ namespace ArchiveCacheManager
             // MessageBoxBigBox
             // 
             this.AcceptButton = this.okButton;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.DarkGray;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(800, 300);

@@ -3,6 +3,11 @@
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
+## New in v2.13
+* Fix config window DPI scaling issue
+* Config window performance improvements
+* Option to skip version during update check
+
 ## New in v2.12
 * Option to copy non-archive files to cache
 * Support for extracting additional formats

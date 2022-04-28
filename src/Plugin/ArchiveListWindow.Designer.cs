@@ -108,7 +108,7 @@ namespace ArchiveCacheManager
             // 
             this.emulatorComboBoxLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.emulatorComboBoxLabel.AutoSize = true;
-            this.emulatorComboBoxLabel.Location = new System.Drawing.Point(247, 421);
+            this.emulatorComboBoxLabel.Location = new System.Drawing.Point(243, 421);
             this.emulatorComboBoxLabel.Name = "emulatorComboBoxLabel";
             this.emulatorComboBoxLabel.Size = new System.Drawing.Size(51, 13);
             this.emulatorComboBoxLabel.TabIndex = 6;
@@ -117,12 +117,12 @@ namespace ArchiveCacheManager
             // ArchiveListWindow
             // 
             this.AcceptButton = this.okButton;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(544, 453);
-            this.Controls.Add(this.emulatorComboBoxLabel);
             this.Controls.Add(this.emulatorComboBox);
+            this.Controls.Add(this.emulatorComboBoxLabel);
             this.Controls.Add(this.archiveNameLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
