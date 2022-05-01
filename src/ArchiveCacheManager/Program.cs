@@ -88,6 +88,11 @@ namespace ArchiveCacheManager
                             Logger.Log("Running in list mode.");
                             ListArchive(args);
                             break;
+                        // Expected command: 7z.exe c <archive size>
+                        case "c":
+                            Logger.Log("Running in batch cache mode.");
+                            PreCacheArchive(args);
+                            break;
                         // Unknown command, pass straight to 7z
                         default:
                             Logger.Log("Unknown arguments, redirecting to 7-Zip.");
@@ -135,6 +140,11 @@ namespace ArchiveCacheManager
         static void ListArchive(string[] args)
         {
             CacheManager.ListArchive();
+        }
+
+        static void PreCacheArchive(string[] args)
+        {
+            CacheManager.BatchCacheArchive(args);
         }
     }
 }

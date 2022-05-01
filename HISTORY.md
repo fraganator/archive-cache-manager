@@ -1,4 +1,8 @@
 # Archive Cache Manager change history
+## v2.14 (2022-05-xx)
+* New right-click menu option - Batch cache games
+    * Cache selected games ready to play later, or play offline
+
 ## v2.13 (2022-04-28)
 * Fix config window DPI scaling issue
 * Config window performance improvements

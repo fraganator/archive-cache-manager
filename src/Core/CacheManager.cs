@@ -23,7 +23,7 @@ namespace ArchiveCacheManager
             {
                 Version version = Version;
 
-                return string.Format("v{0}.{1}", version.Major, version.Minor);
+                return string.Format("v{0}.{1} beta 1", version.Major, version.Minor);
             }
         }
 
@@ -535,7 +535,7 @@ namespace ArchiveCacheManager
         public static void LinkCacheToLaunchFolder()
         {
             string launchPath = LaunchInfo.GetArchiveCacheLaunchPath();
-            if (LaunchInfo.LaunchPathConfig != Config.LaunchPath.Default)
+            if (LaunchInfo.LaunchPathConfig != Config.LaunchPath.Default && !LaunchInfo.BatchCache)
             {
                 Logger.Log(string.Format("Linking {0} to cached archive.", launchPath));
                 try
@@ -594,9 +594,11 @@ namespace ArchiveCacheManager
                 // MinArchiveSize is megabytes, multiply to convert to bytes.
                 // Always store multi-disc games in the cache, regardless of minimum size.
                 // Always store games if LaunchPath is non-default, regardless of minimum size.
+                // Always store games when pre-caching
                 if ((LaunchInfo.GetSize() > Config.MinArchiveSize * 1048576)
                     || (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport)
-                    || (LaunchInfo.LaunchPathConfig != Config.LaunchPath.Default))
+                    || (LaunchInfo.LaunchPathConfig != Config.LaunchPath.Default)
+                    || LaunchInfo.BatchCache)
                 {
                     AddArchiveToCache();
                     GenerateM3u();
@@ -609,6 +611,17 @@ namespace ArchiveCacheManager
                     LaunchInfo.Extractor.Extract(LaunchInfo.GetArchivePath(), PathUtils.GetLaunchBox7zTempPath(), LaunchInfo.GetExtractSingleFile().ToSingleArray());
                 }
             }
+        }
+
+        public static void BatchCacheArchive(string[] args)
+        {
+            LaunchInfo.BatchCache = true;
+            // The second argument can be the extracted archive size, already calculated in the Batch Cache window.
+            if (args.Length > 1)
+            {
+                LaunchInfo.SetSize(Convert.ToInt64(args[1]));
+            }
+            ExtractArchive(args);
         }
     }
 }

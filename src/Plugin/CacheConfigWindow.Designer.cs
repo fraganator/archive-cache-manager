@@ -144,9 +144,9 @@ namespace ArchiveCacheManager
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.okButton.Image = global::ArchiveCacheManager.Resources.tick;
-            this.okButton.Location = new System.Drawing.Point(12, 115);
+            this.okButton.Location = new System.Drawing.Point(12, 110);
             this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(75, 23);
+            this.okButton.Size = new System.Drawing.Size(75, 28);
             this.okButton.TabIndex = 2;
             this.okButton.Text = "OK";
             this.okButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -159,9 +159,9 @@ namespace ArchiveCacheManager
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cancelButton.Image = global::ArchiveCacheManager.Resources.cross_script;
-            this.cancelButton.Location = new System.Drawing.Point(93, 115);
+            this.cancelButton.Location = new System.Drawing.Point(93, 110);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.Size = new System.Drawing.Size(75, 28);
             this.cancelButton.TabIndex = 3;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -172,9 +172,9 @@ namespace ArchiveCacheManager
             // 
             this.cachePathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cachePathBrowseButton.Image = global::ArchiveCacheManager.Resources.folder_horizontal_open;
-            this.cachePathBrowseButton.Location = new System.Drawing.Point(515, 23);
+            this.cachePathBrowseButton.Location = new System.Drawing.Point(515, 22);
             this.cachePathBrowseButton.Name = "cachePathBrowseButton";
-            this.cachePathBrowseButton.Size = new System.Drawing.Size(97, 23);
+            this.cachePathBrowseButton.Size = new System.Drawing.Size(97, 28);
             this.cachePathBrowseButton.TabIndex = 9;
             this.cachePathBrowseButton.Text = "Browse...";
             this.cachePathBrowseButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;

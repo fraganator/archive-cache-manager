@@ -362,32 +362,7 @@ namespace ArchiveCacheManager
             {
                 e.Paint(e.CellBounds, DataGridViewPaintParts.All);
 
-                Bitmap mediaIcon = null;
-
-                string platform = cacheDataGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString();
-                     if (platform.Contains("Microsoft Xbox 360")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Microsoft Xbox")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Nintendo 64")) mediaIcon = Resources.media_n64;
-                else if (platform.Contains("Nintendo GameCube")) mediaIcon = Resources.media_gc;
-                else if (platform.Contains("Nintendo Wii U")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Nintendo Wii")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Sega 32X")) mediaIcon = Resources.media_md;
-                else if (platform.Contains("Sega CD")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Sega Mega-CD")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Sega Dreamcast")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Sega Genesis")) mediaIcon = Resources.media_md;
-                else if (platform.Contains("Sega Mega Drive")) mediaIcon = Resources.media_md;
-                else if (platform.Contains("Sega Saturn")) mediaIcon = Resources.media_cd;
-                else if (platform.Contains("Sony Playstation 2"))
-                {
-                    if (Convert.ToDouble(cacheDataGridView.Rows[e.RowIndex].Cells["ArchiveSize"].Value) > 700.0)
-                        mediaIcon = Resources.media_ps2;
-                    else
-                        mediaIcon = Resources.media_ps2_cd;
-                }
-                else if (platform.Contains("Sony Playstation")) mediaIcon = Resources.media_ps1;
-                else if (platform.Contains("Sony PSP")) mediaIcon = Resources.media_psp;
-                else mediaIcon = Resources.box_zipper;
+                Bitmap mediaIcon = UserInterface.GetMediaIcon(cacheDataGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString());
 
                 if (mediaIcon != null)
                 {

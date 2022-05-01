@@ -115,6 +115,31 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Get the file size. If the path is a symlink, the target file size will be returned.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>The size of the file in bytes, or 0 on error.</returns>
+        public static long GetFileSize(string path)
+        {
+            long size = 0;
+            FileStream file = null;
+            try
+            {
+                file = File.OpenRead(path);
+                size = file.Length;
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                file.Close();
+            }
+
+            return size;
+        }
+
+        /// <summary>
         /// Sets the read-only attribute on all files in the path, including subdirectories. Will NOT set read-only
         /// on files used internally by Archive Cache Manager.
         /// </summary>

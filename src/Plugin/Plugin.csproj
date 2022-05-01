@@ -111,6 +111,13 @@
     <Compile Include="EmulatorPlatformSelectionWindow.Designer.cs">
       <DependentUpon>EmulatorPlatformSelectionWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="BatchCacheMenuItem.cs" />
+    <Compile Include="BatchCacheWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BatchCacheWindow.Designer.cs">
+      <DependentUpon>BatchCacheWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -146,6 +153,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EmulatorPlatformSelectionWindow.resx">
       <DependentUpon>EmulatorPlatformSelectionWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BatchCacheWindow.resx">
+      <DependentUpon>BatchCacheWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -224,6 +234,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exclamation-red.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exclamation-white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blue-document--exclamation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hourglass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exclamation.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

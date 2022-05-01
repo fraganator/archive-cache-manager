@@ -36,8 +36,15 @@ namespace ArchiveCacheManager
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Plugin Settings");
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewConfigWindow));
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.openInExplorerButton = new System.Windows.Forms.Button();
+            this.configureCacheButton = new System.Windows.Forms.Button();
+            this.deleteAllButton = new System.Windows.Forms.Button();
+            this.refreshButton = new System.Windows.Forms.Button();
+            this.deleteSelectedButton = new System.Windows.Forms.Button();
             this.versionLabel = new System.Windows.Forms.Label();
             this.forumLink = new System.Windows.Forms.LinkLabel();
             this.sourceLink = new System.Windows.Forms.LinkLabel();
@@ -49,12 +56,7 @@ namespace ArchiveCacheManager
             this.tabControl1 = new ArchiveCacheManager.StackPanel();
             this.tab1CacheSettings = new System.Windows.Forms.TabPage();
             this.label1 = new System.Windows.Forms.Label();
-            this.openInExplorerButton = new System.Windows.Forms.Button();
-            this.configureCacheButton = new System.Windows.Forms.Button();
-            this.deleteAllButton = new System.Windows.Forms.Button();
             this.cacheSummaryTextBox = new System.Windows.Forms.RichTextBox();
-            this.refreshButton = new System.Windows.Forms.Button();
-            this.deleteSelectedButton = new System.Windows.Forms.Button();
             this.cacheDataGridView = new System.Windows.Forms.DataGridView();
             this.ArchivePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Archive = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -100,6 +102,83 @@ namespace ArchiveCacheManager
             this.tab3SmartExtractSettings.SuspendLayout();
             this.tab4PluginSettings.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // openInExplorerButton
+            // 
+            this.openInExplorerButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.openInExplorerButton.Image = global::ArchiveCacheManager.Resources.folder_horizontal_open;
+            this.openInExplorerButton.Location = new System.Drawing.Point(576, 92);
+            this.openInExplorerButton.Name = "openInExplorerButton";
+            this.openInExplorerButton.Size = new System.Drawing.Size(156, 28);
+            this.openInExplorerButton.TabIndex = 6;
+            this.openInExplorerButton.Text = "Open In Explorer";
+            this.openInExplorerButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.openInExplorerButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip.SetToolTip(this.openInExplorerButton, "Opens the confgured cache path in Windows Explorer.");
+            this.openInExplorerButton.UseVisualStyleBackColor = true;
+            this.openInExplorerButton.Click += new System.EventHandler(this.openInExplorerButton_Click);
+            // 
+            // configureCacheButton
+            // 
+            this.configureCacheButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.configureCacheButton.Image = global::ArchiveCacheManager.Resources.gear;
+            this.configureCacheButton.Location = new System.Drawing.Point(576, 58);
+            this.configureCacheButton.Name = "configureCacheButton";
+            this.configureCacheButton.Size = new System.Drawing.Size(156, 28);
+            this.configureCacheButton.TabIndex = 5;
+            this.configureCacheButton.Text = "Configure Cache...";
+            this.configureCacheButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.configureCacheButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip.SetToolTip(this.configureCacheButton, "Edit the cache configuration.");
+            this.configureCacheButton.UseVisualStyleBackColor = true;
+            this.configureCacheButton.Click += new System.EventHandler(this.configureCacheButton_Click);
+            // 
+            // deleteAllButton
+            // 
+            this.deleteAllButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.deleteAllButton.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.deleteAllButton.Image = global::ArchiveCacheManager.Resources.broom;
+            this.deleteAllButton.Location = new System.Drawing.Point(616, 488);
+            this.deleteAllButton.Name = "deleteAllButton";
+            this.deleteAllButton.Size = new System.Drawing.Size(116, 28);
+            this.deleteAllButton.TabIndex = 10;
+            this.deleteAllButton.Text = "Delete All";
+            this.deleteAllButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.deleteAllButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip.SetToolTip(this.deleteAllButton, "Delete all items from the cache. The cache folder is not removed.");
+            this.deleteAllButton.UseVisualStyleBackColor = true;
+            this.deleteAllButton.Click += new System.EventHandler(this.deleteAllButton_Click);
+            // 
+            // refreshButton
+            // 
+            this.refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.refreshButton.Image = global::ArchiveCacheManager.Resources.arrow_circle_double;
+            this.refreshButton.Location = new System.Drawing.Point(6, 488);
+            this.refreshButton.Name = "refreshButton";
+            this.refreshButton.Size = new System.Drawing.Size(80, 28);
+            this.refreshButton.TabIndex = 8;
+            this.refreshButton.Text = "Refresh";
+            this.refreshButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.refreshButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip.SetToolTip(this.refreshButton, "Refresh the cache details.");
+            this.refreshButton.UseVisualStyleBackColor = true;
+            this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
+            // 
+            // deleteSelectedButton
+            // 
+            this.deleteSelectedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.deleteSelectedButton.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.deleteSelectedButton.Image = global::ArchiveCacheManager.Resources.cross_script;
+            this.deleteSelectedButton.Location = new System.Drawing.Point(494, 488);
+            this.deleteSelectedButton.Name = "deleteSelectedButton";
+            this.deleteSelectedButton.Size = new System.Drawing.Size(116, 28);
+            this.deleteSelectedButton.TabIndex = 9;
+            this.deleteSelectedButton.Text = "Delete";
+            this.deleteSelectedButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.deleteSelectedButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.toolTip.SetToolTip(this.deleteSelectedButton, "Delete the selected items from the cache.");
+            this.deleteSelectedButton.UseVisualStyleBackColor = true;
+            this.deleteSelectedButton.Click += new System.EventHandler(this.deleteSelectedButton_Click);
             // 
             // versionLabel
             // 
@@ -264,52 +343,6 @@ namespace ArchiveCacheManager
             this.label1.Text = "Cache Settings";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // openInExplorerButton
-            // 
-            this.openInExplorerButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.openInExplorerButton.Image = global::ArchiveCacheManager.Resources.folder_horizontal_open;
-            this.openInExplorerButton.Location = new System.Drawing.Point(576, 92);
-            this.openInExplorerButton.Name = "openInExplorerButton";
-            this.openInExplorerButton.Size = new System.Drawing.Size(156, 28);
-            this.openInExplorerButton.TabIndex = 6;
-            this.openInExplorerButton.Text = "Open In Explorer";
-            this.openInExplorerButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.openInExplorerButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip.SetToolTip(this.openInExplorerButton, "Opens the confgured cache path in Windows Explorer.");
-            this.openInExplorerButton.UseVisualStyleBackColor = true;
-            this.openInExplorerButton.Click += new System.EventHandler(this.openInExplorerButton_Click);
-            // 
-            // configureCacheButton
-            // 
-            this.configureCacheButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.configureCacheButton.Image = global::ArchiveCacheManager.Resources.gear;
-            this.configureCacheButton.Location = new System.Drawing.Point(576, 58);
-            this.configureCacheButton.Name = "configureCacheButton";
-            this.configureCacheButton.Size = new System.Drawing.Size(156, 28);
-            this.configureCacheButton.TabIndex = 5;
-            this.configureCacheButton.Text = "Configure Cache...";
-            this.configureCacheButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.configureCacheButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip.SetToolTip(this.configureCacheButton, "Edit the cache configuration.");
-            this.configureCacheButton.UseVisualStyleBackColor = true;
-            this.configureCacheButton.Click += new System.EventHandler(this.configureCacheButton_Click);
-            // 
-            // deleteAllButton
-            // 
-            this.deleteAllButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.deleteAllButton.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.deleteAllButton.Image = global::ArchiveCacheManager.Resources.broom;
-            this.deleteAllButton.Location = new System.Drawing.Point(616, 488);
-            this.deleteAllButton.Name = "deleteAllButton";
-            this.deleteAllButton.Size = new System.Drawing.Size(116, 28);
-            this.deleteAllButton.TabIndex = 10;
-            this.deleteAllButton.Text = "Delete All";
-            this.deleteAllButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.deleteAllButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip.SetToolTip(this.deleteAllButton, "Delete all items from the cache. The cache folder is not removed.");
-            this.deleteAllButton.UseVisualStyleBackColor = true;
-            this.deleteAllButton.Click += new System.EventHandler(this.deleteAllButton_Click);
-            // 
             // cacheSummaryTextBox
             // 
             this.cacheSummaryTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
@@ -324,37 +357,6 @@ namespace ArchiveCacheManager
             this.cacheSummaryTextBox.TabStop = false;
             this.cacheSummaryTextBox.Text = "";
             // 
-            // refreshButton
-            // 
-            this.refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.refreshButton.Image = global::ArchiveCacheManager.Resources.arrow_circle_double;
-            this.refreshButton.Location = new System.Drawing.Point(6, 488);
-            this.refreshButton.Name = "refreshButton";
-            this.refreshButton.Size = new System.Drawing.Size(80, 28);
-            this.refreshButton.TabIndex = 8;
-            this.refreshButton.Text = "Refresh";
-            this.refreshButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.refreshButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip.SetToolTip(this.refreshButton, "Refresh the cache details.");
-            this.refreshButton.UseVisualStyleBackColor = true;
-            this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
-            // 
-            // deleteSelectedButton
-            // 
-            this.deleteSelectedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.deleteSelectedButton.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.deleteSelectedButton.Image = global::ArchiveCacheManager.Resources.cross_script;
-            this.deleteSelectedButton.Location = new System.Drawing.Point(494, 488);
-            this.deleteSelectedButton.Name = "deleteSelectedButton";
-            this.deleteSelectedButton.Size = new System.Drawing.Size(116, 28);
-            this.deleteSelectedButton.TabIndex = 9;
-            this.deleteSelectedButton.Text = "Delete";
-            this.deleteSelectedButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.deleteSelectedButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.toolTip.SetToolTip(this.deleteSelectedButton, "Delete the selected items from the cache.");
-            this.deleteSelectedButton.UseVisualStyleBackColor = true;
-            this.deleteSelectedButton.Click += new System.EventHandler(this.deleteSelectedButton_Click);
-            // 
             // cacheDataGridView
             // 
             this.cacheDataGridView.AllowUserToAddRows = false;
@@ -366,6 +368,15 @@ namespace ArchiveCacheManager
             this.cacheDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.cacheDataGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.cacheDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.cacheDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.cacheDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.cacheDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ArchivePath,
@@ -393,8 +404,8 @@ namespace ArchiveCacheManager
             // 
             // Archive
             // 
-            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(24, 0, 0, 0);
-            this.Archive.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(24, 0, 0, 0);
+            this.Archive.DefaultCellStyle = dataGridViewCellStyle2;
             this.Archive.HeaderText = "Archive";
             this.Archive.Name = "Archive";
             this.Archive.ReadOnly = true;
@@ -408,9 +419,9 @@ namespace ArchiveCacheManager
             // 
             // ArchiveSize
             // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle2.Format = "N1";
-            this.ArchiveSize.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle3.Format = "N1";
+            this.ArchiveSize.DefaultCellStyle = dataGridViewCellStyle3;
             this.ArchiveSize.FillWeight = 25F;
             this.ArchiveSize.HeaderText = "Size (MB)";
             this.ArchiveSize.Name = "ArchiveSize";
@@ -506,6 +517,15 @@ namespace ArchiveCacheManager
             this.emulatorPlatformConfigDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.emulatorPlatformConfigDataGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.emulatorPlatformConfigDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.emulatorPlatformConfigDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.emulatorPlatformConfigDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.emulatorPlatformConfigDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Emulator,

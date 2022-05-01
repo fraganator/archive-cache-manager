@@ -40,7 +40,7 @@ namespace ArchiveCacheManager
 
         public override long GetSize(string archivePath, string fileInArchive = null)
         {
-            return new FileInfo(archivePath).Length;
+            return DiskUtils.GetFileSize(archivePath);
         }
 
         public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)

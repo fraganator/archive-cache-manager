@@ -36,7 +36,7 @@ namespace ArchiveCacheManager
 
         public static string ExtractionProgress(string stdout)
         {
-            string progress = string.Empty;
+            string progress = stdout;
 
             if (stdout != null)
             {
@@ -50,7 +50,7 @@ namespace ArchiveCacheManager
                 }
                 catch (Exception)
                 {
-                    progress = string.Empty;
+
                 }
             }
 

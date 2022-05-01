@@ -124,7 +124,33 @@ namespace ArchiveCacheManager
             return (extractorExists, extractor.Name(), extractorPath);
         }
 
-        public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
+        public static GameInfo SaveGameInfo(IGame game, IAdditionalApplication app, IEmulator emulator)
+        {
+            GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
+            gameInfo.GameId = game.Id;
+            gameInfo.ArchivePath = PluginUtils.GetArchivePath(game, app);
+            gameInfo.Emulator = emulator.Title;
+            gameInfo.Platform = game.Platform;
+            gameInfo.Title = game.Title;
+            gameInfo.Version = game.Version;
+            gameInfo.SelectedFile = GameIndex.GetSelectedFile(game.Id);
+            gameInfo.EmulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform);
+            gameInfo.MultiDisc = PluginUtils.IsLaunchedGameMultiDisc(game, app);
+            if (gameInfo.MultiDisc)
+            {
+                Logger.Log("Multi-disc game detected.");
+                var (totalDiscs, selectedDisc, discs) = PluginUtils.GetMultiDiscInfo(game, app);
+
+                gameInfo.TotalDiscs = totalDiscs;
+                gameInfo.SelectedDisc = selectedDisc;
+                gameInfo.Discs = discs;
+            }
+            gameInfo.Save();
+
+            return gameInfo;
+        }
+
+            public void OnBeforeGameLaunching(IGame game, IAdditionalApplication app, IEmulator emulator)
         {
             if (UseArchiveCacheManager(game, app, emulator))
             {
@@ -144,26 +170,7 @@ namespace ArchiveCacheManager
                 LaunchBoxDataBackup.RestoreAllSettings();
                 cacheManagerActive = true;
 
-                GameInfo gameInfo = new GameInfo(PathUtils.GetGameInfoPath());
-                gameInfo.GameId = game.Id;
-                gameInfo.ArchivePath = PluginUtils.GetArchivePath(game, app);
-                gameInfo.Emulator = emulator.Title;
-                gameInfo.Platform = game.Platform;
-                gameInfo.Title = game.Title;
-                gameInfo.Version = game.Version;
-                gameInfo.SelectedFile = GameIndex.GetSelectedFile(game.Id);
-                gameInfo.EmulatorPlatformM3u = PluginUtils.GetEmulatorPlatformM3uDiscLoadEnabled(emulator.Id, game.Platform);
-                gameInfo.MultiDisc = PluginUtils.IsLaunchedGameMultiDisc(game, app);
-                if (gameInfo.MultiDisc)
-                {
-                    Logger.Log("Multi-disc game detected.");
-                    var (totalDiscs, selectedDisc, discs) = PluginUtils.GetMultiDiscInfo(game, app);
-
-                    gameInfo.TotalDiscs = totalDiscs;
-                    gameInfo.SelectedDisc = selectedDisc;
-                    gameInfo.Discs = discs;
-                }
-                gameInfo.Save();
+                GameInfo gameInfo = SaveGameInfo(game, app, emulator);
 
                 Replace7z();
 
