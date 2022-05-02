@@ -348,7 +348,7 @@ namespace ArchiveCacheManager
             this.cacheSummaryTextBox.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.cacheSummaryTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.cacheSummaryTextBox.Cursor = System.Windows.Forms.Cursors.Default;
-            this.cacheSummaryTextBox.Font = new System.Drawing.Font("Consolas", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cacheSummaryTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cacheSummaryTextBox.Location = new System.Drawing.Point(9, 62);
             this.cacheSummaryTextBox.Name = "cacheSummaryTextBox";
             this.cacheSummaryTextBox.ReadOnly = true;

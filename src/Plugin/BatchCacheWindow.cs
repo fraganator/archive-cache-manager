@@ -21,14 +21,18 @@ namespace ArchiveCacheManager
             None,
             Running,
             Complete,
-            Cancelled
+            Cancelled,
+            Closing
         };
 
         private IGame[] mSelectedGames;
         private double requiredCacheSize = 0;
         private static int mStaticRowIndex = -1;
         private static DataGridView mStaticCacheStatusGridView = null;
-        private static StatusEnum status;
+        private static StatusEnum mStatus;
+        private static ProgressBarFlat mStaticProgressBar = null;
+        private static int mStaticCurrentGame = 0;
+        private static int mStaticTotalGames = 0;
 
         public BatchCacheWindow(IGame[] selectedGames)
         {
@@ -38,10 +42,12 @@ namespace ArchiveCacheManager
 
             mSelectedGames = selectedGames;
             mStaticCacheStatusGridView = cacheStatusGridView;
+            mStaticProgressBar = progressBar;
 
             cacheButton.Enabled = false;
             cancelButton.Enabled = false;
-            status = StatusEnum.None;
+            progressBar.Visible = false;
+            mStatus = StatusEnum.None;
 
             PopulateTable();
         }
@@ -96,66 +102,97 @@ namespace ArchiveCacheManager
 
             GameLaunching.Restore7z();
 
-            for (int i = 0; i < cacheStatusGridView.RowCount; i++)
+            progressBar.Maximum = cacheStatusGridView.RowCount - 1;
+            progressBar.Value = 0;
+            progressBar.Visible = true;
+
+            try
             {
-                Extractor extractor = null;
-                string path = cacheStatusGridView.Rows[i].Cells["ArchivePath"].Value.ToString();
-                int index = Convert.ToInt32(cacheStatusGridView.Rows[i].Cells["Index"].Value);
-
-                if (!File.Exists(path))
+                for (int i = 0; i < cacheStatusGridView.RowCount; i++)
                 {
-                    cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = "";
-                    cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = "";
-                    cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = "None";
-                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "File not found.";
-                    continue;
+                    Extractor extractor = null;
+                    string path = cacheStatusGridView.Rows[i].Cells["ArchivePath"].Value.ToString();
+                    int index = Convert.ToInt32(cacheStatusGridView.Rows[i].Cells["Index"].Value);
+                    string gameInfoPath = PathUtils.GetArchiveCacheGameInfoPath(PathUtils.ArchiveCachePath(PathUtils.GetAbsolutePath(path)));
+
+                    if (File.Exists(gameInfoPath))
+                    {
+                        archiveSize = new GameInfo(gameInfoPath).DecompressedSize;
+                        archiveSizeMb = archiveSize / 1048576.0;
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = archiveSize;
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = archiveSizeMb;
+                        requiredCacheSize += archiveSizeMb;
+                        cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = "None";
+                        cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Already cached.";
+                        continue;
+                    }
+
+                    if (!File.Exists(path))
+                    {
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = "";
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = "";
+                        cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = "None";
+                        cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "File not found.";
+                        continue;
+                    }
+
+                    if (!PluginUtils.GetEmulatorPlatformAutoExtract(mSelectedGames[index].EmulatorId, mSelectedGames[index].Platform))
+                    {
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = "";
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = "";
+                        cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = "None";
+                        cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "\"Extract ROM archives\" disabled.";
+                        continue;
+                    }
+
+                    key = Config.EmulatorPlatformKey(PluginHelper.DataManager.GetEmulatorById(mSelectedGames[index].EmulatorId).Title, mSelectedGames[index].Platform);
+                    Config.Action action = Config.GetAction(key);
+                    bool extract = (action == Config.Action.Extract || action == Config.Action.ExtractCopy);
+                    bool copy = (action == Config.Action.Copy || action == Config.Action.ExtractCopy);
+
+                    if (extract && Zip.SupportedType(path))
+                        extractor = zip;
+                    else if (extract && Config.GetChdman(key) && Chdman.SupportedType(path))
+                        extractor = chdman;
+                    else if (extract && Config.GetDolphinTool(key) && DolphinTool.SupportedType(path))
+                        extractor = dolphinTool;
+                    else
+                    {
+                        extractor = robocopy;
+                        extract = false;
+                    }
+
+                    if (extract || copy)
+                    {
+                        archiveSize = await Task.Run(() => extractor.GetSize(path));
+                        archiveSizeMb = archiveSize / 1048576.0;
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = archiveSize;
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = archiveSizeMb;
+                        requiredCacheSize += archiveSizeMb;
+                        cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = extract ? "Extract" : "Copy";
+                        cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Ready.";
+                    }
+                    else
+                    {
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = "";
+                        cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = "";
+                        cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = "None";
+                        cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "No rule to cache.";
+                    }
+
+                    progressBar.PerformStep();
                 }
 
-                if (!PluginUtils.GetEmulatorPlatformAutoExtract(mSelectedGames[index].EmulatorId, mSelectedGames[index].Platform))
+                cacheButton.Enabled = true;
+                progressBar.Visible = false;
+            }
+            catch (Exception e)
+            {
+                if (mStatus != StatusEnum.Closing)
                 {
-                    cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = "";
-                    cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = "";
-                    cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = "None";
-                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "\"Extract ROM archives\" disabled.";
-                    continue;
-                }
-
-                key = Config.EmulatorPlatformKey(PluginHelper.DataManager.GetEmulatorById(mSelectedGames[index].EmulatorId).Title, mSelectedGames[index].Platform);
-                Config.Action action = Config.GetAction(key);
-                bool extract = (action == Config.Action.Extract || action == Config.Action.ExtractCopy);
-                bool copy = (action == Config.Action.Copy || action == Config.Action.ExtractCopy);
-
-                if (extract && Zip.SupportedType(path))
-                    extractor = zip;
-                else if (extract && Config.GetChdman(key) && Chdman.SupportedType(path))
-                    extractor = chdman;
-                else if (extract && Config.GetDolphinTool(key) && DolphinTool.SupportedType(path))
-                    extractor = dolphinTool;
-                else
-                {
-                    extractor = robocopy;
-                    extract = false;
-                }
-
-                archiveSize = await Task.Run(() => extractor.GetSize(path));
-                archiveSizeMb = archiveSize / 1048576.0;
-                cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value = archiveSize;
-                cacheStatusGridView.Rows[i].Cells["ArchiveSizeMb"].Value = archiveSizeMb;
-
-                if (extract || copy)
-                {
-                    requiredCacheSize += archiveSizeMb;
-                    cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = extract ? "Extract" : "Copy";
-                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Ready.";
-                }
-                else
-                {
-                    cacheStatusGridView.Rows[i].Cells["CacheAction"].Value = "None";
-                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "No rule to cache.";
+                    FlexibleMessageBox.Show($"An exception occurred when querying the games to cache:\r\n{e.ToString()}", "Batch Cache Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
-            cacheButton.Enabled = true;
         }
 
         private void cacheButton_Click(object sender, EventArgs e)
@@ -188,7 +225,9 @@ namespace ArchiveCacheManager
                     Match match = Regex.Match(stdout, progressRegex);
                     if (match.Success)
                     {
-                        mStaticCacheStatusGridView.Rows[mStaticRowIndex].Cells["CacheStatus"].Value = string.Format("Working... {0}%", (int)(double.Parse(match.Groups[1].Value)));
+                        double progress = double.Parse(match.Groups[1].Value);
+                        mStaticProgressBar.Value = (int)(progress / mStaticTotalGames + mStaticCurrentGame / (double)mStaticTotalGames * 100.0);
+                        mStaticCacheStatusGridView.Rows[mStaticRowIndex].Cells["CacheStatus"].Value = string.Format("Working... {0}%", (int)progress);
                     }
                 }
                 catch (Exception)
@@ -202,14 +241,22 @@ namespace ArchiveCacheManager
 
         private async void CacheGames()
         {
-            status = StatusEnum.Running;
+            mStatus = StatusEnum.Running;
 
             cacheButton.Enabled = false;
             cancelButton.Enabled = true;
+            progressBar.Maximum = 100;
+            progressBar.Value = 0;
+            progressBar.Visible = true;
 
+            mStaticCurrentGame = 0;
+            mStaticTotalGames = 0;
             for (int i = 0; i < cacheStatusGridView.Rows.Count; i++)
             {
-                //cacheStatusGridView.Rows[i].Cells["CacheStatus"].Style.BackColor = cacheStatusGridView.DefaultCellStyle.BackColor;
+                if (!string.Equals("None", cacheStatusGridView.Rows[i].Cells["CacheAction"].Value))
+                {
+                    mStaticTotalGames++;
+                }
             }
 
             GameLaunching.Replace7z();
@@ -224,6 +271,7 @@ namespace ArchiveCacheManager
                     continue;
                 }
 
+                progressBar.Value = (int)(mStaticCurrentGame / (double)mStaticTotalGames * 100.0);
                 string gameId = row.Cells["GameId"].Value.ToString();
                 string appId = row.Cells["AppId"].Value.ToString();
                 IGame game = PluginHelper.DataManager.GetGameById(gameId);
@@ -233,11 +281,12 @@ namespace ArchiveCacheManager
                 cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Working...";
                 GameLaunching.SaveGameInfo(game, app, emulator);
                 (string stdout, string stderr, int exitCode) = await Task.Run(() => ProcessUtils.RunProcess(PathUtils.GetLaunchBox7zPath(), $"c {cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value}", true, ExtractionProgress));
+                mStaticCurrentGame++;
 
-                if (status == StatusEnum.Cancelled)
+                if (mStatus == StatusEnum.Cancelled)
                 {
                     cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Extraction cancelled.";
-                    //cacheStatusGridView.Rows[i].Cells["CacheStatus"].Style.BackColor = Color.FromArgb(64, 64, 0);
+                    progressBar.Visible = false;
                     break;
                 }
                 else if (exitCode != 0)
@@ -248,28 +297,30 @@ namespace ArchiveCacheManager
                                             null, "Continue Caching", "Stop");
                     if (result == DialogResult.Cancel)
                     {
+                        progressBar.Visible = false;
                         break;
                     }
-                    //cacheStatusGridView.Rows[i].Cells["CacheStatus"].Style.BackColor = Color.FromArgb(64, 0, 0);
                 }
                 else
                 {
                     cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Complete.";
-                    //cacheStatusGridView.Rows[i].Cells["CacheStatus"].Style.BackColor = Color.FromArgb(0, 64, 0);
                 }
             }
 
             GameLaunching.Restore7z();
 
-            status = StatusEnum.Complete;
+            mStatus = StatusEnum.Complete;
 
             cacheButton.Enabled = true;
             cancelButton.Enabled = false;
+            progressBar.Visible = false;
         }
 
         private void BatchCacheWindow_Shown(object sender, EventArgs e)
         {
             cacheStatusGridView.ClearSelection();
+
+            Application.DoEvents();
 
             // Async call, as this can be time consuming
             PopulateTableArchiveSize();
@@ -277,7 +328,11 @@ namespace ArchiveCacheManager
 
         private void BatchCacheWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (status != StatusEnum.None && !PluginHelper.StateManager.IsBigBox)
+            mStaticCacheStatusGridView = null;
+            mSelectedGames = null;
+            mStaticProgressBar = null;
+
+            if (mStatus != StatusEnum.None && !PluginHelper.StateManager.IsBigBox)
             {
                 PluginHelper.LaunchBoxMainViewModel.RefreshData();
             }
@@ -285,19 +340,19 @@ namespace ArchiveCacheManager
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            status = StatusEnum.Cancelled;
+            mStatus = StatusEnum.Cancelled;
             ProcessUtils.KillProcess();
         }
 
         private void BatchCacheWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (status == StatusEnum.Running)
+            if (mStatus == StatusEnum.Running)
             {
                 var result = FlexibleMessageBox.Show("Caching is still in progress!\r\n\r\nCancel caching?", "Cancel caching?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (result == DialogResult.Yes)
                 {
-                    status = StatusEnum.Cancelled;
+                    mStatus = StatusEnum.Closing;
                     ProcessUtils.KillProcess();
                 }
                 else
@@ -305,7 +360,11 @@ namespace ArchiveCacheManager
                     e.Cancel = true;
                 }
             }
-        }
+            else
+            {
+                mStatus = StatusEnum.Closing;
+            }
+            }
 
         private void cacheStatusGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
@@ -324,7 +383,7 @@ namespace ArchiveCacheManager
                 else if (e.ColumnIndex == cacheStatusGridView.Columns["CacheStatus"].Index)
                 {
                     string statusText = cacheStatusGridView.Rows[e.RowIndex].Cells["CacheStatus"].Value.ToString().ToLower();
-                    if (statusText.Contains("complete"))
+                    if (statusText.Contains("complete") || statusText.Contains("already cached"))
                     {
                         cellIcon = Resources.tick;
                     }

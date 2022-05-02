@@ -274,7 +274,19 @@ namespace ArchiveCacheManager
                     dataGridView.CellMouseEnter += DataGridView_CellMouseEnter;
                     dataGridView.CellMouseLeave += DataGridView_CellMouseLeave;
                 }
+                else if (control is ProgressBar)
+                {
+                    ProgressBar progressBar = control as ProgressBar;
+                    progressBar.BackColor = backColorContrast1;
+                    progressBar.ForeColor = LaunchBoxSettings.DialogAccentColor;
+                }
             }
+        }
+
+        public static void ScaleControlFont(Control control, float scale)
+        {
+            Font controlFont = control.Font;
+            control.Font = new Font(controlFont.FontFamily, controlFont.Size * scale, controlFont.Style);
         }
 
         private static void DataGridView_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
@@ -378,6 +390,26 @@ namespace ArchiveCacheManager
                 m.Result = (IntPtr)1;
             else
                 base.WndProc(ref m);
+        }
+    }
+
+    public class ProgressBarFlat : ProgressBar
+    {
+        public ProgressBarFlat()
+        {
+            this.SetStyle(ControlStyles.UserPaint, true);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Rectangle rec = new Rectangle(0, 0, this.Width, this.Height);
+            double scaleFactor = (((double)Value - (double)Minimum) / ((double)Maximum - (double)Minimum));
+
+            e.Graphics.FillRectangle(new SolidBrush(Color.Black), rec);
+            e.Graphics.FillRectangle(new SolidBrush(BackColor), 1, 1, rec.Width - 2, rec.Height - 2);
+            rec.Width = (int)((rec.Width * scaleFactor) - 2);
+            rec.Height -= 2;
+            e.Graphics.FillRectangle(new SolidBrush(ForeColor), 1, 1, rec.Width, rec.Height);
         }
     }
 }

@@ -121,19 +121,24 @@ namespace ArchiveCacheManager
         /// <returns>The size of the file in bytes, or 0 on error.</returns>
         public static long GetFileSize(string path)
         {
-            long size = 0;
-            FileStream file = null;
-            try
+            long size = new FileInfo(path).Length;
+
+            // A zero size could be a symlink, try open it a check the length that way.
+            if (size == 0)
             {
-                file = File.OpenRead(path);
-                size = file.Length;
-            }
-            catch (Exception)
-            {
-            }
-            finally
-            {
-                file.Close();
+                FileStream file = null;
+                try
+                {
+                    file = File.OpenRead(path);
+                    size = file.Length;
+                }
+                catch (Exception)
+                {
+                }
+                finally
+                {
+                    file.Close();
+                }
             }
 
             return size;

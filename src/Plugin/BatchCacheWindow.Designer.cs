@@ -47,6 +47,7 @@ namespace ArchiveCacheManager
             this.ArchiveSizeMb = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CacheAction = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CacheStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
             ((System.ComponentModel.ISupportInitialize)(this.cacheStatusGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -88,7 +89,7 @@ namespace ArchiveCacheManager
             this.cacheStatusGridView.Name = "cacheStatusGridView";
             this.cacheStatusGridView.RowHeadersVisible = false;
             this.cacheStatusGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.cacheStatusGridView.Size = new System.Drawing.Size(920, 373);
+            this.cacheStatusGridView.Size = new System.Drawing.Size(920, 374);
             this.cacheStatusGridView.StandardTab = true;
             this.cacheStatusGridView.TabIndex = 8;
             this.cacheStatusGridView.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.cacheStatusGridView_CellPainting);
@@ -154,19 +155,21 @@ namespace ArchiveCacheManager
             this.Archive.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(24, 0, 3, 0);
             this.Archive.DefaultCellStyle = dataGridViewCellStyle2;
-            this.Archive.FillWeight = 150F;
             this.Archive.HeaderText = "Archive";
             this.Archive.MinimumWidth = 300;
             this.Archive.Name = "Archive";
             this.Archive.ReadOnly = true;
+            this.Archive.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // ArchivePlatform
             // 
             this.ArchivePlatform.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.ArchivePlatform.FillWeight = 60F;
             this.ArchivePlatform.HeaderText = "Platform";
             this.ArchivePlatform.MinimumWidth = 150;
             this.ArchivePlatform.Name = "ArchivePlatform";
             this.ArchivePlatform.ReadOnly = true;
+            this.ArchivePlatform.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // ArchiveSize
             // 
@@ -177,33 +180,48 @@ namespace ArchiveCacheManager
             // 
             // ArchiveSizeMb
             // 
-            this.ArchiveSizeMb.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.ArchiveSizeMb.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
             dataGridViewCellStyle3.Format = "N1";
             this.ArchiveSizeMb.DefaultCellStyle = dataGridViewCellStyle3;
             this.ArchiveSizeMb.HeaderText = "Size (MB)";
-            this.ArchiveSizeMb.MinimumWidth = 80;
             this.ArchiveSizeMb.Name = "ArchiveSizeMb";
             this.ArchiveSizeMb.ReadOnly = true;
-            this.ArchiveSizeMb.Width = 80;
+            this.ArchiveSizeMb.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.ArchiveSizeMb.Width = 58;
             // 
             // CacheAction
             // 
-            this.CacheAction.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.CacheAction.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
             this.CacheAction.HeaderText = "Cache Action";
             this.CacheAction.Name = "CacheAction";
             this.CacheAction.ReadOnly = true;
-            this.CacheAction.Width = 96;
+            this.CacheAction.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.CacheAction.Width = 77;
             // 
             // CacheStatus
             // 
-            this.CacheStatus.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(24, 0, 0, 0);
+            this.CacheStatus.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(24, 0, 3, 0);
             this.CacheStatus.DefaultCellStyle = dataGridViewCellStyle4;
+            this.CacheStatus.FillWeight = 60F;
             this.CacheStatus.HeaderText = "Status";
+            this.CacheStatus.MinimumWidth = 220;
             this.CacheStatus.Name = "CacheStatus";
             this.CacheStatus.ReadOnly = true;
-            this.CacheStatus.Width = 240;
+            this.CacheStatus.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(12, 385);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(920, 10);
+            this.progressBar.Step = 1;
+            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar.TabIndex = 11;
+            this.progressBar.Visible = false;
             // 
             // BatchCacheWindow
             // 
@@ -213,6 +231,7 @@ namespace ArchiveCacheManager
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.cacheButton);
             this.Controls.Add(this.cacheStatusGridView);
+            this.Controls.Add(this.progressBar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimizeBox = false;
             this.Name = "BatchCacheWindow";
@@ -231,6 +250,7 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridView cacheStatusGridView;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button cacheButton;
+        private ProgressBarFlat progressBar;
         private System.Windows.Forms.DataGridViewTextBoxColumn Index;
         private System.Windows.Forms.DataGridViewTextBoxColumn GameId;
         private System.Windows.Forms.DataGridViewTextBoxColumn AppId;
