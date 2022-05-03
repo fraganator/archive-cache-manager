@@ -5,12 +5,13 @@ using System.IO;
 using System.Diagnostics;
 using System.Drawing;
 using Unbroken.LaunchBox.Plugins;
+using System.Threading.Tasks;
 
 namespace ArchiveCacheManager
 {
     public partial class NewConfigWindow : Form
     {
-        private bool refreshLaunchBox = false;
+        public bool RefreshLaunchBox = false;
 
         public NewConfigWindow()
         {
@@ -29,7 +30,7 @@ namespace ArchiveCacheManager
                 UserInterface.SetColumnMinimumWidth(column);
             }
 
-            refreshLaunchBox = false;
+            RefreshLaunchBox = false;
 
             Config.Load();
 
@@ -329,7 +330,7 @@ namespace ArchiveCacheManager
             updateCacheInfo();
             updateEnabledState();
 
-            refreshLaunchBox = true;
+            RefreshLaunchBox = true;
         }
 
         private void cacheDataGridView_CurrentCellDirtyStateChanged(object sender, EventArgs e)
@@ -350,7 +351,7 @@ namespace ArchiveCacheManager
             updateCacheInfo(true);
             updateEnabledState();
 
-            refreshLaunchBox = true;
+            RefreshLaunchBox = true;
         }
 
         private void cacheDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
@@ -374,14 +375,6 @@ namespace ArchiveCacheManager
                     e.Graphics.DrawImage(mediaIcon, new Rectangle(x, y, w, h));
                     e.Handled = true;
                 }
-            }
-        }
-
-        private void ConfigWindow_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (refreshLaunchBox  && !PluginHelper.StateManager.IsBigBox)
-            {
-                PluginHelper.LaunchBoxMainViewModel.RefreshData();
             }
         }
 

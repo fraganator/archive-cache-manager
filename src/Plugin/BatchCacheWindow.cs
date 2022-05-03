@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -19,11 +20,16 @@ namespace ArchiveCacheManager
         enum StatusEnum
         {
             None,
-            Running,
+            Checking,
+            Ready,
+            Caching,
             Complete,
             Cancelled,
-            Closing
+            Closing,
+            Error
         };
+
+        public bool RefreshLaunchBox = false;
 
         private IGame[] mSelectedGames;
         private double requiredCacheSize = 0;
@@ -102,6 +108,7 @@ namespace ArchiveCacheManager
 
             GameLaunching.Restore7z();
 
+            mStatus = StatusEnum.Checking;
             progressBar.Maximum = cacheStatusGridView.RowCount - 1;
             progressBar.Value = 0;
             progressBar.Visible = true;
@@ -185,12 +192,14 @@ namespace ArchiveCacheManager
 
                 cacheButton.Enabled = true;
                 progressBar.Visible = false;
+                mStatus = StatusEnum.Ready;
             }
             catch (Exception e)
             {
                 if (mStatus != StatusEnum.Closing)
                 {
-                    FlexibleMessageBox.Show($"An exception occurred when querying the games to cache:\r\n{e.ToString()}", "Batch Cache Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    UserInterface.ErrorDialog($"An exception occurred when querying the games to cache:\r\n{e.ToString()}", this);
+                    mStatus = StatusEnum.Error;
                 }
             }
         }
@@ -199,7 +208,7 @@ namespace ArchiveCacheManager
         {
             if (requiredCacheSize > Config.CacheSize)
             {
-                var result = FlexibleMessageBox.Show(string.Format("The configured cache size isn't large enough to fit all of the games.\r\n\r\nIncrease the cache size from {0:N0} MB to {1:N0} MB?", Config.CacheSize, Math.Ceiling(requiredCacheSize)),
+                var result = FlexibleMessageBox.Show(this, string.Format("The configured cache size isn't large enough to fit all of the games.\r\n\r\nIncrease the cache size from {0:N0} MB to {1:N0} MB?", Config.CacheSize, Math.Ceiling(requiredCacheSize)),
                                                      "Increase cache size?", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                 if (result == DialogResult.OK)
                 {
@@ -211,6 +220,8 @@ namespace ArchiveCacheManager
                     return;
                 }
             }
+
+            RefreshLaunchBox = true;
             CacheGames();
         }
 
@@ -241,7 +252,7 @@ namespace ArchiveCacheManager
 
         private async void CacheGames()
         {
-            mStatus = StatusEnum.Running;
+            mStatus = StatusEnum.Caching;
 
             cacheButton.Enabled = false;
             cancelButton.Enabled = true;
@@ -261,10 +272,12 @@ namespace ArchiveCacheManager
 
             GameLaunching.Replace7z();
 
+            var stopwatch = Stopwatch.StartNew();
             for (int i = 0; i < cacheStatusGridView.Rows.Count; i++)
             {
                 DataGridViewRow row = cacheStatusGridView.Rows[i];
                 mStaticRowIndex = i;
+                cacheStatusGridView.FirstDisplayedScrollingRowIndex = i;
 
                 if (string.Equals("None", row.Cells["CacheAction"].Value))
                 {
@@ -292,8 +305,8 @@ namespace ArchiveCacheManager
                 else if (exitCode != 0)
                 {
                     cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Extraction error.";
-                    var result = FlexibleMessageBox.Show($"Error caching {cacheStatusGridView.Rows[i].Cells["Archive"].Value}:\r\n{stdout}", "Caching Error",
-                                            MessageBoxButtons.OKCancel, SystemIcons.Error.ToBitmap(), MessageBoxDefaultButton.Button2,
+                    var result = FlexibleMessageBox.Show(this, $"Error caching {cacheStatusGridView.Rows[i].Cells["Archive"].Value}:\r\n{stdout}", "Caching Error",
+                                            MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2,
                                             null, "Continue Caching", "Stop");
                     if (result == DialogResult.Cancel)
                     {
@@ -306,6 +319,8 @@ namespace ArchiveCacheManager
                     cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Complete.";
                 }
             }
+            stopwatch.Stop();
+            Logger.Log($"Caching completed in {stopwatch.ElapsedMilliseconds}ms.");
 
             GameLaunching.Restore7z();
 
@@ -326,18 +341,6 @@ namespace ArchiveCacheManager
             PopulateTableArchiveSize();
         }
 
-        private void BatchCacheWindow_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            mStaticCacheStatusGridView = null;
-            mSelectedGames = null;
-            mStaticProgressBar = null;
-
-            if (mStatus != StatusEnum.None && !PluginHelper.StateManager.IsBigBox)
-            {
-                PluginHelper.LaunchBoxMainViewModel.RefreshData();
-            }
-        }
-
         private void cancelButton_Click(object sender, EventArgs e)
         {
             mStatus = StatusEnum.Cancelled;
@@ -346,13 +349,13 @@ namespace ArchiveCacheManager
 
         private void BatchCacheWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (mStatus == StatusEnum.Running)
+            if (mStatus == StatusEnum.Caching)
             {
-                var result = FlexibleMessageBox.Show("Caching is still in progress!\r\n\r\nCancel caching?", "Cancel caching?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var result = FlexibleMessageBox.Show(this, "Caching is still in progress!\r\n\r\nCancel caching?", "Cancel caching?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (result == DialogResult.Yes)
                 {
-                    mStatus = StatusEnum.Closing;
+                    mStatus = StatusEnum.Cancelled;
                     ProcessUtils.KillProcess();
                 }
                 else
@@ -360,11 +363,12 @@ namespace ArchiveCacheManager
                     e.Cancel = true;
                 }
             }
-            else
+            else if (mStatus == StatusEnum.Checking)
             {
                 mStatus = StatusEnum.Closing;
+                ProcessUtils.KillProcess();
             }
-            }
+        }
 
         private void cacheStatusGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {

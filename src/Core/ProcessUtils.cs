@@ -14,7 +14,13 @@ namespace ArchiveCacheManager
 
         public static void KillProcess()
         {
-            mProcess.Kill();
+            try
+            {
+                mProcess.Kill();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public static (string, string, int) RunProcess(string executable, string args, bool redirectOutput = false, Func<string, string> processOutput = null, bool redirectError = false, Func<string, string> processError = null)

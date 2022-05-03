@@ -37,6 +37,7 @@ namespace ArchiveCacheManager
             this.cacheStatusGridView = new System.Windows.Forms.DataGridView();
             this.cancelButton = new System.Windows.Forms.Button();
             this.cacheButton = new System.Windows.Forms.Button();
+            this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
             this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.GameId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.AppId = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -47,7 +48,6 @@ namespace ArchiveCacheManager
             this.ArchiveSizeMb = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CacheAction = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CacheStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
             ((System.ComponentModel.ISupportInitialize)(this.cacheStatusGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -121,6 +121,18 @@ namespace ArchiveCacheManager
             this.cacheButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.cacheButton.UseVisualStyleBackColor = true;
             this.cacheButton.Click += new System.EventHandler(this.cacheButton_Click);
+            // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(12, 385);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(920, 10);
+            this.progressBar.Step = 1;
+            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar.TabIndex = 11;
+            this.progressBar.Visible = false;
             // 
             // Index
             // 
@@ -211,18 +223,6 @@ namespace ArchiveCacheManager
             this.CacheStatus.ReadOnly = true;
             this.CacheStatus.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
-            // progressBar
-            // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(12, 385);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(920, 10);
-            this.progressBar.Step = 1;
-            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar.TabIndex = 11;
-            this.progressBar.Visible = false;
-            // 
             // BatchCacheWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -238,7 +238,6 @@ namespace ArchiveCacheManager
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Batch Cache Games";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BatchCacheWindow_FormClosing);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.BatchCacheWindow_FormClosed);
             this.Shown += new System.EventHandler(this.BatchCacheWindow_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.cacheStatusGridView)).EndInit();
             this.ResumeLayout(false);

@@ -17,6 +17,11 @@ namespace ArchiveCacheManager
         static Color backColorContrast1 = CalcContrast(backColor, contrast);
         static Color backColorContrast2 = CalcContrast(backColor, contrast / 2);
 
+        public static DialogResult ErrorDialog(string message, IWin32Window owner = null)
+        {
+            return FlexibleMessageBox.Show(owner, message, "Archive Cache Manager", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button3);
+        }
+
         // https://stackoverflow.com/a/2735242
         public static IEnumerable<T> Descendants<T>(this Control control) where T : class
         {
@@ -261,6 +266,10 @@ namespace ArchiveCacheManager
                     dataGridView.DefaultCellStyle.ForeColor = foreColor;
                     dataGridView.DefaultCellStyle.SelectionBackColor = LaunchBoxSettings.DialogAccentColor;
                     dataGridView.DefaultCellStyle.SelectionForeColor = foreColor;
+                    dataGridView.AlternatingRowsDefaultCellStyle.BackColor = backColorContrast1;
+                    dataGridView.AlternatingRowsDefaultCellStyle.ForeColor = foreColor;
+                    dataGridView.AlternatingRowsDefaultCellStyle.SelectionBackColor = LaunchBoxSettings.DialogAccentColor;
+                    dataGridView.AlternatingRowsDefaultCellStyle.SelectionForeColor = foreColor;
                     dataGridView.GridColor = backColorContrast1;
                     dataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
                     double colorDiv = 1.15;
@@ -296,7 +305,7 @@ namespace ArchiveCacheManager
                 var dataGridView = sender as DataGridView;
                 foreach (DataGridViewCell cell in dataGridView.Rows[e.RowIndex].Cells)
                 {
-                    cell.Style.BackColor = dataGridView.DefaultCellStyle.BackColor;
+                    cell.Style.BackColor = e.RowIndex % 2 == 0 ? dataGridView.DefaultCellStyle.BackColor : dataGridView.AlternatingRowsDefaultCellStyle.BackColor;
                 }
             }
         }

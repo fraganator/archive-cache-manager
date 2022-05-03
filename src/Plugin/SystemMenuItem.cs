@@ -22,6 +22,11 @@ namespace ArchiveCacheManager
             // Glue between the main app window (WPF) and this window (WinForms)
             parent.AssignHandle(new WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle);
             window.ShowDialog(parent);
+
+            if (window.RefreshLaunchBox && !PluginHelper.StateManager.IsBigBox)
+            {
+                PluginHelper.LaunchBoxMainViewModel.RefreshData();
+            }
         }
     }
 }

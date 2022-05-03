@@ -132,9 +132,8 @@ namespace ArchiveCacheManager
                 }
                 else if (retries <= 0)
                 {
-                    FlexibleMessageBox.Show(string.Format("Archive Cache Manager:\r\nError restoring temporary settings changes.\r\n" +
-                                                  "Please review the items below and manually restore them, or restore a Data Backup created by LaunchBox.\r\n\r\n{0}", message),
-                                    "Archive Cache Manager Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    UserInterface.ErrorDialog($"Archive Cache Manager:\r\nError restoring temporary settings changes.\r\n"
+                                              + $"Please review the items below and manually restore them, or restore a Data Backup created by LaunchBox.\r\n\r\n{message}");
                     File.Delete(mSettingsPath);
                 }
             }
