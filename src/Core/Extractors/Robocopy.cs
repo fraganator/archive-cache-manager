@@ -46,6 +46,7 @@ namespace ArchiveCacheManager
                 catch (Exception e)
                 {
                     Logger.Log($"File copy error: {e.ToString()}");
+                    Console.Out.WriteLine(e.Message);
                     Environment.ExitCode = 1;
                 }
             }

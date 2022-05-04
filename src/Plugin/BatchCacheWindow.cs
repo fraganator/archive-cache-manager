@@ -24,7 +24,7 @@ namespace ArchiveCacheManager
             Ready,
             Caching,
             Complete,
-            Cancelled,
+            Stopped,
             Closing,
             Error
         };
@@ -44,6 +44,7 @@ namespace ArchiveCacheManager
         {
             InitializeComponent();
             UserInterface.SetDoubleBuffered(cacheStatusGridView, true);
+            UserInterface.SetDoubleBuffered(progressBar, true);
             UserInterface.ApplyTheme(this);
 
             mSelectedGames = selectedGames;
@@ -51,7 +52,7 @@ namespace ArchiveCacheManager
             mStaticProgressBar = progressBar;
 
             cacheButton.Enabled = false;
-            cancelButton.Enabled = false;
+            stopButton.Enabled = false;
             progressBar.Visible = false;
             mStatus = StatusEnum.None;
 
@@ -237,8 +238,8 @@ namespace ArchiveCacheManager
                     if (match.Success)
                     {
                         double progress = double.Parse(match.Groups[1].Value);
-                        mStaticProgressBar.Value = (int)(progress / mStaticTotalGames + mStaticCurrentGame / (double)mStaticTotalGames * 100.0);
-                        mStaticCacheStatusGridView.Rows[mStaticRowIndex].Cells["CacheStatus"].Value = string.Format("Working... {0}%", (int)progress);
+                        mStaticProgressBar.Value = (int)(((progress / mStaticTotalGames) / 100.0 + (double)mStaticCurrentGame / mStaticTotalGames) * mStaticProgressBar.Maximum);
+                        mStaticCacheStatusGridView.Rows[mStaticRowIndex].Cells["CacheStatus"].Value = string.Format("Caching... {0}%", (int)progress);
                     }
                 }
                 catch (Exception)
@@ -255,8 +256,8 @@ namespace ArchiveCacheManager
             mStatus = StatusEnum.Caching;
 
             cacheButton.Enabled = false;
-            cancelButton.Enabled = true;
-            progressBar.Maximum = 100;
+            stopButton.Enabled = true;
+            progressBar.Maximum = 1000;
             progressBar.Value = 0;
             progressBar.Visible = true;
 
@@ -276,29 +277,32 @@ namespace ArchiveCacheManager
             for (int i = 0; i < cacheStatusGridView.Rows.Count; i++)
             {
                 DataGridViewRow row = cacheStatusGridView.Rows[i];
-                mStaticRowIndex = i;
-                cacheStatusGridView.FirstDisplayedScrollingRowIndex = i;
 
                 if (string.Equals("None", row.Cells["CacheAction"].Value))
                 {
                     continue;
                 }
 
-                progressBar.Value = (int)(mStaticCurrentGame / (double)mStaticTotalGames * 100.0);
+                mStaticRowIndex = i;
+                row.Selected = true;
+                int firstRow = i - cacheStatusGridView.DisplayedRowCount(false) / 2;
+                cacheStatusGridView.FirstDisplayedScrollingRowIndex = firstRow >= 0 ? firstRow : 0;
+
+                progressBar.Value = (int)((double)mStaticCurrentGame / mStaticTotalGames * progressBar.Maximum);
                 string gameId = row.Cells["GameId"].Value.ToString();
                 string appId = row.Cells["AppId"].Value.ToString();
                 IGame game = PluginHelper.DataManager.GetGameById(gameId);
                 IAdditionalApplication app = PluginUtils.GetAdditionalApplicationById(gameId, appId);
                 IEmulator emulator = PluginHelper.DataManager.GetEmulatorById(game.EmulatorId);
 
-                cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Working...";
+                cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Caching...";
                 GameLaunching.SaveGameInfo(game, app, emulator);
                 (string stdout, string stderr, int exitCode) = await Task.Run(() => ProcessUtils.RunProcess(PathUtils.GetLaunchBox7zPath(), $"c {cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value}", true, ExtractionProgress));
                 mStaticCurrentGame++;
 
-                if (mStatus == StatusEnum.Cancelled)
+                if (mStatus == StatusEnum.Stopped)
                 {
-                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Extraction cancelled.";
+                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Caching stopped.";
                     progressBar.Visible = false;
                     break;
                 }
@@ -327,7 +331,7 @@ namespace ArchiveCacheManager
             mStatus = StatusEnum.Complete;
 
             cacheButton.Enabled = true;
-            cancelButton.Enabled = false;
+            stopButton.Enabled = false;
             progressBar.Visible = false;
         }
 
@@ -343,7 +347,7 @@ namespace ArchiveCacheManager
 
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            mStatus = StatusEnum.Cancelled;
+            mStatus = StatusEnum.Stopped;
             ProcessUtils.KillProcess();
         }
 
@@ -351,11 +355,11 @@ namespace ArchiveCacheManager
         {
             if (mStatus == StatusEnum.Caching)
             {
-                var result = FlexibleMessageBox.Show(this, "Caching is still in progress!\r\n\r\nCancel caching?", "Cancel caching?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var result = FlexibleMessageBox.Show(this, "Caching is still in progress!\r\n\r\nStop caching and close?", "Stop caching?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (result == DialogResult.Yes)
                 {
-                    mStatus = StatusEnum.Cancelled;
+                    mStatus = StatusEnum.Stopped;
                     ProcessUtils.KillProcess();
                 }
                 else
@@ -391,7 +395,11 @@ namespace ArchiveCacheManager
                     {
                         cellIcon = Resources.tick;
                     }
-                    else if (statusText.Contains("working"))
+                    else if (statusText.Contains("stopped"))
+                    {
+                        cellIcon = Resources.exclamation_white;
+                    }
+                    else if (statusText.Contains("caching"))
                     {
                         cellIcon = Resources.hourglass;
                     }
@@ -399,13 +407,13 @@ namespace ArchiveCacheManager
                     {
                         cellIcon = Resources.exclamation_red;
                     }
-                    else if (statusText.Contains("cancel"))
-                    {
-                        cellIcon = Resources.exclamation_white;
-                    }
                     else if (statusText.Contains("file not found"))
                     {
                         cellIcon = Resources.exclamation;
+                    }
+                    else if (statusText.Contains("no rule") || statusText.Contains("disabled"))
+                    {
+
                     }
                 }
 
@@ -420,6 +428,11 @@ namespace ArchiveCacheManager
                     e.Handled = true;
                 }
             }
+        }
+
+        private void closeButton_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

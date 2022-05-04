@@ -35,9 +35,6 @@ namespace ArchiveCacheManager
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BatchCacheWindow));
             this.cacheStatusGridView = new System.Windows.Forms.DataGridView();
-            this.cancelButton = new System.Windows.Forms.Button();
-            this.cacheButton = new System.Windows.Forms.Button();
-            this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
             this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.GameId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.AppId = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -48,6 +45,10 @@ namespace ArchiveCacheManager
             this.ArchiveSizeMb = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CacheAction = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CacheStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.closeButton = new System.Windows.Forms.Button();
+            this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
+            this.stopButton = new System.Windows.Forms.Button();
+            this.cacheButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.cacheStatusGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -93,46 +94,6 @@ namespace ArchiveCacheManager
             this.cacheStatusGridView.StandardTab = true;
             this.cacheStatusGridView.TabIndex = 8;
             this.cacheStatusGridView.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.cacheStatusGridView_CellPainting);
-            // 
-            // cancelButton
-            // 
-            this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cancelButton.Image = global::ArchiveCacheManager.Resources.cross_script;
-            this.cancelButton.Location = new System.Drawing.Point(146, 401);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(128, 28);
-            this.cancelButton.TabIndex = 10;
-            this.cancelButton.Text = "Cancel";
-            this.cancelButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cancelButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.cancelButton.UseVisualStyleBackColor = true;
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
-            // 
-            // cacheButton
-            // 
-            this.cacheButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cacheButton.Image = global::ArchiveCacheManager.Resources.box_zipper;
-            this.cacheButton.Location = new System.Drawing.Point(12, 401);
-            this.cacheButton.Name = "cacheButton";
-            this.cacheButton.Size = new System.Drawing.Size(128, 28);
-            this.cacheButton.TabIndex = 9;
-            this.cacheButton.Text = "Cache Games";
-            this.cacheButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.cacheButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.cacheButton.UseVisualStyleBackColor = true;
-            this.cacheButton.Click += new System.EventHandler(this.cacheButton_Click);
-            // 
-            // progressBar
-            // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(12, 385);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(920, 10);
-            this.progressBar.Step = 1;
-            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar.TabIndex = 11;
-            this.progressBar.Visible = false;
             // 
             // Index
             // 
@@ -223,17 +184,71 @@ namespace ArchiveCacheManager
             this.CacheStatus.ReadOnly = true;
             this.CacheStatus.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
+            // closeButton
+            // 
+            this.closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.closeButton.Location = new System.Drawing.Point(804, 401);
+            this.closeButton.Name = "closeButton";
+            this.closeButton.Size = new System.Drawing.Size(128, 28);
+            this.closeButton.TabIndex = 12;
+            this.closeButton.Text = "Close";
+            this.closeButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.closeButton.UseVisualStyleBackColor = true;
+            this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
+            // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(12, 385);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(920, 10);
+            this.progressBar.Step = 1;
+            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar.TabIndex = 11;
+            this.progressBar.Visible = false;
+            // 
+            // stopButton
+            // 
+            this.stopButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.stopButton.Image = global::ArchiveCacheManager.Resources.cross_octagon;
+            this.stopButton.Location = new System.Drawing.Point(146, 401);
+            this.stopButton.Name = "stopButton";
+            this.stopButton.Size = new System.Drawing.Size(128, 28);
+            this.stopButton.TabIndex = 10;
+            this.stopButton.Text = "Stop";
+            this.stopButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.stopButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.stopButton.UseVisualStyleBackColor = true;
+            this.stopButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // cacheButton
+            // 
+            this.cacheButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cacheButton.Image = global::ArchiveCacheManager.Resources.box__plus;
+            this.cacheButton.Location = new System.Drawing.Point(12, 401);
+            this.cacheButton.Name = "cacheButton";
+            this.cacheButton.Size = new System.Drawing.Size(128, 28);
+            this.cacheButton.TabIndex = 9;
+            this.cacheButton.Text = "Cache Games";
+            this.cacheButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.cacheButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.cacheButton.UseVisualStyleBackColor = true;
+            this.cacheButton.Click += new System.EventHandler(this.cacheButton_Click);
+            // 
             // BatchCacheWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(944, 441);
-            this.Controls.Add(this.cancelButton);
+            this.Controls.Add(this.closeButton);
+            this.Controls.Add(this.stopButton);
             this.Controls.Add(this.cacheButton);
             this.Controls.Add(this.cacheStatusGridView);
             this.Controls.Add(this.progressBar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(480, 180);
             this.Name = "BatchCacheWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Batch Cache Games";
@@ -247,7 +262,7 @@ namespace ArchiveCacheManager
         #endregion
 
         private System.Windows.Forms.DataGridView cacheStatusGridView;
-        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.Button cacheButton;
         private ProgressBarFlat progressBar;
         private System.Windows.Forms.DataGridViewTextBoxColumn Index;
@@ -260,5 +275,6 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewTextBoxColumn ArchiveSizeMb;
         private System.Windows.Forms.DataGridViewTextBoxColumn CacheAction;
         private System.Windows.Forms.DataGridViewTextBoxColumn CacheStatus;
+        private System.Windows.Forms.Button closeButton;
     }
 }

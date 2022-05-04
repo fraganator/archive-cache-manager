@@ -83,6 +83,16 @@ namespace ArchiveCacheManager {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap box__plus {
+            get {
+                object obj = ResourceManager.GetObject("box__plus", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap box_zipper {
             get {
                 object obj = ResourceManager.GetObject("box_zipper", resourceCulture);
@@ -96,6 +106,16 @@ namespace ArchiveCacheManager {
         internal static System.Drawing.Bitmap broom {
             get {
                 object obj = ResourceManager.GetObject("broom", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cross_octagon {
+            get {
+                object obj = ResourceManager.GetObject("cross_octagon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

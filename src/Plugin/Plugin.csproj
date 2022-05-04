@@ -242,13 +242,16 @@
     <None Include="Resources\exclamation-white.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\blue-document--exclamation.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\hourglass.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\exclamation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cross-octagon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\box--plus.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
