@@ -41,6 +41,7 @@ namespace ArchiveCacheManager
         public static Extractor Extractor = null;
         public static Config.LaunchPath LaunchPathConfig => mGameCacheData.Config.LaunchPath;
         public static bool MultiDiscSupport => mGameCacheData.Config.MultiDisc;
+        public static bool BatchCache = false;
 
         static LaunchInfo()
         {
@@ -92,6 +93,11 @@ namespace ArchiveCacheManager
 
             // Default to Zip extractor
             return new Zip();
+        }
+
+        public static void SetSize(long size)
+        {
+            mGameCacheData.Size = size;
         }
 
         /// <summary>

@@ -17,6 +17,11 @@ namespace ArchiveCacheManager
         static Color backColorContrast1 = CalcContrast(backColor, contrast);
         static Color backColorContrast2 = CalcContrast(backColor, contrast / 2);
 
+        public static DialogResult ErrorDialog(string message, IWin32Window owner = null)
+        {
+            return FlexibleMessageBox.Show(owner, message, "Archive Cache Manager", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button3);
+        }
+
         // https://stackoverflow.com/a/2735242
         public static IEnumerable<T> Descendants<T>(this Control control) where T : class
         {
@@ -67,6 +72,31 @@ namespace ArchiveCacheManager
                     comboBoxColumn.Width = minWidth;
                 }
             }
+        }
+
+        public static Bitmap GetMediaIcon(string platform)
+        {
+            Bitmap mediaIcon;
+
+            if (platform.Contains("Microsoft Xbox 360")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Microsoft Xbox")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Nintendo 64")) mediaIcon = Resources.media_n64;
+            else if (platform.Contains("Nintendo GameCube")) mediaIcon = Resources.media_gc;
+            else if (platform.Contains("Nintendo Wii U")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Nintendo Wii")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Sega 32X")) mediaIcon = Resources.media_md;
+            else if (platform.Contains("Sega CD")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Sega Mega-CD")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Sega Dreamcast")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Sega Genesis")) mediaIcon = Resources.media_md;
+            else if (platform.Contains("Sega Mega Drive")) mediaIcon = Resources.media_md;
+            else if (platform.Contains("Sega Saturn")) mediaIcon = Resources.media_cd;
+            else if (platform.Contains("Sony Playstation 2")) mediaIcon = Resources.media_ps2;
+            else if (platform.Contains("Sony Playstation")) mediaIcon = Resources.media_ps1;
+            else if (platform.Contains("Sony PSP")) mediaIcon = Resources.media_psp;
+            else mediaIcon = Resources.box_zipper;
+
+            return mediaIcon;
         }
 
         private static Color CalcContrast(Color colour, double contrast)
@@ -236,6 +266,10 @@ namespace ArchiveCacheManager
                     dataGridView.DefaultCellStyle.ForeColor = foreColor;
                     dataGridView.DefaultCellStyle.SelectionBackColor = LaunchBoxSettings.DialogAccentColor;
                     dataGridView.DefaultCellStyle.SelectionForeColor = foreColor;
+                    dataGridView.AlternatingRowsDefaultCellStyle.BackColor = backColorContrast1;
+                    dataGridView.AlternatingRowsDefaultCellStyle.ForeColor = foreColor;
+                    dataGridView.AlternatingRowsDefaultCellStyle.SelectionBackColor = LaunchBoxSettings.DialogAccentColor;
+                    dataGridView.AlternatingRowsDefaultCellStyle.SelectionForeColor = foreColor;
                     dataGridView.GridColor = backColorContrast1;
                     dataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
                     double colorDiv = 1.15;
@@ -249,7 +283,19 @@ namespace ArchiveCacheManager
                     dataGridView.CellMouseEnter += DataGridView_CellMouseEnter;
                     dataGridView.CellMouseLeave += DataGridView_CellMouseLeave;
                 }
+                else if (control is ProgressBar)
+                {
+                    ProgressBar progressBar = control as ProgressBar;
+                    progressBar.BackColor = backColorContrast1;
+                    progressBar.ForeColor = LaunchBoxSettings.DialogAccentColor;
+                }
             }
+        }
+
+        public static void ScaleControlFont(Control control, float scale)
+        {
+            Font controlFont = control.Font;
+            control.Font = new Font(controlFont.FontFamily, controlFont.Size * scale, controlFont.Style);
         }
 
         private static void DataGridView_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
@@ -259,7 +305,7 @@ namespace ArchiveCacheManager
                 var dataGridView = sender as DataGridView;
                 foreach (DataGridViewCell cell in dataGridView.Rows[e.RowIndex].Cells)
                 {
-                    cell.Style.BackColor = dataGridView.DefaultCellStyle.BackColor;
+                    cell.Style.BackColor = e.RowIndex % 2 == 0 ? dataGridView.DefaultCellStyle.BackColor : dataGridView.AlternatingRowsDefaultCellStyle.BackColor;
                 }
             }
         }
@@ -353,6 +399,26 @@ namespace ArchiveCacheManager
                 m.Result = (IntPtr)1;
             else
                 base.WndProc(ref m);
+        }
+    }
+
+    public class ProgressBarFlat : ProgressBar
+    {
+        public ProgressBarFlat()
+        {
+            this.SetStyle(ControlStyles.UserPaint, true);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Rectangle rec = new Rectangle(0, 0, this.Width, this.Height);
+            double scaleFactor = (((double)Value - (double)Minimum) / ((double)Maximum - (double)Minimum));
+
+            e.Graphics.FillRectangle(new SolidBrush(Color.Black), rec);
+            e.Graphics.FillRectangle(new SolidBrush(BackColor), 1, 1, rec.Width - 2, rec.Height - 2);
+            rec.Width = (int)((rec.Width * scaleFactor) - 2);
+            rec.Height -= 2;
+            e.Graphics.FillRectangle(new SolidBrush(ForeColor), 1, 1, rec.Width, rec.Height);
         }
     }
 }

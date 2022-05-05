@@ -297,6 +297,21 @@ namespace ArchiveCacheManager
             return FlexibleMessageBoxForm.Show(owner, text, caption, buttons, MessageBoxIcon.None, defaultButton, icon);
         }
 
+        /// <summary>
+        /// Shows the specified message box.
+        /// </summary>
+        /// <param name="owner">The owner.</param>
+        /// <param name="text">The text.</param>
+        /// <param name="caption">The caption.</param>
+        /// <param name="buttons">The buttons.</param>
+        /// <param name="icon">The icon.</param>
+        /// <param name="defaultButton">The default button.</param>
+        /// <returns>The dialog result.</returns>
+        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton, string button1Text = null, string button2Text = null, string button3Text = null)
+        {
+            return FlexibleMessageBoxForm.Show(owner, text, caption, buttons, icon, defaultButton, null, button1Text, button2Text, button3Text);
+        }
+
         #endregion
 
         #region Internal form class
@@ -371,15 +386,16 @@ namespace ArchiveCacheManager
                 this.richTextBoxMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
                 this.richTextBoxMessage.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.FlexibleMessageBoxFormBindingSource, "MessageText", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
                 this.richTextBoxMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                this.richTextBoxMessage.Location = new System.Drawing.Point(50, 26);
+                this.richTextBoxMessage.Location = new System.Drawing.Point(55, 26);
                 this.richTextBoxMessage.Margin = new System.Windows.Forms.Padding(0);
                 this.richTextBoxMessage.Name = "richTextBoxMessage";
                 this.richTextBoxMessage.ReadOnly = true;
                 this.richTextBoxMessage.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-                this.richTextBoxMessage.Size = new System.Drawing.Size(200, 20);
+                this.richTextBoxMessage.Size = new System.Drawing.Size(195, 20);
                 this.richTextBoxMessage.TabIndex = 0;
                 this.richTextBoxMessage.TabStop = false;
                 this.richTextBoxMessage.Text = "<Message>";
+                this.richTextBoxMessage.DetectUrls = false;
                 this.richTextBoxMessage.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBoxMessage_LinkClicked);
                 // 
                 // panel1

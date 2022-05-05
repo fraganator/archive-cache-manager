@@ -35,8 +35,7 @@ namespace ArchiveCacheManager
         {
             if (!PathUtils.IsPathSafe(cachePath.Text))
             {
-                FlexibleMessageBox.Show(this, string.Format("ERROR! The cache path can not be set to {0}.\r\nPlease change the cache path.", Path.GetFullPath(cachePath.Text)), "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                UserInterface.ErrorDialog($"ERROR! The cache path can not be set to {Path.GetFullPath(cachePath.Text)}.\r\nPlease change the cache path.", this);
                 return;
             }
 

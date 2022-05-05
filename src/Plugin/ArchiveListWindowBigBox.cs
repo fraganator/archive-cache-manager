@@ -20,6 +20,9 @@ namespace ArchiveCacheManager
         {
             InitializeComponent();
 
+            UserInterface.ScaleControlFont(fileListBox, 96.0f / fileListBox.DeviceDpi);
+            UserInterface.ScaleControlFont(archiveNameLabel, 96.0f / archiveNameLabel.DeviceDpi);
+
             if (LaunchBoxSettings.HideMouseCursor)
             {
                 Cursor.Hide();

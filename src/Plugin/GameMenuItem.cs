@@ -26,68 +26,77 @@ namespace ArchiveCacheManager
 
         public void OnSelected(IGame selectedGame)
         {
-            // HACK
-            // In case where game is launched, but launch failed or aborted, 7z isn't cleaned up. If this code then runs, it will
-            // call the archive cache manager version of 7z, which will not return the correct results (file priority will be applied,
-            // and the first file listing removed. Restore 7z here, just in case it wasn't cleaned up properly previously.
-            GameLaunching.Restore7z();
+            string path = PathUtils.GetAbsolutePath(selectedGame.ApplicationPath);
 
-            string[] fileList = new Zip().List(PathUtils.GetAbsolutePath(selectedGame.ApplicationPath));
-
-            if (fileList.Count() == 0)
+            if (File.Exists(path))
             {
-                string errorMessage = string.Format("Error listing contents of {0}.\r\n\r\nCheck {1} for details.", Path.GetFileName(selectedGame.ApplicationPath), Path.GetFileName(PathUtils.GetLogFilePath()));
+                // HACK
+                // In case where game is launched, but launch failed or aborted, 7z isn't cleaned up. If this code then runs, it will
+                // call the archive cache manager version of 7z, which will not return the correct results (file priority will be applied,
+                // and the first file listing removed. Restore 7z here, just in case it wasn't cleaned up properly previously.
+                GameLaunching.Restore7z();
 
+                string[] fileList = new Zip().List(path);
+
+                if (fileList.Count() == 0)
+                {
+                    string errorMessage = string.Format("Error listing contents of {0}.\r\n\r\nCheck {1} for details.", Path.GetFileName(selectedGame.ApplicationPath), Path.GetFileName(PathUtils.GetLogFilePath()));
+
+                    if (PluginHelper.StateManager.IsBigBox)
+                    {
+                        MessageBoxBigBox messageBox = new MessageBoxBigBox(errorMessage);
+                        messageBox.ShowDialog();
+                    }
+                    else
+                    {
+                        UserInterface.ErrorDialog(errorMessage);
+                    }
+
+                    return;
+                }
+
+                var emulatorsTuple = PluginUtils.GetPlatformEmulators(selectedGame.Platform, selectedGame.EmulatorId);
+
+                Form window;
                 if (PluginHelper.StateManager.IsBigBox)
                 {
-                    MessageBoxBigBox messageBox = new MessageBoxBigBox(errorMessage);
-                    messageBox.ShowDialog();
+                    window = new ArchiveListWindowBigBox(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
                 }
                 else
                 {
-                    FlexibleMessageBox.Show(errorMessage, "Archive Cache Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, emulatorsTuple.Select(emu => PluginUtils.GetEmulatorTitle(emu.Item1, emu.Item2)).ToArray(), GameIndex.GetSelectedFile(selectedGame.Id));
                 }
-                
-                return;
-            }
+                //NativeWindow parent = new NativeWindow();
 
-            var emulatorsTuple = PluginUtils.GetPlatformEmulators(selectedGame.Platform, selectedGame.EmulatorId);
+                // Glue between the main app window (WPF) and this window (WinForms)
+                //parent.AssignHandle(new WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle);
+                window.ShowDialog();// parent);
 
-            Form window;
-            if (PluginHelper.StateManager.IsBigBox)
-            {
-                window = new ArchiveListWindowBigBox(Path.GetFileName(selectedGame.ApplicationPath), fileList, GameIndex.GetSelectedFile(selectedGame.Id));
+                if (window.DialogResult == DialogResult.OK)
+                {
+                    if (PluginHelper.StateManager.IsBigBox)
+                    {
+                        GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindowBigBox).SelectedFile);
+                        PluginHelper.BigBoxMainViewModel.PlayGame(selectedGame, null, PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId), null);
+                    }
+                    else
+                    {
+                        int emulatorIndex = (window as ArchiveListWindow).EmulatorIndex;
+                        // Use a specific command line for the IEmulatorPlatform. This covers the case where RetroArch has more than one core configured for the same platform.
+                        string commandLine = emulatorsTuple[emulatorIndex].Item2.CommandLine;
+                        // Use the game's custom command line if it exists and we're running with the game's emulator (index 0)
+                        if (emulatorIndex == 0 && !string.IsNullOrEmpty(selectedGame.CommandLine))
+                        {
+                            commandLine = selectedGame.CommandLine;
+                        }
+                        GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindow).SelectedFile);
+                        PluginHelper.LaunchBoxMainViewModel.PlayGame(selectedGame, null, emulatorsTuple[emulatorIndex].Item1, commandLine);
+                    }
+                }
             }
             else
             {
-                window = new ArchiveListWindow(Path.GetFileName(selectedGame.ApplicationPath), fileList, emulatorsTuple.Select(emu => PluginUtils.GetEmulatorTitle(emu.Item1, emu.Item2)).ToArray(), GameIndex.GetSelectedFile(selectedGame.Id));
-            }
-            //NativeWindow parent = new NativeWindow();
-
-            // Glue between the main app window (WPF) and this window (WinForms)
-            //parent.AssignHandle(new WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle);
-            window.ShowDialog();// parent);
-
-            if (window.DialogResult == DialogResult.OK)
-            {
-                if (PluginHelper.StateManager.IsBigBox)
-                {
-                    GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindowBigBox).SelectedFile);
-                    PluginHelper.BigBoxMainViewModel.PlayGame(selectedGame, null, PluginHelper.DataManager.GetEmulatorById(selectedGame.EmulatorId), null);
-                }
-                else
-                {
-                    int emulatorIndex = (window as ArchiveListWindow).EmulatorIndex;
-                    // Use a specific command line for the IEmulatorPlatform. This covers the case where RetroArch has more than one core configured for the same platform.
-                    string commandLine = emulatorsTuple[emulatorIndex].Item2.CommandLine;
-                    // Use the game's custom command line if it exists and we're running with the game's emulator (index 0)
-                    if (emulatorIndex == 0 && !string.IsNullOrEmpty(selectedGame.CommandLine))
-                    {
-                        commandLine = selectedGame.CommandLine;
-                    }
-                    GameIndex.SetSelectedFile(selectedGame.Id, (window as ArchiveListWindow).SelectedFile);
-                    PluginHelper.LaunchBoxMainViewModel.PlayGame(selectedGame, null, emulatorsTuple[emulatorIndex].Item1, commandLine);
-                }
+                UserInterface.ErrorDialog($"Couldn't find the archive file:\r\n\r\n{path}");
             }
         }
 

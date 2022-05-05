@@ -17,6 +17,8 @@ namespace ArchiveCacheManager
         {
             InitializeComponent();
 
+            UserInterface.ScaleControlFont(message, 96.0f / message.DeviceDpi);
+
             message.Text = text;
         }
     }

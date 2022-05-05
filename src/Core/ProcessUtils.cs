@@ -10,23 +10,36 @@ namespace ArchiveCacheManager
 {
     public static class ProcessUtils
     {
+        static Process mProcess;
+
+        public static void KillProcess()
+        {
+            try
+            {
+                mProcess.Kill();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public static (string, string, int) RunProcess(string executable, string args, bool redirectOutput = false, Func<string, string> processOutput = null, bool redirectError = false, Func<string, string> processError = null)
         {
             string stdout;
             string stderr;
             int exitCode;
-            Process process = new Process();
-            process.StartInfo.FileName = executable;
-            process.StartInfo.Arguments = args;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.RedirectStandardError = true;
+            mProcess = new Process();
+            mProcess.StartInfo.FileName = executable;
+            mProcess.StartInfo.Arguments = args;
+            mProcess.StartInfo.UseShellExecute = false;
+            mProcess.StartInfo.CreateNoWindow = true;
+            mProcess.StartInfo.RedirectStandardOutput = true;
+            mProcess.StartInfo.RedirectStandardError = true;
             StringBuilder asyncError = new StringBuilder();
             StringBuilder asyncOutput = new StringBuilder();
             string processedStdout = string.Empty;
             string processedStderr = string.Empty;
-            process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
+            mProcess.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
             {
                 if (redirectOutput)
                 {
@@ -35,7 +48,7 @@ namespace ArchiveCacheManager
                 }
                 asyncOutput.Append("\r\n" + e.Data);
             });
-            process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+            mProcess.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
             {
                 if (redirectError)
                 {
@@ -54,17 +67,17 @@ namespace ArchiveCacheManager
 
             try
             {
-                process.Start();
-                process.BeginErrorReadLine();
-                process.BeginOutputReadLine();
+                mProcess.Start();
+                mProcess.BeginErrorReadLine();
+                mProcess.BeginOutputReadLine();
 
                 // LB allows terminating the extraction process by pressing Esc on the loading screen. If this process is killed,
                 // the child process (the real 7z in this case) will NOT be terminated. Add 7z as a tracked child process, which
                 // will be automatically killed if this process is also killed.
-                ChildProcessTracker.AddProcess(process);
+                ChildProcessTracker.AddProcess(mProcess);
 
-                process.WaitForExit();
-                exitCode = process.ExitCode;
+                mProcess.WaitForExit();
+                exitCode = mProcess.ExitCode;
             }
             catch (Exception e)
             {
