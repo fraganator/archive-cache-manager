@@ -261,6 +261,8 @@ namespace ArchiveCacheManager
             progressBar.Value = 0;
             progressBar.Visible = true;
 
+            int errorCount = 0;
+
             mStaticCurrentGame = 0;
             mStaticTotalGames = 0;
             for (int i = 0; i < cacheStatusGridView.Rows.Count; i++)
@@ -300,7 +302,7 @@ namespace ArchiveCacheManager
                 (string stdout, string stderr, int exitCode) = await Task.Run(() => ProcessUtils.RunProcess(PathUtils.GetLaunchBox7zPath(), $"c {cacheStatusGridView.Rows[i].Cells["ArchiveSize"].Value}", true, ExtractionProgress));
                 mStaticCurrentGame++;
 
-                if (mStatus == StatusEnum.Stopped)
+                if (mStatus == StatusEnum.Stopped || mStatus == StatusEnum.Closing)
                 {
                     cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Caching stopped.";
                     progressBar.Visible = false;
@@ -308,15 +310,21 @@ namespace ArchiveCacheManager
                 }
                 else if (exitCode != 0)
                 {
-                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Extraction error.";
-                    var result = FlexibleMessageBox.Show(this, $"Error caching {cacheStatusGridView.Rows[i].Cells["Archive"].Value}:\r\n{stdout}", "Caching Error",
+                    stopwatch.Stop();
+                    errorCount++;
+                    cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Caching error.";
+                    bool multiDisc = PluginUtils.IsGameMultiDisc(mSelectedGames[Convert.ToInt32(cacheStatusGridView.Rows[i].Cells["Index"].Value)]);
+                    var result = FlexibleMessageBox.Show(this, $"Error caching \"{cacheStatusGridView.Rows[i].Cells["Archive"].Value}\"" +
+                                                         (multiDisc ? " or one of its associated discs." : "."), "Caching Error",
                                             MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2,
                                             null, "Continue Caching", "Stop");
                     if (result == DialogResult.Cancel)
                     {
+                        mStatus = StatusEnum.Stopped;
                         progressBar.Visible = false;
                         break;
                     }
+                    stopwatch.Start();
                 }
                 else
                 {
@@ -328,11 +336,20 @@ namespace ArchiveCacheManager
 
             GameLaunching.Restore7z();
 
-            mStatus = StatusEnum.Complete;
-
             cacheButton.Enabled = true;
             stopButton.Enabled = false;
             progressBar.Visible = false;
+
+            if (mStatus != StatusEnum.Stopped && mStatus != StatusEnum.Closing)
+            {
+                FlexibleMessageBox.Show(this,
+                                        $"Batch caching completed in {(int)Math.Floor(stopwatch.Elapsed.TotalHours):D2}:{(int)stopwatch.Elapsed.Minutes:D2}:{(int)stopwatch.Elapsed.Seconds:D2}" +
+                                        (errorCount > 0 ? $" with {errorCount} error(s)." : "."),
+                                        "Archive Cache Manager",
+                                        MessageBoxButtons.OK,
+                                        Resources.icon32x32);
+            }
+            mStatus = StatusEnum.Complete;
         }
 
         private void BatchCacheWindow_Shown(object sender, EventArgs e)
@@ -359,7 +376,7 @@ namespace ArchiveCacheManager
 
                 if (result == DialogResult.Yes)
                 {
-                    mStatus = StatusEnum.Stopped;
+                    mStatus = StatusEnum.Closing;
                     ProcessUtils.KillProcess();
                 }
                 else
@@ -395,13 +412,13 @@ namespace ArchiveCacheManager
                     {
                         cellIcon = Resources.tick;
                     }
+                    else if (statusText.Contains("caching..."))
+                    {
+                        cellIcon = Resources.hourglass;
+                    }
                     else if (statusText.Contains("stopped"))
                     {
                         cellIcon = Resources.exclamation_white;
-                    }
-                    else if (statusText.Contains("caching"))
-                    {
-                        cellIcon = Resources.hourglass;
                     }
                     else if (statusText.Contains("error"))
                     {

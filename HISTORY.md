@@ -1,7 +1,9 @@
 # Archive Cache Manager change history
-## v2.14 (2022-05-xx)
-* New right-click menu option - Batch cache games
-    * Cache selected games ready to play later, or play offline
+## v2.14 (2022-05-05)
+* New right-click menu option - "Batch Cache Games"
+    * Extract or copy multiple games to the cache, ready to play later
+    * Bulk cache games from NAS or external storage
+        * Cached games can be played even if network or external storage disconnected
 
 ## v2.13 (2022-04-28)
 * Fix config window DPI scaling issue

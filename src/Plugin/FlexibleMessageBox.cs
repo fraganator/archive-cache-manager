@@ -386,12 +386,12 @@ namespace ArchiveCacheManager
                 this.richTextBoxMessage.BorderStyle = System.Windows.Forms.BorderStyle.None;
                 this.richTextBoxMessage.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.FlexibleMessageBoxFormBindingSource, "MessageText", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
                 this.richTextBoxMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-                this.richTextBoxMessage.Location = new System.Drawing.Point(50, 26);
+                this.richTextBoxMessage.Location = new System.Drawing.Point(55, 26);
                 this.richTextBoxMessage.Margin = new System.Windows.Forms.Padding(0);
                 this.richTextBoxMessage.Name = "richTextBoxMessage";
                 this.richTextBoxMessage.ReadOnly = true;
                 this.richTextBoxMessage.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-                this.richTextBoxMessage.Size = new System.Drawing.Size(200, 20);
+                this.richTextBoxMessage.Size = new System.Drawing.Size(195, 20);
                 this.richTextBoxMessage.TabIndex = 0;
                 this.richTextBoxMessage.TabStop = false;
                 this.richTextBoxMessage.Text = "<Message>";

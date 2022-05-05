@@ -3,26 +3,11 @@
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
-## New in v2.13
-* Fix config window DPI scaling issue
-* Config window performance improvements
-* Option to skip version during update check
-
-## New in v2.12
-* Option to copy non-archive files to cache
-* Support for extracting additional formats
-    * Option to extract chd to cue+bin using chdman
-	* Option to extract rvz, wia, gcz to iso using DolphinTool
-* Option to specify a launch folder for cached games (game platform, game title, or emulator title)
-    * Useful for managing common RetroArch settings
-* Smart Extract option to only extract required files from an archive
-    * Useful for merged ROM sets
-* Emulator selection when launching a file from "Select ROM In Archive" list
-* Option to bypass LaunchBox's check the ROM file exists when launching a game
-    * Allows launching cached game immediately - no waiting for slow disk spin-up or network latency
-	* Allows playing cached games 'offline' if NAS or cloud storage unavailable
-* Config window and UI overhaul
-* Minor bug fixes
+## New in v2.14
+* New right-click menu option - "Batch Cache Games"
+    * Extract or copy multiple games to the cache, ready to play later
+    * Bulk cache games from NAS or external storage
+        * Cached games can be played even if network or external storage disconnected
 
 ## Description
 When a compressed ROM (zip, 7z, rar, gz, chd, rvz, etc.) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.
@@ -39,6 +24,7 @@ As the cache size approaches the maximum size, the oldest played games are delet
 * Option to copy ROM files to cache without extraction.
 * Option to keep select ROMs cached and ready to play.
 * Select and play individual ROM files from an archive.
+* Batch cache feature for extracting or copying multiple games to cache at once.
 * Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
 * Support for additional archive formats (chd, rvz, etc)
 * Badge to indicate cached games
@@ -46,12 +32,12 @@ As the cache size approaches the maximum size, the oldest played games are delet
 ### Example Use Cases
 Why use Archive Cache Manager? Here's some example use cases.
 
-* Zipped ROMs located on network server or cloud drive, where disk read or network transfer time is slow.
+* ROMs located on NAS or external storage, where disk read or transfer time is slow.
 * ROM library maintained as accurately ripped/dumped collections, where specialised compression formats not an option.
-* Extract and play archives from location other than `LaunchBox\ThirdParty\7-Zip\Temp`, such as high speed SSD.
+* Extract and play archives from location other than `LaunchBox\ThirdParty\7-Zip\Temp`, such as platform specific folder (for RetroArch Content Directory settings).
 * Playing ripped PS2 games with PCSX2 where the disc image is bin/cue format, avoiding the "CDVD plugin failed to open" error message.
-* Playing MSU versions of games, where need to launch the rom file instead of the cue file from the archive.
-* Your library contains GoodMerged sets, and you want a quick way to play individual ROMs.
+* Playing zipped MSU versions of games, where need to launch the rom file instead of the cue file from the archive.
+* The library contains GoodMerged sets, and you want a quick way to play individual ROMs.
 
 ## Installation
 * Download the latest release from https://forums.launchbox-app.com/files/file/234-archive-cache-manager/ or https://github.com/fraganator/archive-cache-manager/releases
@@ -76,6 +62,19 @@ Cache and extraction behaviour can be modified in plugin's configuration window.
 To use the multi-disc cache feature, check the _"Multi-disc Support"_ option in the Archive Cache Manager config window. The next time a multi-disc game is launched, all the discs from the game will be extracted to the cache and a corresponding M3U file generated.
 
 If the emulator \ platform supports M3U files (as configured in LaunchBox), the generated M3U file will be used when launching the game. Otherwise a single disc will be launched, and swapping between cached discs can be done manually in the emulator.
+
+### Batch Caching Games
+Multiple games can be cached at once using the Batch Cache Games window. Select one or more games in LaunchBox, then right-click a game and choose the "Batch Cache Games..." option.
+
+A window will popup displaying the list of games, and begin checking the extracted ROM sizes. Once the checks are complete, click the Cache Games button to begin caching.
+
+![Batch caching window](images/batch-cache.png?raw=true "Batch caching window")
+
+Games are cached according to the plugin's emulator and platform settings. A game may be extracted, copied, or no action taken if it doesn't match a caching rule, or it's already cached.
+
+Each game's caching progress will be displayed in the Status column, and a progress bar at the bottom of the game list shows the overall caching progress. If there are any errors while caching, an error message is displayed with the option to continue or stop.
+
+_**Tip:** For games stored on a NAS or an external drive, use Batch Cache Games to cache a selection of them locally. Enable the plugin's `Always Bypass LaunchBox Path Check` option to allow the cached game to be launched directly, even if the network or external drive is disconnected!_
 
 ### Selecting and Playing Individual ROMs From an Archive
 To play an individual ROM from an archive containing multiple ROMs (different regions, hacks, or discs), right-click it and choose "Select ROM In Archive...".
