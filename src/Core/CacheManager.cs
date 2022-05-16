@@ -257,7 +257,7 @@ namespace ArchiveCacheManager
 
             if (!LaunchInfo.Game.SelectedFile.Equals(string.Empty))
             {
-                if (LaunchInfo.Extractor.List(LaunchInfo.GetArchivePath(), LaunchInfo.Game.SelectedFile.ToSingleArray()).Length > 0)
+                if (LaunchInfo.GetFileList(null, LaunchInfo.Game.SelectedFile.ToSingleArray()).Length > 0)
                 {
                     fileList.Add(LaunchInfo.Game.SelectedFile);
                     Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchInfo.Game.SelectedFile));
@@ -278,7 +278,7 @@ namespace ArchiveCacheManager
                     // Search the extensions in priority order
                     foreach (string extension in extensionPriority)
                     {
-                        fileList = LaunchInfo.Extractor.List(LaunchInfo.GetArchivePath(), string.Format("{0}", extension.Trim()).ToSingleArray(), null, true).ToList();
+                        fileList = LaunchInfo.GetFileList(null, string.Format("{0}", extension.Trim()).ToSingleArray(), null, true).ToList();
 
                         if (fileList.Count > 0)
                         {
@@ -293,7 +293,7 @@ namespace ArchiveCacheManager
                 }
             }
 
-            fileList = LaunchInfo.Extractor.List(LaunchInfo.GetArchivePath()).ToList();
+            fileList = LaunchInfo.GetFileList().ToList();
 
             return fileList;
         }

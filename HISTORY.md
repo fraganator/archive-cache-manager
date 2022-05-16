@@ -1,4 +1,8 @@
 # Archive Cache Manager change history
+## v2.15 (2022-05-xx)
+* Improve performance when matching many file priorities
+* Fix incorrect M3U launch path
+
 ## v2.14 (2022-05-05)
 * New right-click menu option - "Batch Cache Games"
     * Extract or copy multiple games to the cache, ready to play later

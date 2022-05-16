@@ -89,6 +89,16 @@ namespace ArchiveCacheManager
         /// <returns>The list of files in an archive, filtered using include and exclude lists when specified.</returns>
         public abstract string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false);
 
+        /// <summary>
+        /// Get the size of archive after extraction and the file list.
+        /// If fileInArchive is specified, the returned size will be of the file only.
+        /// This function is equivalent to calling GetSize() and List(), but may be faster with certain extractors.
+        /// </summary>
+        /// <param name="archivePath"></param>
+        /// <param name="fileInArchive"></param>
+        /// <returns>Tuple of extracted archive size or file size, and file list.</returns>
+        public abstract (long, string[]) GetSizeAndList(string archivePath, string fileInArchive = null);
+
         public abstract string GetExtractorPath();
     }
 }

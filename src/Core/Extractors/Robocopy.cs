@@ -79,5 +79,10 @@ namespace ArchiveCacheManager
         {
             return null;
         }
+
+        public override (long, string[]) GetSizeAndList(string archivePath, string fileInArchive = null)
+        {
+            return (GetSize(archivePath, fileInArchive), List(archivePath));
+        }
     }
 }

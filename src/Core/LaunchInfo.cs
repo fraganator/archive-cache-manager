@@ -19,6 +19,7 @@ namespace ArchiveCacheManager
             public bool? ArchiveInCache;
             public long? Size;
             public bool? ExtractSingleFile;
+            public string[] FileList;
 
             public Config.EmulatorPlatformConfig Config;
             public string ArchiveCacheLaunchPath;
@@ -26,6 +27,10 @@ namespace ArchiveCacheManager
 
             public CacheData()
             {
+                ArchiveInCache = null;
+                Size = null;
+                ExtractSingleFile = null;
+                FileList = null;
                 Config = new Config.EmulatorPlatformConfig();
             }
         };
@@ -95,6 +100,47 @@ namespace ArchiveCacheManager
             return new Zip();
         }
 
+        public static void PopulateArchiveInfo()
+        {
+            if (mGame.MultiDisc && MultiDiscSupport)
+            {
+                foreach (var disc in mMultiDiscCacheData.Keys)
+                {
+                    if (mMultiDiscCacheData[disc].Size == null && mMultiDiscCacheData[disc].FileList == null)
+                    {
+                        (mMultiDiscCacheData[disc].Size, mMultiDiscCacheData[disc].FileList) = Extractor.GetSizeAndList(mMultiDiscCacheData[disc].ArchivePath);
+                    }
+                    else
+                    {
+                        if (mMultiDiscCacheData[disc].Size == null)
+                        {
+                            mMultiDiscCacheData[disc].Size = Extractor.GetSize(mMultiDiscCacheData[disc].ArchivePath);
+                        }
+                        if (mMultiDiscCacheData[disc].FileList == null)
+                        {
+                            mMultiDiscCacheData[disc].FileList = Extractor.List(mMultiDiscCacheData[disc].ArchivePath);
+                        }
+                    }
+                }
+            }
+
+            if (mGameCacheData.Size == null && mGameCacheData.FileList == null)
+            {
+                (mGameCacheData.Size, mGameCacheData.FileList) = Extractor.GetSizeAndList(mGameCacheData.ArchivePath);
+            }
+            else
+            {
+                if (mGameCacheData.Size == null)
+                {
+                    mGameCacheData.Size = Extractor.GetSize(mGameCacheData.ArchivePath);
+                }
+                if (mGameCacheData.FileList == null)
+                {
+                    mGameCacheData.FileList = Extractor.List(mGameCacheData.ArchivePath);
+                }
+            }
+        }
+
         public static void SetSize(long size)
         {
             mGameCacheData.Size = size;
@@ -147,6 +193,66 @@ namespace ArchiveCacheManager
             return (long)mGameCacheData.Size;
         }
 
+        public static string[] GetFileList(int? disc = null, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        {
+            if (disc != null)
+            {
+                try
+                {
+                    if (mMultiDiscCacheData[(int)disc].FileList == null)
+                    {
+                        mMultiDiscCacheData[(int)disc].FileList = Extractor.List(mMultiDiscCacheData[(int)disc].ArchivePath);
+                    }
+
+                    return MatchFileList(mMultiDiscCacheData[(int)disc].FileList, includeList, excludeList, prefixWildcard);
+                }
+                catch (KeyNotFoundException)
+                {
+                    Logger.Log(string.Format("Unknown disc number {0}, using launched file list instead.", (int)disc));
+                }
+            }
+
+            if (mGameCacheData.FileList == null)
+            {
+                mGameCacheData.FileList = Extractor.List(mGameCacheData.ArchivePath);
+            }
+
+            return MatchFileList(mGameCacheData.FileList, includeList, excludeList, prefixWildcard);
+        }
+
+        private static string[] MatchFileList(string[] fileList, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        {
+            if (includeList == null && excludeList == null)
+            {
+                return fileList;
+            }
+
+            List<string> matchFileList = new List<string>();
+            string prefix = prefixWildcard ? "*" : "";
+            if (includeList != null)
+            {
+                foreach (var include in includeList)
+                {
+                    matchFileList.AddRange(fileList.Where(x => x.EqualsWildcard(prefix + include)));
+                }
+            }
+
+            if (excludeList != null)
+            {
+                if (includeList == null)
+                {
+                    matchFileList.AddRange(fileList);
+                }
+
+                foreach (var exclude in excludeList)
+                {
+                    matchFileList.RemoveAll(x => x.EqualsWildcard(prefix + exclude));
+                }
+            }
+
+            return matchFileList.ToArray();
+        }
+
         /// <summary>
         /// Get the individual file to be extracted from the archive, if supported.
         /// Will only return a result if SmartExtract is enabled, and the game was launched with a file selected.
@@ -174,7 +280,7 @@ namespace ArchiveCacheManager
                         excludeList.Add(extension);
                     }
 
-                    if (Extractor.List(mGame.ArchivePath, null, excludeList.ToArray(), true).Count() == 0)
+                    if (GetFileList(null, null, excludeList.ToArray(), true).Count() == 0)
                     {
                         mGameCacheData.ExtractSingleFile = true;
                         Logger.Log(string.Format("Smart Extraction enabled for file \"{0}\".", mGame.SelectedFile));
@@ -286,10 +392,10 @@ namespace ArchiveCacheManager
             {
                 case Config.M3uName.GameId:
                 default:
-                    m3uName = PathUtils.GetArchiveCacheM3uGameIdPath(GetArchiveCachePath(disc), mGame.GameId);
+                    m3uName = PathUtils.GetArchiveCacheM3uGameIdPath(GetArchiveCacheLaunchPath(disc), mGame.GameId);
                     break;
                 case Config.M3uName.TitleVersion:
-                    m3uName = PathUtils.GetArchiveCacheM3uGameTitlePath(GetArchiveCachePath(disc), mGame.GameId, mGame.Title, mGame.Version, disc);
+                    m3uName = PathUtils.GetArchiveCacheM3uGameTitlePath(GetArchiveCacheLaunchPath(disc), mGame.GameId, mGame.Title, mGame.Version, disc);
                     break;
             }
 
