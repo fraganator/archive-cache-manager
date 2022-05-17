@@ -70,18 +70,13 @@ namespace ArchiveCacheManager
             // -bsp1 = redirect progress to stdout
             string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa -bsp1 {2}", archivePath, cachePath, GetIncludeExcludeArgs(includeList, excludeList, false));
 
-            (_, _, int exitCode) = Run7z(args, true);
+            var (_, _, exitCode) = Run7z(args, true);
             return exitCode == 0;
         }
 
-        public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        public override string[] List(string archivePath)
         {
-            // Run List command
-            // Parse stdout for all "Path = " entries
-            // Return -1 on error
-            string[] fileList = Array.Empty<string>();
-
-            var (stdout, _, exitCode) = ListArchiveDetails(archivePath, includeList, excludeList, prefixWildcard);
+            var (stdout, _, exitCode) = ListArchiveDetails(archivePath);
 
             /*
             stdout will be in the format below:
@@ -118,6 +113,8 @@ namespace ArchiveCacheManager
             c:\LaunchBox\ThirdParty\7-Zip>
             --------
             */
+
+            string[] fileList = Array.Empty<string>();
 
             if (exitCode == 0)
             {
@@ -248,84 +245,6 @@ namespace ArchiveCacheManager
         public override string GetExtractorPath()
         {
             return PathUtils.GetLaunchBox7zPath();
-        }
-
-        public override (long, string[]) GetSizeAndList(string archivePath, string fileInArchive = null)
-        {
-            var (stdout, _, exitCode) = ListArchiveDetails(archivePath);
-
-            /*
-            stdout will be in the format below:
-            --------
-            c:\LaunchBox\ThirdParty\7-Zip>7z l "c:\Emulation\ROMs\Doom (USA).zip"
-
-            7-Zip 19.00 (x64) : Copyright (c) 1999-2018 Igor Pavlov : 2019-02-21
-
-            Scanning the drive for archives:
-            1 file, 260733247 bytes (249 MiB)
-
-            Listing archive: c:\Emulation\ROMs\Doom (USA).zip
-
-            --
-            Path = c:\Emulation\ROMs\Doom (USA).zip
-            Type = zip
-            Physical Size = 260733247
-            Comment = TORRENTZIPPED-9F8E0391
-
-               Date      Time    Attr         Size   Compressed  Name
-            ------------------- ----- ------------ ------------  ------------------------
-            1996-12-24 23:32:00 .....     84175728     69019477  Doom (USA) (Track 1).bin
-            1996-12-24 23:32:00 .....     33737088     31332352  Doom (USA) (Track 2).bin
-            1996-12-24 23:32:00 .....     20801088     19163186  Doom (USA) (Track 3).bin
-            1996-12-24 23:32:00 .....     41992608     38498123  Doom (USA) (Track 4).bin
-            1996-12-24 23:32:00 .....     36717072     34627868  Doom (USA) (Track 5).bin
-            1996-12-24 23:32:00 .....     22936704     21946175  Doom (USA) (Track 6).bin
-            1996-12-24 23:32:00 .....      9847824      8577248  Doom (USA) (Track 7).bin
-            1996-12-24 23:32:00 .....     40560240     37567531  Doom (USA) (Track 8).bin
-            1996-12-24 23:32:00 .....          814          147  Doom (USA).cue
-            ------------------- ----- ------------ ------------  ------------------------
-            1996-12-24 23:32:00          290769166    260732107  9 files
-
-            c:\LaunchBox\ThirdParty\7-Zip>
-            --------
-            */
-
-            long archiveSize = 0;
-            string[] fileList = Array.Empty<string>();
-
-            if (exitCode == 0)
-            {
-                string[] info;
-                // Split on the "----" dividers (see above). There will then be three sections, the header info, the files, and the summary.
-                string[] stdoutArray = stdout.Split(new string[] { "------------------- ----- ------------ ------------  ------------------------" }, StringSplitOptions.RemoveEmptyEntries);
-
-                // Get the complete archive size from the summary section
-                archiveSize = ParseSize(stdoutArray[stdoutArray.Length - 1]);
-
-                if (stdoutArray.Length > 2)
-                {
-                    // Split the files on "\r\n", so we have an array with one element per filename + info
-                    info = stdoutArray[1].Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                    for (int i = 0; i < info.Length; i++)
-                    {
-                        // Split the string at the 53rd char, after the date/time/attr/size/compressed info.
-                        fileList[i] = info[i].Substring(53).Trim();
-
-                        if (!string.IsNullOrEmpty(fileInArchive) && Equals(fileList[i], fileInArchive))
-                        {
-                            // Replace the archive size with the file size
-                            archiveSize = ParseSize(info[i]);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Logger.Log(string.Format("Error listing archive {0}.", archivePath));
-                Environment.ExitCode = exitCode;
-            }
-
-            return (archiveSize, fileList);
         }
     }
 }

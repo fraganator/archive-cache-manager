@@ -189,6 +189,11 @@ namespace ArchiveCacheManager
                     }
 
                     progressBar.PerformStep();
+
+                    if (mStatus == StatusEnum.Closing)
+                    {
+                        return;
+                    }
                 }
 
                 cacheButton.Enabled = true;

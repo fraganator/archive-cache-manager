@@ -102,7 +102,7 @@ namespace ArchiveCacheManager
             return size;
         }
 
-        public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        public override string[] List(string archivePath)
         {
             string[] fileList = new string[2];
             fileList[0] = Path.GetFileNameWithoutExtension(archivePath) + ".cue";
@@ -118,11 +118,6 @@ namespace ArchiveCacheManager
         public override string GetExtractorPath()
         {
             return executablePath;
-        }
-
-        public override (long, string[]) GetSizeAndList(string archivePath, string fileInArchive = null)
-        {
-            return (GetSize(archivePath, fileInArchive), List(archivePath));
         }
     }
 }

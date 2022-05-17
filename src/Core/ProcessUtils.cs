@@ -17,6 +17,7 @@ namespace ArchiveCacheManager
             try
             {
                 mProcess.Kill();
+                mProcess.WaitForExit();
             }
             catch (Exception)
             {

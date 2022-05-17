@@ -23,7 +23,7 @@ namespace ArchiveCacheManager
             {
                 Version version = Version;
 
-                return string.Format("v{0}.{1}", version.Major, version.Minor);
+                return string.Format("v{0}.{1} beta 1", version.Major, version.Minor);
             }
         }
 
@@ -124,7 +124,7 @@ namespace ArchiveCacheManager
                 foreach (var discInfo in LaunchInfo.Game.Discs)
                 {
                     // Delete any previously generated m3u file, so it doesn't get included in the subsequent archive listing
-                    DiskUtils.DeleteFile(LaunchInfo.GetM3uName(discInfo.Disc));
+                    DiskUtils.DeleteFile(LaunchInfo.GetM3uPath(LaunchInfo.GetArchiveCachePath(discInfo.Disc), discInfo.Disc));
                     filePaths.Add(discInfo.Disc, ListCacheArchive(LaunchInfo.GetArchiveCachePath(discInfo.Disc), discInfo.Disc).FirstOrDefault());
                 }
 
@@ -143,7 +143,7 @@ namespace ArchiveCacheManager
                         }
                     }
 
-                    string m3uPath = LaunchInfo.GetM3uName(discInfo.Disc);
+                    string m3uPath = LaunchInfo.GetM3uPath(LaunchInfo.GetArchiveCachePath(discInfo.Disc), discInfo.Disc);
                     try
                     {
                         File.WriteAllLines(m3uPath, multiDiscPaths);
@@ -218,7 +218,7 @@ namespace ArchiveCacheManager
                 if (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport && LaunchInfo.Game.EmulatorPlatformM3u)
                 {
                     // This is a multi-disc game, and the emulator supports m3u files. Set the file list to the generated m3u file.
-                    fileList.Add(LaunchInfo.GetM3uName(LaunchInfo.Game.SelectedDisc));
+                    fileList.Add(LaunchInfo.GetM3uPath(LaunchInfo.GetArchiveCacheLaunchPath(LaunchInfo.Game.SelectedDisc), LaunchInfo.Game.SelectedDisc));
                 }
                 else
                 {
@@ -251,51 +251,26 @@ namespace ArchiveCacheManager
         /// <returns>The file list for the archive in "Path = absolute\file\path.ext" format, with one entry per line.</returns>
         public static List<string> ListFileArchive()
         {
-            string stdout = string.Empty;
-            string selectedFilePath = string.Empty;
-            List<string> fileList = new List<string>();
+            List<string> filteredFileList = new List<string>();
+            string[] fileList = LaunchInfo.GetFileList();
 
             if (!LaunchInfo.Game.SelectedFile.Equals(string.Empty))
             {
-                if (LaunchInfo.GetFileList(null, LaunchInfo.Game.SelectedFile.ToSingleArray()).Length > 0)
+                if (LaunchInfo.MatchFileList(fileList, LaunchInfo.Game.SelectedFile.ToSingleArray()).Length > 0)
                 {
-                    fileList.Add(LaunchInfo.Game.SelectedFile);
+                    filteredFileList.Add(LaunchInfo.Game.SelectedFile);
                     Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchInfo.Game.SelectedFile));
-                    return fileList;
+                    return filteredFileList;
                 }
             }
 
-            List<string> prioritySections = new List<string>();
-            prioritySections.Add(Config.EmulatorPlatformKey(LaunchInfo.Game.Emulator, LaunchInfo.Game.Platform));
-            prioritySections.Add(Config.EmulatorPlatformKey("All", "All"));
-
-            foreach (var prioritySection in prioritySections)
+            filteredFileList = LaunchInfo.GetPriorityFileList(fileList);
+            if (filteredFileList.Count > 0)
             {
-                try
-                {
-                    string[] extensionPriority = Config.GetFilenamePriority(prioritySection).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-
-                    // Search the extensions in priority order
-                    foreach (string extension in extensionPriority)
-                    {
-                        fileList = LaunchInfo.GetFileList(null, string.Format("{0}", extension.Trim()).ToSingleArray(), null, true).ToList();
-
-                        if (fileList.Count > 0)
-                        {
-                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension.Trim()));
-                            return fileList;
-                        }
-                    }
-                }
-                catch (KeyNotFoundException)
-                {
-
-                }
+                return filteredFileList;
             }
 
-            fileList = LaunchInfo.GetFileList().ToList();
-
-            return fileList;
+            return fileList.ToList();
         }
 
         /// <summary>
@@ -304,69 +279,51 @@ namespace ArchiveCacheManager
         /// <returns>The file list for the cached archive, with one entry per line. All paths are absolute.</returns>
         public static List<string> ListCacheArchive(string archiveCachePath, int? disc = null)
         {
-            List<string> fileList = new List<string>();
+            List<string> filteredFileList = new List<string>();
             string[] managerFiles = PathUtils.GetManagerFiles(archiveCachePath);
+            string[] fileList;
+
+            try
+            {
+                fileList = Directory.GetFiles(archiveCachePath, "*", SearchOption.AllDirectories);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to list cache path {archiveCachePath}\r\n{e.ToString()}");
+                return filteredFileList;
+            }
 
             if (!string.IsNullOrEmpty(LaunchInfo.Game.SelectedFile) && !(LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport))
             {
-                if (Directory.GetFiles(archiveCachePath, LaunchInfo.Game.SelectedFile, SearchOption.AllDirectories).Length > 0)
+                string selectedFilePath = Path.Combine(archiveCachePath, LaunchInfo.Game.SelectedFile);
+                if (LaunchInfo.MatchFileList(fileList, selectedFilePath.ToSingleArray()).Length > 0)
                 {
-                    fileList.Add(Path.Combine(archiveCachePath, LaunchInfo.Game.SelectedFile));
+                    filteredFileList.Add(selectedFilePath);
                     Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchInfo.Game.SelectedFile));
-                    return fileList;
+                    return filteredFileList;
                 }
             }
 
-            List<string> prioritySections = new List<string>();
-            prioritySections.Add(Config.EmulatorPlatformKey(LaunchInfo.Game.Emulator, LaunchInfo.Game.Platform));
-            prioritySections.Add(Config.EmulatorPlatformKey("All", "All"));
-
-            foreach (var prioritySection in prioritySections)
+            filteredFileList = LaunchInfo.GetPriorityFileList(fileList, managerFiles);
+            if (filteredFileList.Count > 0)
             {
-                try
-                {
-                    string[] extensionPriority = Utils.SplitExtensions(Config.GetFilenamePriority(prioritySection));
-
-                    // Search the extensions in priority order
-                    foreach (string extension in extensionPriority)
-                    {
-                        fileList = Directory.GetFiles(archiveCachePath, string.Format("*{0}", extension), SearchOption.AllDirectories).ToList();
-
-                        foreach (string ex in managerFiles)
-                        {
-                            fileList.Remove(ex);
-                        }
-
-                        if (fileList.Count > 0)
-                        {
-                            Logger.Log(string.Format("Using filename priority \"{0}\".", extension));
-                            return fileList;
-                        }
-                    }
-                }
-                catch (KeyNotFoundException)
-                {
-
-                }
+                return filteredFileList;
             }
 
-            fileList = Directory.GetFiles(archiveCachePath, "*", SearchOption.AllDirectories).ToList();
-
+            filteredFileList = fileList.ToList();
             foreach (string ex in managerFiles)
             {
-                fileList.Remove(ex);
+                filteredFileList.Remove(ex);
             }
-
-            if (fileList.Count > 0)
+            if (filteredFileList.Count > 0)
             {
                 // If we're listing a disc from a multi-disc game, only return a single file
                 if (disc != null)
                 {
-                    fileList.RemoveRange(1, fileList.Count() - 1);
+                    filteredFileList.RemoveRange(1, filteredFileList.Count() - 1);
                 }
             }
-
-            return fileList;
+            return filteredFileList;
         }
 
         /// <summary>
