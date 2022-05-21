@@ -253,13 +253,14 @@ namespace ArchiveCacheManager
         {
             List<string> filteredFileList = new List<string>();
             string[] fileList = LaunchInfo.GetFileList();
+            string selectedFile = LaunchInfo.GetExtractSingleFile();
 
-            if (!LaunchInfo.Game.SelectedFile.Equals(string.Empty))
+            if (!string.IsNullOrEmpty(selectedFile))
             {
-                if (LaunchInfo.MatchFileList(fileList, LaunchInfo.Game.SelectedFile.ToSingleArray()).Length > 0)
+                if (LaunchInfo.MatchFileList(fileList, selectedFile.ToSingleArray()).Length > 0)
                 {
-                    filteredFileList.Add(LaunchInfo.Game.SelectedFile);
-                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchInfo.Game.SelectedFile));
+                    filteredFileList.Add(selectedFile);
+                    Logger.Log(string.Format("Selected individual file from archive \"{0}\".", selectedFile));
                     return filteredFileList;
                 }
             }
@@ -295,9 +296,9 @@ namespace ArchiveCacheManager
 
             if (!string.IsNullOrEmpty(LaunchInfo.Game.SelectedFile) && !(LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport))
             {
-                string selectedFilePath = Path.Combine(archiveCachePath, LaunchInfo.Game.SelectedFile);
-                if (LaunchInfo.MatchFileList(fileList, selectedFilePath.ToSingleArray()).Length > 0)
+                if (LaunchInfo.MatchFileList(fileList, LaunchInfo.Game.SelectedFile.ToSingleArray()).Length > 0)
                 {
+                    string selectedFilePath = Path.Combine(archiveCachePath, LaunchInfo.Game.SelectedFile);
                     filteredFileList.Add(selectedFilePath);
                     Logger.Log(string.Format("Selected individual file from archive \"{0}\".", LaunchInfo.Game.SelectedFile));
                     return filteredFileList;

@@ -253,6 +253,12 @@
   <ItemGroup>
     <None Include="Resources\box--plus.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\star.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\star-blue.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y $(TargetPath) c:\LaunchBox\Plugins\ArchiveCacheManager

@@ -188,36 +188,46 @@ namespace ArchiveCacheManager
 
             List<string> matchFileList = new List<string>();
             string prefix = prefixWildcard ? "*" : "";
-            if (includeList != null)
+
+            try
             {
-                foreach (var include in includeList)
+                if (includeList != null)
                 {
-                    matchFileList.AddRange(fileList.Where(x => x.EqualsWildcard(prefix + include, true)));
+                    foreach (var include in includeList)
+                    {
+                        //matchFileList.AddRange(fileList.Where(x => Operators.LikeString(Path.GetFileName(x), prefix + include.Replace("[", "[[]"), CompareMethod.Text)));
+                        matchFileList.AddRange(fileList.Where(x => FastWildcard.FastWildcard.IsMatch(Path.GetFileName(x), prefix + include)));
+                    }
+                }
+
+                if (excludeList != null)
+                {
+                    if (includeList == null)
+                    {
+                        matchFileList.AddRange(fileList);
+                    }
+
+                    foreach (var exclude in excludeList)
+                    {
+                        //matchFileList.RemoveAll(x => Operators.LikeString(Path.GetFileName(x), prefix + exclude.Replace("[", "[[]"), CompareMethod.Text));
+                        matchFileList.RemoveAll(x => FastWildcard.FastWildcard.IsMatch(Path.GetFileName(x), prefix + exclude));
+                    }
                 }
             }
-
-            if (excludeList != null)
+            catch (Exception e)
             {
-                if (includeList == null)
-                {
-                    matchFileList.AddRange(fileList);
-                }
-
-                foreach (var exclude in excludeList)
-                {
-                    matchFileList.RemoveAll(x => x.EqualsWildcard(prefix + exclude, true));
-                }
+                Logger.Log($"Error during pattern match:\r\n{e.ToString()}");
             }
 
             return matchFileList.ToArray();
         }
 
-        public static List<string> GetPriorityFileList(string[] fileList, string[] ignoreFiles = null)
+        public static List<string> GetPriorityFileList(string[] fileList, string[] ignoreFiles = null, string emulator = null, string platform = null)
         {
             List<string> priorityList = new List<string>();
 
             List<string> prioritySections = new List<string>();
-            prioritySections.Add(Config.EmulatorPlatformKey(mGame.Emulator, mGame.Platform));
+            prioritySections.Add(Config.EmulatorPlatformKey(emulator ?? mGame.Emulator, platform ?? mGame.Platform));
             prioritySections.Add(Config.EmulatorPlatformKey("All", "All"));
 
             foreach (var prioritySection in prioritySections)
@@ -231,7 +241,7 @@ namespace ArchiveCacheManager
                     {
                         priorityList = MatchFileList(fileList, $"{extension.Trim()}".ToSingleArray(), null, true).ToList();
 
-                        if (ignoreFiles != null)
+                        if (ignoreFiles != null && priorityList.Count > 0)
                         {
                             foreach (var ignoreFile in ignoreFiles)
                             {

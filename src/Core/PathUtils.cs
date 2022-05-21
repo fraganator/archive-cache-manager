@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Linq;
+using System.Globalization;
 
 namespace ArchiveCacheManager
 {
@@ -17,7 +18,7 @@ namespace ArchiveCacheManager
          * <LaunchBox>\Core\LaunchBox.exe
          * <LaunchBox>\ThirdParty\7-Zip\7z.exe
          */
-        public static readonly int MAX_PATH = 260;
+        public static readonly int MAX_PATH = 255; // Should be 260, but RetroArch fails to load anything over 255 chars
 
         private static readonly string configFileName = @"config.ini";
         private static readonly string gameIndexFileName = @"game-index.ini";
@@ -350,22 +351,58 @@ namespace ArchiveCacheManager
         /// Absolute path to the archive within the cache.
         /// </summary>
         /// <param name="archivePath">The path to the cache lcation.</param>
+        /// <param name="checkOldFormat">Flag to check if the cache contains the old path naming format, and uses it if found.</param>
+        /// <param name="longestPath">The longest sub path in the archive, used to determine the maximum path length. If not specified, the archive name will be used.</param>
         /// <returns>Absolute path to the archive within the cache.</returns>
-        public static string ArchiveCachePath(string archivePath)
+        public static string ArchiveCachePath(string archivePath, bool checkOldFormat = true, string longestPath = null)
         {
-            return Path.Combine(CachePath(), FilenameWithHash(archivePath));
-        }
+            // Some users have hundreds of already cached games, so don't want to force them to re-cache.
+            // Check the old path format (filename + hash), and use it if it already exists.
+            // *Could* rename the old path format to the new, but this is simpler and less error prone.
+            if (checkOldFormat)
+            {
+                string oldPathFormat = Path.Combine(CachePath(), FilenameWithHash(archivePath));
+                if (Directory.Exists(oldPathFormat))
+                {
+                    return oldPathFormat;
+                }
+            }
 
-        /// <summary>
-        /// Absolute path to the archive within the cache.
-        /// </summary>
-        /// <param name="archivePath">The path to the cache lcation.</param>
-        /// <returns>Absolute path to the archive within the cache.</returns>
-        public static string ArchiveCachePath(string archivePath, string title, string version, string id)
-        {
-            string path = string.Format("{0} {1} [{2}]", title, version, id.Substring(0, 6));
-            path = GetValidFilename(path, Path.GetFileName(archivePath));
-            return Path.Combine(CachePath(), path);
+            int hashLength = 6;
+            string ellipsis = "...";
+            string path = FilenameWithHash(archivePath, hashLength);
+            string archiveCachePath = Path.Combine(CachePath(), path);
+
+            // If longestPath not specified, assume longest sub path will be same as the archive filename
+            StringInfo lengthTestPath = new StringInfo(Path.Combine(archiveCachePath, longestPath ?? Path.GetFileName(archivePath)));
+
+            if (lengthTestPath.LengthInTextElements <= MAX_PATH)
+            {
+                return archiveCachePath;
+            }
+
+            string extension = Path.GetExtension(archivePath);
+            string hash = path.Substring(path.Length - hashLength - 3);
+            // Minimum path is 8 characters + ellipsis + 8 characters + extension + hash
+            // e.g. "Final Fa...(Disc 1).zip - 123456"
+            // 8 is minimum leading characters in path (e.g. "Final Fantasy VII (Europe) (Disc 1).zip" -> "Final Fa")
+            // 8 is minimum trailing characters in path before extension (e.g. "Final Fantasy VII (Europe) (Disc 1).zip" -> "(Disc 1)")
+            // 3 is the number of leading chars before the hash string in the form " - "
+            int minPathLength = 8 + ellipsis.Length + 8 + new StringInfo(Path.GetExtension(archivePath)).LengthInTextElements + 3 + hashLength;
+            int charsToRemove = lengthTestPath.LengthInTextElements - MAX_PATH;
+            StringInfo basePath = new StringInfo(Path.GetFileNameWithoutExtension(archivePath));
+            int charsToKeep = basePath.LengthInTextElements - charsToRemove - ellipsis.Length;
+
+            if (charsToKeep < minPathLength)
+            {
+                charsToKeep = minPathLength;
+            }
+
+            string startPath = basePath.SubstringByTextElements(0, charsToKeep / 2);
+            string endPath = basePath.SubstringByTextElements(basePath.LengthInTextElements - charsToKeep / 2);
+            archiveCachePath = Path.Combine(CachePath(), startPath + ellipsis + endPath + extension + hash);
+
+            return archiveCachePath;
         }
 
         /// <summary>

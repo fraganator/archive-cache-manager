@@ -52,10 +52,12 @@
     <Compile Include="Extractors\DolphinTool.cs" />
     <Compile Include="Extractors\Robocopy.cs" />
     <Compile Include="Extractors\Extractor.cs" />
+    <Compile Include="FastWildcard.cs" />
     <Compile Include="LaunchInfo.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="GameIndex.cs" />
     <Compile Include="GameInfo.cs" />
+    <Compile Include="MatchSettings.cs" />
     <Compile Include="ProcessUtils.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Utils.cs" />
@@ -64,7 +66,6 @@
     <Compile Include="DiskUtils.cs" />
     <Compile Include="PathUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WildcardMatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
