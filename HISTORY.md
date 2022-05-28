@@ -1,7 +1,10 @@
 # Archive Cache Manager change history
 ## v2.15 (2022-05-xx)
-* Improve performance when matching many file priorities
-* Fix incorrect M3U launch path
+* Improve performance when checking many file priorities
+* Smart Extract uses file priority if individual ROM not previously selected
+* Reduce archive cache path length if too long
+* Interface tweaks
+* Fix platform launch path for auto generated M3Us
 
 ## v2.14 (2022-05-05)
 * New right-click menu option - "Batch Cache Games"

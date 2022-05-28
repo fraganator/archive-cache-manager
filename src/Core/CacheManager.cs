@@ -253,7 +253,7 @@ namespace ArchiveCacheManager
         {
             List<string> filteredFileList = new List<string>();
             string[] fileList = LaunchInfo.GetFileList();
-            string selectedFile = LaunchInfo.GetExtractSingleFile();
+            string selectedFile = LaunchInfo.GetExtractSingleFile() ?? LaunchInfo.Game.SelectedFile;
 
             if (!string.IsNullOrEmpty(selectedFile))
             {

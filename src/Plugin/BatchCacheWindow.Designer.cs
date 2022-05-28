@@ -46,9 +46,9 @@ namespace ArchiveCacheManager
             this.CacheAction = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CacheStatus = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.closeButton = new System.Windows.Forms.Button();
-            this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
             this.stopButton = new System.Windows.Forms.Button();
             this.cacheButton = new System.Windows.Forms.Button();
+            this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
             ((System.ComponentModel.ISupportInitialize)(this.cacheStatusGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -196,18 +196,6 @@ namespace ArchiveCacheManager
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
             // 
-            // progressBar
-            // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(12, 385);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(920, 10);
-            this.progressBar.Step = 1;
-            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar.TabIndex = 11;
-            this.progressBar.Visible = false;
-            // 
             // stopButton
             // 
             this.stopButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -236,6 +224,18 @@ namespace ArchiveCacheManager
             this.cacheButton.UseVisualStyleBackColor = true;
             this.cacheButton.Click += new System.EventHandler(this.cacheButton_Click);
             // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(12, 385);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(920, 10);
+            this.progressBar.Step = 1;
+            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar.TabIndex = 11;
+            this.progressBar.Visible = false;
+            // 
             // BatchCacheWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -256,6 +256,7 @@ namespace ArchiveCacheManager
             this.Shown += new System.EventHandler(this.BatchCacheWindow_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.cacheStatusGridView)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

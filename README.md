@@ -3,11 +3,12 @@
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
-## New in v2.14
-* New right-click menu option - "Batch Cache Games"
-    * Extract or copy multiple games to the cache, ready to play later
-    * Bulk cache games from NAS or external storage
-        * Cached games can be played even if network or external storage disconnected
+## New in v2.15
+* Improve performance when checking many file priorities
+* Smart Extract uses file priority if individual ROM not previously selected
+* Reduce archive cache path length if too long
+* Interface tweaks
+* Fix platform launch path for auto generated M3Us
 
 ## Description
 When a compressed ROM (zip, 7z, rar, gz, chd, rvz, etc.) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.

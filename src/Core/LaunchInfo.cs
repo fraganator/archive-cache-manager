@@ -278,7 +278,8 @@ namespace ArchiveCacheManager
 
                 if (mGameCacheData.Config.SmartExtract)
                 {
-                    if (string.IsNullOrEmpty(mGame.SelectedFile))
+                    bool fileNotSelected = string.IsNullOrEmpty(mGame.SelectedFile);
+                    if (fileNotSelected)
                     {
                         mGame.SelectedFile = GetPriorityFileList(GetFileList()).ElementAtOrDefault(0);
                     }
@@ -304,10 +305,10 @@ namespace ArchiveCacheManager
                             mGameCacheData.ExtractSingleFile = true;
                             Logger.Log(string.Format("Smart Extraction enabled for file \"{0}\".", mGame.SelectedFile));
                         }
-                    }
-                    else
-                    {
-                        mGame.SelectedFile = null;
+                        else if (fileNotSelected)
+                        {
+                            mGame.SelectedFile = null;
+                        }
                     }
                 }
             }

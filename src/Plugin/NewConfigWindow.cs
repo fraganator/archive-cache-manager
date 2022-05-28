@@ -13,6 +13,8 @@ namespace ArchiveCacheManager
     {
         public bool RefreshLaunchBox = false;
 
+        private Dictionary<string, Bitmap> emulatorIcons;
+
         public NewConfigWindow()
         {
             InitializeComponent();
@@ -20,6 +22,22 @@ namespace ArchiveCacheManager
             UserInterface.SetDoubleBuffered(cacheDataGridView, true);
             UserInterface.SetDoubleBuffered(emulatorPlatformConfigDataGridView, true);
             UserInterface.ApplyTheme(this);
+
+            emulatorIcons = new Dictionary<string, Bitmap>();
+            foreach (var emulator in PluginHelper.DataManager.GetAllEmulators())
+            {
+                try
+                {
+                    Bitmap icon = ShellIcon.GetShellIcon(PathUtils.GetAbsolutePath(emulator.ApplicationPath), ShellIcon.IconSize.Small);
+                    if (icon != null)
+                    {
+                        emulatorIcons.Add(emulator.Title, icon);
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
 
             foreach (DataGridViewColumn column in cacheDataGridView.Columns)
             {
@@ -247,6 +265,16 @@ namespace ArchiveCacheManager
 
             if (window.DialogResult == DialogResult.OK)
             {
+                foreach (DataGridViewRow row in emulatorPlatformConfigDataGridView.Rows)
+                {
+                    if (string.Equals(row.Cells["Emulator"].Value.ToString(), window.Emulator, StringComparison.InvariantCultureIgnoreCase) &&
+                        string.Equals(row.Cells["Platform"].Value.ToString(), window.Platform, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        row.Selected = true;
+                        return;
+                    }
+                }
+
                 int index = emulatorPlatformConfigDataGridView.Rows.Add(new object[] { window.Emulator,
                                                                                        window.Platform,
                                                                                        string.Empty,
@@ -361,19 +389,11 @@ namespace ArchiveCacheManager
 
             if (e.ColumnIndex == cacheDataGridView.Columns["Archive"].Index)
             {
-                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
+                Bitmap icon = UserInterface.GetMediaIcon(cacheDataGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString());
 
-                Bitmap mediaIcon = UserInterface.GetMediaIcon(cacheDataGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString());
-
-                if (mediaIcon != null)
+                if (icon != null)
                 {
-                    var w = mediaIcon.Width;
-                    var h = mediaIcon.Height;
-                    var x = e.CellBounds.Left + 5;// + (e.CellBounds.Width - w) / 2;
-                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
-
-                    e.Graphics.DrawImage(mediaIcon, new Rectangle(x, y, w, h));
-                    e.Handled = true;
+                    UserInterface.DrawCellIcon(e, icon);
                 }
             }
         }
@@ -406,6 +426,21 @@ namespace ArchiveCacheManager
             if (dataGridView.Cursor != Cursors.Default)
             {
                 dataGridView.Cursor = Cursors.Default;
+            }
+        }
+
+        private void emulatorPlatformConfigDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex < 0)
+                return;
+
+            if (e.ColumnIndex == emulatorPlatformConfigDataGridView.Columns["Emulator"].Index)
+            {
+                Bitmap icon = null;
+                if (emulatorIcons.TryGetValue(emulatorPlatformConfigDataGridView.Rows[e.RowIndex].Cells["Emulator"].Value.ToString(), out icon) && icon != null)
+                {
+                    UserInterface.DrawCellIcon(e, icon);
+                }
             }
         }
     }

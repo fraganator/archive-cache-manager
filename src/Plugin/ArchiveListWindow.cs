@@ -54,7 +54,8 @@ namespace ArchiveCacheManager
             SelectedFile = string.Empty;
 
             UserInterface.ApplyTheme(this);
-            // fileListGridView.CellPainting += fileListGridView_CellPainting;
+            //fileListGridView.Columns["File"].DefaultCellStyle.Padding = new Padding(34, 0, 0, 0);
+            //fileListGridView.CellPainting += fileListGridView_CellPainting;
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -71,40 +72,22 @@ namespace ArchiveCacheManager
         /*
         private void fileListGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
+            int priorityIndex = 0;
+            int selectedIndex = 0;
+
             if (e.RowIndex < 0)
                 return;
 
             if (e.ColumnIndex == fileListGridView.Columns["File"].Index)
             {
-                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
-
-                Bitmap priorityIcon = null;
-                Bitmap selectedIcon = null;
-
                 if (e.RowIndex == priorityIndex)
                 {
-                    priorityIcon = Resources.star_blue;
-
-                    var w = priorityIcon.Width;
-                    var h = priorityIcon.Height;
-                    var x = e.CellBounds.Left + 5;// + (e.CellBounds.Width - w) / 2;
-                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
-
-                    e.Graphics.DrawImage(priorityIcon, new Rectangle(x, y, w, h));
-                    e.Handled = true;
+                    UserInterface.DrawCellIcon(e, Resources.star_blue);
                 }
                 
                 if (e.RowIndex == selectedIndex)
                 {
-                    selectedIcon = Resources.star;
-
-                    var w = selectedIcon.Width;
-                    var h = selectedIcon.Height;
-                    var x = e.CellBounds.Left + 15;// + (e.CellBounds.Width - w) / 2;
-                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
-
-                    e.Graphics.DrawImage(selectedIcon, new Rectangle(x, y, w, h));
-                    e.Handled = true;
+                    UserInterface.DrawCellIcon(e, Resources.star, 15, false);
                 }
             }
         }

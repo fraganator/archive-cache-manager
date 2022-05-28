@@ -404,13 +404,11 @@ namespace ArchiveCacheManager
             if (e.ColumnIndex == cacheStatusGridView.Columns["Archive"].Index ||
                 e.ColumnIndex == cacheStatusGridView.Columns["CacheStatus"].Index)
             {
-                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
-
-                Bitmap cellIcon = null;
+                Bitmap icon = null;
 
                 if (e.ColumnIndex == cacheStatusGridView.Columns["Archive"].Index)
                 {
-                    cellIcon = UserInterface.GetMediaIcon(cacheStatusGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString());
+                    icon = UserInterface.GetMediaIcon(cacheStatusGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString());
                 }
                 else if (e.ColumnIndex == cacheStatusGridView.Columns["CacheStatus"].Index)
                 {
@@ -421,23 +419,23 @@ namespace ArchiveCacheManager
                     }
                     else if (statusText.Contains("complete") || statusText.Contains("already cached"))
                     {
-                        cellIcon = Resources.tick;
+                        icon = Resources.tick;
                     }
                     else if (statusText.Contains("caching..."))
                     {
-                        cellIcon = Resources.hourglass;
+                        icon = Resources.hourglass;
                     }
                     else if (statusText.Contains("stopped"))
                     {
-                        cellIcon = Resources.exclamation_white;
+                        icon = Resources.exclamation_white;
                     }
                     else if (statusText.Contains("error"))
                     {
-                        cellIcon = Resources.exclamation_red;
+                        icon = Resources.exclamation_red;
                     }
                     else if (statusText.Contains("file not found"))
                     {
-                        cellIcon = Resources.exclamation;
+                        icon = Resources.exclamation;
                     }
                     else if (statusText.Contains("no rule") || statusText.Contains("disabled"))
                     {
@@ -445,15 +443,9 @@ namespace ArchiveCacheManager
                     }
                 }
 
-                if (cellIcon != null)
+                if (icon != null)
                 {
-                    var w = cellIcon.Width;
-                    var h = cellIcon.Height;
-                    var x = e.CellBounds.Left + 5;// + (e.CellBounds.Width - w) / 2;
-                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
-
-                    e.Graphics.DrawImage(cellIcon, new Rectangle(x, y, w, h));
-                    e.Handled = true;
+                    UserInterface.DrawCellIcon(e, icon);
                 }
             }
         }

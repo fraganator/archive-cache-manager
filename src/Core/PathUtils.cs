@@ -387,8 +387,7 @@ namespace ArchiveCacheManager
             // e.g. "Final Fa...(Disc 1).zip - 123456"
             // 8 is minimum leading characters in path (e.g. "Final Fantasy VII (Europe) (Disc 1).zip" -> "Final Fa")
             // 8 is minimum trailing characters in path before extension (e.g. "Final Fantasy VII (Europe) (Disc 1).zip" -> "(Disc 1)")
-            // 3 is the number of leading chars before the hash string in the form " - "
-            int minPathLength = 8 + ellipsis.Length + 8 + new StringInfo(Path.GetExtension(archivePath)).LengthInTextElements + 3 + hashLength;
+            int minPathLength = 8 + ellipsis.Length + 8;
             int charsToRemove = lengthTestPath.LengthInTextElements - MAX_PATH;
             StringInfo basePath = new StringInfo(Path.GetFileNameWithoutExtension(archivePath));
             int charsToKeep = basePath.LengthInTextElements - charsToRemove - ellipsis.Length;
