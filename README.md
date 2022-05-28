@@ -243,7 +243,13 @@ When enabled, the Smart Extract option will check if it's possible to extract on
 Smart Extract will extract and launch a single file from an archive if the following conditions are met:
 
 * An individual file has been selected through the "Select ROM in Archive..." right-click menu.
+    * _OR_
+* A file priority match has been found.
+
+**AND**
+
 * All of the file types in an archive are the same, excluding files with Metadata Extensions.
+    * _OR_
 * All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.
 
 #### Stand-alone ROM Extensions
