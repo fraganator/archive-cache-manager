@@ -212,23 +212,24 @@ namespace ArchiveCacheManager
 
         private void cacheButton_Click(object sender, EventArgs e)
         {
+            DialogResult result = DialogResult.No;
+
             if (requiredCacheSize > Config.CacheSize)
             {
-                var result = FlexibleMessageBox.Show(this, string.Format("The configured cache size isn't large enough to fit all of the games.\r\n\r\nIncrease the cache size from {0:N0} MB to {1:N0} MB?", Config.CacheSize, Math.Ceiling(requiredCacheSize)),
-                                                     "Increase cache size?", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                if (result == DialogResult.OK)
+                result = FlexibleMessageBox.Show(this, string.Format("The configured cache size isn't large enough to fit all of the games.\r\n\r\nIncrease the cache size from {0:N0} MB to {1:N0} MB?", Config.CacheSize, Math.Ceiling(requiredCacheSize)),
+                                                     "Increase cache size?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, "Yes", "No (cache anyway)", "Cancel");
+                if (result == DialogResult.Yes)
                 {
                     Config.CacheSize = (long)Math.Ceiling(requiredCacheSize);
                     Config.Save();
                 }
-                else
-                {
-                    return;
-                }
             }
 
-            RefreshLaunchBox = true;
-            CacheGames();
+            if (result != DialogResult.Cancel)
+            {
+                RefreshLaunchBox = true;
+                CacheGames();
+            }
         }
 
         public static string ExtractionProgress(string stdout)

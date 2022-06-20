@@ -168,15 +168,14 @@
   <data name="label6.Text" xml:space="preserve">
     <value>Smart Extract will extract and launch a single file from an archive if the following conditions are met:
 
-An individual file has been selected through the "Select ROM in Archive..." right-click menu.
-OR
-A file priority match has been found.
+- All of the file types in an archive are the same, excluding files with Metadata Extensions.
+    OR
+-All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.
 
-AND
-
-All of the file types in an archive are the same, excluding files with Metadata Extensions.
-OR
-All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.</value>
+The file to extract will be (in priority order):
+1. The individual file selected through the "Select ROM in Archive..." right-click menu.
+2. The first file which matches a configured Priority.
+3. The first file in the archive.</value>
   </data>
   <data name="label8.Text" xml:space="preserve">
     <value>Bypass LaunchBox's check that a game's application path (ROM file) exists before launch.

@@ -281,7 +281,7 @@ namespace ArchiveCacheManager
                     bool fileNotSelected = string.IsNullOrEmpty(mGame.SelectedFile);
                     if (fileNotSelected)
                     {
-                        mGame.SelectedFile = GetPriorityFileList(GetFileList()).ElementAtOrDefault(0);
+                        mGame.SelectedFile = GetPriorityFileList(GetFileList()).ElementAtOrDefault(0) ?? GetFileList().ElementAtOrDefault(0);
                     }
 
                     if (!string.IsNullOrEmpty(mGame.SelectedFile))

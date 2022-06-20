@@ -262,6 +262,9 @@
   <ItemGroup>
     <None Include="Resources\star-blue.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\joystick.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y $(TargetPath) c:\LaunchBox\Plugins\ArchiveCacheManager

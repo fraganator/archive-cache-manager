@@ -4,11 +4,12 @@
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
 ## New in v2.15
-* Improve performance when checking many file priorities
-* Smart Extract uses file priority if individual ROM not previously selected
-* Reduce archive cache path length if too long
+* Reduced archive cache path length, avoiding path too long errors
+* Small performance improvement when checking many file priorities
+* Smart Extract uses Priority to select file in case where individual ROM file not previously selected
+* Fix incorrect path for auto generated M3Us when Launch Path is not Default
+* Fix background thread issue when Batch Cache Games window closed while still calculating archive sizes
 * Interface tweaks
-* Fix platform launch path for auto generated M3Us
 
 ## Description
 When a compressed ROM (zip, 7z, rar, gz, chd, rvz, etc.) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.
@@ -24,7 +25,7 @@ As the cache size approaches the maximum size, the oldest played games are delet
 * Option to extract all discs in a multi-disc game, and generate M3U file.
 * Option to copy ROM files to cache without extraction.
 * Option to keep select ROMs cached and ready to play.
-* Select and play individual ROM files from an archive.
+* Select and play individual ROMs from a merged ROM archive.
 * Batch cache feature for extracting or copying multiple games to cache at once.
 * Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
 * Support for additional archive formats (chd, rvz, etc)
@@ -103,7 +104,7 @@ The plugin includes a badge to indicate if a game is currently in the cache. It 
 Configuration can be accessed from the _Tools->Archive Cache Manager_ menu. An overview of each of the configuration screens and options is below.
 
 ## Cache Settings
-This page shows a summary of the cache storage and currently cache items, and provides options for cache configuration.
+This page shows a summary of the cache storage and currently cached items, and provides options for cache configuration.
 
 ![Achive Cache Manager config screen](images/cache-settings.png?raw=true "Achive Cache Manager cache settings")
 
@@ -242,15 +243,16 @@ When enabled, the Smart Extract option will check if it's possible to extract on
 
 Smart Extract will extract and launch a single file from an archive if the following conditions are met:
 
-* An individual file has been selected through the "Select ROM in Archive..." right-click menu.
-    * _OR_
-* A file priority match has been found.
-
-**AND**
-
 * All of the file types in an archive are the same, excluding files with Metadata Extensions.
-    * _OR_
+
+    _OR_
+
 * All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.
+
+The file to extract will be (in priority order):
+1. The individual file selected through the "Select ROM in Archive..." right-click menu.
+2. The first file which matches a configured Priority.
+3. The first file in the archive.
 
 #### Stand-alone ROM Extensions
 A comma delimited list of file extensions which can run stand-alone (no dependencies on other files).

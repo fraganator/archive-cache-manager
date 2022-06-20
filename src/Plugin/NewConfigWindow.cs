@@ -437,7 +437,18 @@ namespace ArchiveCacheManager
             if (e.ColumnIndex == emulatorPlatformConfigDataGridView.Columns["Emulator"].Index)
             {
                 Bitmap icon = null;
-                if (emulatorIcons.TryGetValue(emulatorPlatformConfigDataGridView.Rows[e.RowIndex].Cells["Emulator"].Value.ToString(), out icon) && icon != null)
+                string emulator = emulatorPlatformConfigDataGridView.Rows[e.RowIndex].Cells["Emulator"].Value.ToString();
+
+                if (string.Equals(emulator, "All", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    icon = Resources.joystick;
+                }
+                else
+                {
+                    emulatorIcons.TryGetValue(emulator, out icon);
+                }
+
+                if (icon != null)
                 {
                     UserInterface.DrawCellIcon(e, icon);
                 }
