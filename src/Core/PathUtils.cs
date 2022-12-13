@@ -550,6 +550,17 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Check if the filename has the specified extension
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        public static bool HasExtension(string filename, string extension)
+        {
+            return string.Equals(Path.GetExtension(filename), extension, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        /// <summary>
         /// Check if the launched game is a compressed archive based on the file extension.
         /// Extensions checked are zip, 7z, rar.
         /// </summary>

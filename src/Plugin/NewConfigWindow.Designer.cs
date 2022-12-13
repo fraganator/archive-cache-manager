@@ -37,9 +37,9 @@ namespace ArchiveCacheManager
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewConfigWindow));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewConfigWindow));
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.openInExplorerButton = new System.Windows.Forms.Button();
             this.configureCacheButton = new System.Windows.Forms.Button();
@@ -80,6 +80,7 @@ namespace ArchiveCacheManager
             this.SmartExtract = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Chdman = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.DolphinTool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.ExtractXiso = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.addPriorityButton = new System.Windows.Forms.Button();
             this.tab3SmartExtractSettings = new System.Windows.Forms.TabPage();
             this.label6 = new System.Windows.Forms.Label();
@@ -462,11 +463,9 @@ namespace ArchiveCacheManager
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(6, 451);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(460, 26);
+            this.label9.Size = new System.Drawing.Size(516, 26);
             this.label9.TabIndex = 99;
-            this.label9.Text = "If chdman or DolphinTool is checked, ensure the corresponding chdman.exe or Dolph" +
-    "inTool.exe\r\napplication is placed in the LaunchBox\\Plugins\\ArchiveCacheManager\\E" +
-    "xtractors folder.";
+            this.label9.Text = resources.GetString("label9.Text");
             // 
             // extractionSettingsTipLabel
             // 
@@ -540,7 +539,8 @@ namespace ArchiveCacheManager
             this.M3uName,
             this.SmartExtract,
             this.Chdman,
-            this.DolphinTool});
+            this.DolphinTool,
+            this.ExtractXiso});
             this.emulatorPlatformConfigDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.emulatorPlatformConfigDataGridView.Location = new System.Drawing.Point(6, 62);
             this.emulatorPlatformConfigDataGridView.MultiSelect = false;
@@ -654,6 +654,13 @@ namespace ArchiveCacheManager
             this.DolphinTool.Name = "DolphinTool";
             this.DolphinTool.ToolTipText = "Extract RVZ, WIA, and GCZ files to ISO files.";
             this.DolphinTool.Width = 70;
+            // 
+            // ExtractXiso
+            // 
+            this.ExtractXiso.HeaderText = "extract-xiso";
+            this.ExtractXiso.Name = "ExtractXiso";
+            this.ExtractXiso.ToolTipText = "Extract ZIP and ISO files in xiso format.";
+            this.ExtractXiso.Width = 66;
             // 
             // addPriorityButton
             // 
@@ -909,5 +916,6 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewCheckBoxColumn SmartExtract;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Chdman;
         private System.Windows.Forms.DataGridViewCheckBoxColumn DolphinTool;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn ExtractXiso;
     }
 }

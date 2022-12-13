@@ -101,6 +101,7 @@ namespace ArchiveCacheManager
             Extractor zip = new Zip();
             Extractor chdman = new Chdman();
             Extractor dolphinTool = new DolphinTool();
+            Extractor extractXiso = new ExtractXiso();
             Extractor robocopy = new Robocopy();
             long archiveSize = 0;
             double archiveSizeMb = 0;
@@ -158,12 +159,14 @@ namespace ArchiveCacheManager
                     bool extract = (action == Config.Action.Extract || action == Config.Action.ExtractCopy);
                     bool copy = (action == Config.Action.Copy || action == Config.Action.ExtractCopy);
 
-                    if (extract && Zip.SupportedType(path))
-                        extractor = zip;
-                    else if (extract && Config.GetChdman(key) && Chdman.SupportedType(path))
+                    if (extract && Config.GetChdman(key) && Chdman.SupportedType(path))
                         extractor = chdman;
                     else if (extract && Config.GetDolphinTool(key) && DolphinTool.SupportedType(path))
                         extractor = dolphinTool;
+                    else if (extract && Config.GetExtractXiso(key) && ExtractXiso.SupportedType(path))
+                        extractor = extractXiso;
+                    else if (extract && Zip.SupportedType(path))
+                        extractor = zip;
                     else
                     {
                         extractor = robocopy;

@@ -77,7 +77,8 @@ namespace ArchiveCacheManager
                                                                                 m3uNameItems[(int)config.Value.M3uName],
                                                                                 config.Value.SmartExtract,
                                                                                 config.Value.Chdman,
-                                                                                config.Value.DolphinTool });
+                                                                                config.Value.DolphinTool,
+                                                                                config.Value.ExtractXiso });
                 }
                 else
                 {
@@ -90,7 +91,8 @@ namespace ArchiveCacheManager
                                                                           m3uNameItems[(int)config.Value.M3uName],
                                                                           config.Value.SmartExtract,
                                                                           config.Value.Chdman,
-                                                                          config.Value.DolphinTool });
+                                                                          config.Value.DolphinTool,
+                                                                          config.Value.ExtractXiso });
                 }
             }
             emulatorPlatformConfigDataGridView.ClearSelection();
@@ -227,6 +229,7 @@ namespace ArchiveCacheManager
                 config[key].SmartExtract = Convert.ToBoolean(row.Cells[7].Value);
                 config[key].Chdman = Convert.ToBoolean(row.Cells[8].Value);
                 config[key].DolphinTool = Convert.ToBoolean(row.Cells[9].Value);
+                config[key].ExtractXiso = Convert.ToBoolean(row.Cells[10].Value);
             }
 
             Config.UpdateCheck = updateCheckCheckBox.Checked;

@@ -79,17 +79,21 @@ namespace ArchiveCacheManager
             bool extract = (mGameCacheData.Config.Action == Config.Action.Extract || mGameCacheData.Config.Action == Config.Action.ExtractCopy);
             bool copy = (mGameCacheData.Config.Action == Config.Action.Copy || mGameCacheData.Config.Action == Config.Action.ExtractCopy);
 
-            if (extract && Zip.SupportedType(archivePath))
-            {
-                return new Zip();
-            }
-            else if (extract && mGameCacheData.Config.Chdman && Chdman.SupportedType(archivePath))
+            if (extract && mGameCacheData.Config.Chdman && Chdman.SupportedType(archivePath))
             {
                 return new Chdman();
             }
             else if (extract && mGameCacheData.Config.DolphinTool && DolphinTool.SupportedType(archivePath))
             {
                 return new DolphinTool();
+            }
+            else if (extract && mGameCacheData.Config.ExtractXiso && ExtractXiso.SupportedType(archivePath))
+            {
+                return new ExtractXiso();
+            }
+            else if (extract && Zip.SupportedType(archivePath))
+            {
+                return new Zip();
             }
             else if (copy)
             {
@@ -150,6 +154,41 @@ namespace ArchiveCacheManager
             }
 
             return (long)mGameCacheData.Size;
+        }
+
+        /// <summary>
+        /// Update the size of the cached game based on the cache path. Only call this after successful extraction.
+        /// </summary>
+        /// <param name="disc"></param>
+        /// <returns></returns>
+        public static void UpdateSizeFromCache(int? disc = null)
+        {
+            if (disc != null)
+            {
+                try
+                {
+                    mMultiDiscCacheData[(int)disc].Size = DiskUtils.DirectorySize(new DirectoryInfo(mMultiDiscCacheData[(int)disc].ArchiveCachePath));
+                    Logger.Log(string.Format("Disc {0} on disk size is {1} bytes.", (int)disc, (long)mMultiDiscCacheData[(int)disc].Size));
+                    return;
+                }
+                catch (KeyNotFoundException)
+                {
+                    Logger.Log(string.Format("Unknown disc number {0}, using DecompressedSize instead.", (int)disc));
+                }
+            }
+
+            if (mGame.MultiDisc && MultiDiscSupport && disc == null)
+            {
+                foreach (var discCacheData in mMultiDiscCacheData)
+                {
+                    UpdateSizeFromCache(discCacheData.Key);
+                }
+                return;
+            }
+
+            mGameCacheData.Size = DiskUtils.DirectorySize(new DirectoryInfo(mGameCacheData.ArchiveCachePath));
+            mGame.DecompressedSize = (long)mGameCacheData.Size;
+            Logger.Log(string.Format("On disk archive size is {0} bytes.", (long)mGameCacheData.Size));
         }
 
         public static string[] GetFileList(int? disc = null)

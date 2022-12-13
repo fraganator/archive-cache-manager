@@ -4,9 +4,13 @@
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
 ## New in v2.15
-* Reduced archive cache path length, avoiding path too long errors
+* New _extract-xiso_ option for Xbox iso conversion
+    * Full iso files (redump) automatically converted and cached in xiso format
+    * Supports both zipped and unzipped iso files
+    * Requires _extract-xiso.exe_ to be added to the `ArchiveCacheManager\Extractors` folder
+* Reduced archive cache path lengths, avoiding path too long errors
 * Small performance improvement when checking many file priorities
-* Smart Extract uses Priority to select file in case where individual ROM file not previously selected
+* Smart Extract uses Priority to select file from archive in case where individual ROM file not previously selected
 * Fix incorrect path for auto generated M3Us when Launch Path is not Default
 * Fix background thread issue when Batch Cache Games window closed while still calculating archive sizes
 * Interface tweaks
@@ -29,6 +33,7 @@ As the cache size approaches the maximum size, the oldest played games are delet
 * Batch cache feature for extracting or copying multiple games to cache at once.
 * Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
 * Support for additional archive formats (chd, rvz, etc)
+* Support for Xbox iso to xiso conversion
 * Badge to indicate cached games
 
 ### Example Use Cases
@@ -233,6 +238,11 @@ Default _`Disabled`_
 
 #### DolphinTool
 Check this option to extract _rvz_, _wia_, and _gcz_ files to _iso_ files using DolphinTool. The executable _DolphinTool.exe_ must be copied to the folder `LaunchBox\Plugins\ArchiveCacheManager\Extractors`.
+
+Default _`Disabled`_
+
+#### extract-xiso
+Check this option to extract and convert full _iso_ files to Xbox _iso_ files using extract-xiso. Supports both zipped and stand-alone _iso_ files. The executable _extract-xiso.exe_ must be copied to the folder `LaunchBox\Plugins\ArchiveCacheManager\Extractors`.
 
 Default _`Disabled`_
 

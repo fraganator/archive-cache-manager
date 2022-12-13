@@ -1,8 +1,12 @@
 # Archive Cache Manager change history
-## v2.15 (2022-05-xx)
-* Reduced archive cache path length, avoiding path too long errors
+## v2.15 (2022-12-xx)
+* New _extract-xiso_ option for Xbox iso conversion
+    * Full iso files (redump) automatically converted and cached in xiso format
+    * Supports both zipped and unzipped iso files
+    * Requires _extract-xiso.exe_ to be added to the `ArchiveCacheManager\Extractors` folder
+* Reduced archive cache path lengths, avoiding path too long errors
 * Small performance improvement when checking many file priorities
-* Smart Extract uses Priority to select file in case where individual ROM file not previously selected
+* Smart Extract uses Priority to select file from archive in case where individual ROM file not previously selected
 * Fix incorrect path for auto generated M3Us when Launch Path is not Default
 * Fix background thread issue when Batch Cache Games window closed while still calculating archive sizes
 * Interface tweaks

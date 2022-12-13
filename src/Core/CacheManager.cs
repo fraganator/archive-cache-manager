@@ -99,6 +99,7 @@ namespace ArchiveCacheManager
                 var result = LaunchInfo.Extractor.Extract(LaunchInfo.GetArchivePath(disc), LaunchInfo.GetArchiveCachePath(disc), singleFile.ToSingleArray());
                 if (result)
                 {
+                    LaunchInfo.UpdateSizeFromCache(disc);
                     LaunchInfo.SaveToCache(disc);
                     DiskUtils.SetDirectoryContentsReadOnly(LaunchInfo.GetArchiveCachePath(disc));
                     File.Delete(PathUtils.GetArchiveCacheExtractingFlagPath(LaunchInfo.GetArchiveCachePath(disc)));
