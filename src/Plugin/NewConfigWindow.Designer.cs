@@ -35,10 +35,11 @@ namespace ArchiveCacheManager
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Smart Extract Settings");
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Plugin Settings");
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewConfigWindow));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewConfigWindow));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.openInExplorerButton = new System.Windows.Forms.Button();
             this.configureCacheButton = new System.Windows.Forms.Button();
@@ -58,6 +59,11 @@ namespace ArchiveCacheManager
             this.label1 = new System.Windows.Forms.Label();
             this.cacheSummaryTextBox = new System.Windows.Forms.RichTextBox();
             this.cacheDataGridView = new System.Windows.Forms.DataGridView();
+            this.ArchivePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Archive = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ArchivePlatform = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ArchiveSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Keep = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tab2ExtractionSettings = new System.Windows.Forms.TabPage();
             this.label9 = new System.Windows.Forms.Label();
             this.extractionSettingsTipLabel = new System.Windows.Forms.Label();
@@ -74,6 +80,7 @@ namespace ArchiveCacheManager
             this.SmartExtract = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Chdman = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.DolphinTool = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.ExtractXiso = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.addPriorityButton = new System.Windows.Forms.Button();
             this.tab3SmartExtractSettings = new System.Windows.Forms.TabPage();
             this.label6 = new System.Windows.Forms.Label();
@@ -88,11 +95,6 @@ namespace ArchiveCacheManager
             this.label7 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.updateCheckCheckBox = new System.Windows.Forms.CheckBox();
-            this.ArchivePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Archive = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ArchivePlatform = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ArchiveSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Keep = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.flowLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab1CacheSettings.SuspendLayout();
@@ -395,6 +397,49 @@ namespace ArchiveCacheManager
             this.cacheDataGridView.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.cacheDataGridView_CellPainting);
             this.cacheDataGridView.CurrentCellDirtyStateChanged += new System.EventHandler(this.cacheDataGridView_CurrentCellDirtyStateChanged);
             // 
+            // ArchivePath
+            // 
+            this.ArchivePath.HeaderText = "ArchivePath";
+            this.ArchivePath.Name = "ArchivePath";
+            this.ArchivePath.ReadOnly = true;
+            this.ArchivePath.Visible = false;
+            // 
+            // Archive
+            // 
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(24, 0, 0, 0);
+            this.Archive.DefaultCellStyle = dataGridViewCellStyle2;
+            this.Archive.HeaderText = "Archive";
+            this.Archive.Name = "Archive";
+            this.Archive.ReadOnly = true;
+            // 
+            // ArchivePlatform
+            // 
+            this.ArchivePlatform.FillWeight = 60F;
+            this.ArchivePlatform.HeaderText = "Platform";
+            this.ArchivePlatform.Name = "ArchivePlatform";
+            this.ArchivePlatform.ReadOnly = true;
+            // 
+            // ArchiveSize
+            // 
+            this.ArchiveSize.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle3.Format = "N1";
+            this.ArchiveSize.DefaultCellStyle = dataGridViewCellStyle3;
+            this.ArchiveSize.FillWeight = 25F;
+            this.ArchiveSize.HeaderText = "Size (MB)";
+            this.ArchiveSize.Name = "ArchiveSize";
+            this.ArchiveSize.ReadOnly = true;
+            this.ArchiveSize.Width = 77;
+            // 
+            // Keep
+            // 
+            this.Keep.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Keep.FillWeight = 12F;
+            this.Keep.HeaderText = "Keep";
+            this.Keep.Name = "Keep";
+            this.Keep.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.Keep.Width = 57;
+            // 
             // tab2ExtractionSettings
             // 
             this.tab2ExtractionSettings.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -418,11 +463,9 @@ namespace ArchiveCacheManager
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(6, 451);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(460, 26);
+            this.label9.Size = new System.Drawing.Size(516, 26);
             this.label9.TabIndex = 99;
-            this.label9.Text = "If chdman or DolphinTool is checked, ensure the corresponding chdman.exe or Dolph" +
-    "inTool.exe\r\napplication is placed in the LaunchBox\\Plugins\\ArchiveCacheManager\\E" +
-    "xtractors folder.";
+            this.label9.Text = resources.GetString("label9.Text");
             // 
             // extractionSettingsTipLabel
             // 
@@ -496,7 +539,8 @@ namespace ArchiveCacheManager
             this.M3uName,
             this.SmartExtract,
             this.Chdman,
-            this.DolphinTool});
+            this.DolphinTool,
+            this.ExtractXiso});
             this.emulatorPlatformConfigDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.emulatorPlatformConfigDataGridView.Location = new System.Drawing.Point(6, 62);
             this.emulatorPlatformConfigDataGridView.MultiSelect = false;
@@ -508,10 +552,13 @@ namespace ArchiveCacheManager
             this.emulatorPlatformConfigDataGridView.TabIndex = 11;
             this.emulatorPlatformConfigDataGridView.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.emulatorPlatformConfigDataGridView_CellMouseEnter);
             this.emulatorPlatformConfigDataGridView.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.emulatorPlatformConfigDataGridView_CellMouseLeave);
+            this.emulatorPlatformConfigDataGridView.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.emulatorPlatformConfigDataGridView_CellPainting);
             this.emulatorPlatformConfigDataGridView.SelectionChanged += new System.EventHandler(this.extensionPriorityDataGridView_SelectionChanged);
             // 
             // Emulator
             // 
+            dataGridViewCellStyle5.Padding = new System.Windows.Forms.Padding(24, 0, 0, 0);
+            this.Emulator.DefaultCellStyle = dataGridViewCellStyle5;
             this.Emulator.HeaderText = "Emulator";
             this.Emulator.MinimumWidth = 150;
             this.Emulator.Name = "Emulator";
@@ -608,6 +655,13 @@ namespace ArchiveCacheManager
             this.DolphinTool.ToolTipText = "Extract RVZ, WIA, and GCZ files to ISO files.";
             this.DolphinTool.Width = 70;
             // 
+            // ExtractXiso
+            // 
+            this.ExtractXiso.HeaderText = "extract-xiso";
+            this.ExtractXiso.Name = "ExtractXiso";
+            this.ExtractXiso.ToolTipText = "Extract ZIP and ISO files in xiso format.";
+            this.ExtractXiso.Width = 66;
+            // 
             // addPriorityButton
             // 
             this.addPriorityButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -644,7 +698,7 @@ namespace ArchiveCacheManager
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(7, 174);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(472, 65);
+            this.label6.Size = new System.Drawing.Size(471, 130);
             this.label6.TabIndex = 99;
             this.label6.Text = resources.GetString("label6.Text");
             // 
@@ -770,49 +824,6 @@ namespace ArchiveCacheManager
             this.updateCheckCheckBox.UseVisualStyleBackColor = true;
             this.updateCheckCheckBox.CheckedChanged += new System.EventHandler(this.multiDiscSupportCheckBox_CheckedChanged);
             // 
-            // ArchivePath
-            // 
-            this.ArchivePath.HeaderText = "ArchivePath";
-            this.ArchivePath.Name = "ArchivePath";
-            this.ArchivePath.ReadOnly = true;
-            this.ArchivePath.Visible = false;
-            // 
-            // Archive
-            // 
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(24, 0, 0, 0);
-            this.Archive.DefaultCellStyle = dataGridViewCellStyle2;
-            this.Archive.HeaderText = "Archive";
-            this.Archive.Name = "Archive";
-            this.Archive.ReadOnly = true;
-            // 
-            // ArchivePlatform
-            // 
-            this.ArchivePlatform.FillWeight = 60F;
-            this.ArchivePlatform.HeaderText = "Platform";
-            this.ArchivePlatform.Name = "ArchivePlatform";
-            this.ArchivePlatform.ReadOnly = true;
-            // 
-            // ArchiveSize
-            // 
-            this.ArchiveSize.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle3.Format = "N1";
-            this.ArchiveSize.DefaultCellStyle = dataGridViewCellStyle3;
-            this.ArchiveSize.FillWeight = 25F;
-            this.ArchiveSize.HeaderText = "Size (MB)";
-            this.ArchiveSize.Name = "ArchiveSize";
-            this.ArchiveSize.ReadOnly = true;
-            this.ArchiveSize.Width = 77;
-            // 
-            // Keep
-            // 
-            this.Keep.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            this.Keep.FillWeight = 12F;
-            this.Keep.HeaderText = "Keep";
-            this.Keep.Name = "Keep";
-            this.Keep.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.Keep.Width = 57;
-            // 
             // NewConfigWindow
             // 
             this.AcceptButton = this.okButton;
@@ -889,6 +900,12 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.CheckBox bypassPathCheckCheckBox;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePath;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Archive;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePlatform;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ArchiveSize;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Keep;
         private System.Windows.Forms.DataGridViewTextBoxColumn Emulator;
         private System.Windows.Forms.DataGridViewTextBoxColumn Platform;
         private System.Windows.Forms.DataGridViewTextBoxColumn Priority;
@@ -899,11 +916,6 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewCheckBoxColumn SmartExtract;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Chdman;
         private System.Windows.Forms.DataGridViewCheckBoxColumn DolphinTool;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePath;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Archive;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ArchivePlatform;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ArchiveSize;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn Keep;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn ExtractXiso;
     }
 }

@@ -3,11 +3,17 @@
 
 A LaunchBox plugin which caches extracted ROM archives, letting you play games faster. Also allows launching individual files from archives, and loading preferred file types from an archive.
 
-## New in v2.14
-* New right-click menu option - "Batch Cache Games"
-    * Extract or copy multiple games to the cache, ready to play later
-    * Bulk cache games from NAS or external storage
-        * Cached games can be played even if network or external storage disconnected
+## New in v2.15
+* New _extract-xiso_ option for Xbox iso conversion
+    * Full iso files (redump) automatically converted and cached in xiso format
+    * Supports both zipped and unzipped iso files
+    * Requires _extract-xiso.exe_ to be added to the `ArchiveCacheManager\Extractors` folder
+* Reduced archive cache path lengths, avoiding path too long errors
+* Small performance improvement when checking many file priorities
+* Smart Extract uses Priority to select file from archive in case where individual ROM file not previously selected
+* Fix incorrect path for auto generated M3Us when Launch Path is not Default
+* Fix background thread issue when Batch Cache Games window closed while still calculating archive sizes
+* Interface tweaks
 
 ## Description
 When a compressed ROM (zip, 7z, rar, gz, chd, rvz, etc.) is first extracted, it is stored in the archive cache. The next time it is played, the game is loaded directly from the cache, virtually eliminating wait time.
@@ -23,10 +29,11 @@ As the cache size approaches the maximum size, the oldest played games are delet
 * Option to extract all discs in a multi-disc game, and generate M3U file.
 * Option to copy ROM files to cache without extraction.
 * Option to keep select ROMs cached and ready to play.
-* Select and play individual ROM files from an archive.
+* Select and play individual ROMs from a merged ROM archive.
 * Batch cache feature for extracting or copying multiple games to cache at once.
 * Filename and extension priorities per emulator and platform (cue, bin, iso, etc).
 * Support for additional archive formats (chd, rvz, etc)
+* Support for Xbox iso to xiso conversion
 * Badge to indicate cached games
 
 ### Example Use Cases
@@ -102,7 +109,7 @@ The plugin includes a badge to indicate if a game is currently in the cache. It 
 Configuration can be accessed from the _Tools->Archive Cache Manager_ menu. An overview of each of the configuration screens and options is below.
 
 ## Cache Settings
-This page shows a summary of the cache storage and currently cache items, and provides options for cache configuration.
+This page shows a summary of the cache storage and currently cached items, and provides options for cache configuration.
 
 ![Achive Cache Manager config screen](images/cache-settings.png?raw=true "Achive Cache Manager cache settings")
 
@@ -234,6 +241,11 @@ Check this option to extract _rvz_, _wia_, and _gcz_ files to _iso_ files using 
 
 Default _`Disabled`_
 
+#### extract-xiso
+Check this option to extract and convert full _iso_ files to Xbox _iso_ files using extract-xiso. Supports both zipped and stand-alone _iso_ files. The executable _extract-xiso.exe_ must be copied to the folder `LaunchBox\Plugins\ArchiveCacheManager\Extractors`.
+
+Default _`Disabled`_
+
 ## Smart Extract Settings
 When enabled, the Smart Extract option will check if it's possible to extract only a single file from an archive. For merged archives containing multiple ROM versions and hacks, this avoids the need to extract a potentially large number of files to play a single game.
 
@@ -241,9 +253,16 @@ When enabled, the Smart Extract option will check if it's possible to extract on
 
 Smart Extract will extract and launch a single file from an archive if the following conditions are met:
 
-* An individual file has been selected through the "Select ROM in Archive..." right-click menu.
 * All of the file types in an archive are the same, excluding files with Metadata Extensions.
+
+    _OR_
+
 * All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.
+
+The file to extract will be (in priority order):
+1. The individual file selected through the "Select ROM in Archive..." right-click menu.
+2. The first file which matches a configured Priority.
+3. The first file in the archive.
 
 #### Stand-alone ROM Extensions
 A comma delimited list of file extensions which can run stand-alone (no dependencies on other files).
@@ -294,3 +313,4 @@ Octokit               | latest  | `Install-Package Octokit -ProjectName Plugin`
 * INI File Parser library Copyright (c) 2008 Ricardo Amores Hernández. Licensed under the MIT license. https://github.com/rickyah/ini-parser
 * Octokit library Copyright (c) 2017 GitHub Inc. Licensed under the MIT license. https://github.com/octokit/octokit.net
 * FlexibleMessageBox Copyright (c) 2014 Jörg Reichert. Licensed under the CPOL. https://www.codeproject.com/Articles/601900/FlexibleMessageBox
+* FastWildcard Copyright (c) 2020 Alex Angas. Licensed under the MIT license. https://github.com/fastwildcard/fastwildcard

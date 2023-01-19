@@ -83,11 +83,8 @@ namespace ArchiveCacheManager
         /// Get a file list for the specified archive.
         /// </summary>
         /// <param name="archivePath">Archive to list.</param>
-        /// <param name="includeList">Optional list of files or file extensions to include. The listing will only return these values if they are found.</param>
-        /// <param name="excludeList">Optional list of files or file extensions to exclude. The listing will exclude these values if they are found.</param>
-        /// <param name="prefixWildcard">Option to prefix all include and exclude lists with a "*" wildcard.</param>
-        /// <returns>The list of files in an archive, filtered using include and exclude lists when specified.</returns>
-        public abstract string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false);
+        /// <returns>The list of files in an archive.</returns>
+        public abstract string[] List(string archivePath);
 
         public abstract string GetExtractorPath();
     }

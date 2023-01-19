@@ -292,6 +292,32 @@ namespace ArchiveCacheManager
             }
         }
 
+        /// <summary>
+        /// Draw an icon in the cell of a DataGridView. Call from the DataGridView's CellPainting event.
+        /// </summary>
+        /// <param name="e">The event from CellPainting.</param>
+        /// <param name="icon">The icon to draw. Recommended size is 16x16.</param>
+        /// <param name="offset">Left offset of the icon. Default is 5.</param>
+        /// <param name="paint">Whether to paint the cell before drawing the icon. The cell must be painted once. If additional icons are drawn in the same cell, set this false.</param>
+        public static void DrawCellIcon(DataGridViewCellPaintingEventArgs e, Bitmap icon, int offset = 5, bool paint = true)
+        {
+            if (icon != null)
+            {
+                if (paint)
+                {
+                    e.Paint(e.CellBounds, DataGridViewPaintParts.All);
+                }
+
+                var w = icon.Width;
+                var h = icon.Height;
+                var x = e.CellBounds.Left + offset;// + (e.CellBounds.Width - w) / 2;
+                var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
+
+                e.Graphics.DrawImage(icon, new Rectangle(x, y, w, h));
+                e.Handled = true;
+            }
+        }
+
         public static void ScaleControlFont(Control control, float scale)
         {
             Font controlFont = control.Font;

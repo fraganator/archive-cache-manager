@@ -54,6 +54,7 @@ namespace ArchiveCacheManager
         private static readonly M3uName defaultM3uName = M3uName.GameId;
         private static readonly bool defaultChdman = false;
         private static readonly bool defaultDolphinTool = false;
+        private static readonly bool defaultExtractXiso = false;
 
         public class EmulatorPlatformConfig
         {
@@ -65,6 +66,7 @@ namespace ArchiveCacheManager
             public bool SmartExtract;
             public bool Chdman;
             public bool DolphinTool;
+            public bool ExtractXiso;
 
             public EmulatorPlatformConfig()
             {
@@ -76,6 +78,7 @@ namespace ArchiveCacheManager
                 SmartExtract = defaultSmartExtract;
                 Chdman = defaultChdman;
                 DolphinTool = defaultDolphinTool;
+                ExtractXiso = defaultExtractXiso;
             }
         };
 
@@ -321,6 +324,23 @@ namespace ArchiveCacheManager
             return defaultDolphinTool;
         }
 
+        public static bool GetExtractXiso(string key)
+        {
+            try
+            {
+                return mEmulatorPlatformConfig[key].ExtractXiso;
+            }
+            catch (KeyNotFoundException) { }
+
+            try
+            {
+                return mEmulatorPlatformConfig[defaultEmulatorPlatform].ExtractXiso;
+            }
+            catch (KeyNotFoundException) { }
+
+            return defaultExtractXiso;
+        }
+
         public static string EmulatorPlatformKey(string emulator, string platform) => string.Format(@"{0} \ {1}", emulator, platform);
 
         /// <summary>
@@ -478,6 +498,11 @@ namespace ArchiveCacheManager
                             {
                                 mEmulatorPlatformConfig[section.SectionName].DolphinTool = Convert.ToBoolean(section.Keys[nameof(EmulatorPlatformConfig.DolphinTool)]);
                             }
+
+                            if (section.Keys.ContainsKey(nameof(EmulatorPlatformConfig.ExtractXiso)))
+                            {
+                                mEmulatorPlatformConfig[section.SectionName].ExtractXiso = Convert.ToBoolean(section.Keys[nameof(EmulatorPlatformConfig.ExtractXiso)]);
+                            }
                         }
                     }
 
@@ -567,6 +592,7 @@ namespace ArchiveCacheManager
                 iniData[priority.Key][nameof(EmulatorPlatformConfig.SmartExtract)] = priority.Value.SmartExtract.ToString();
                 iniData[priority.Key][nameof(EmulatorPlatformConfig.Chdman)] = priority.Value.Chdman.ToString();
                 iniData[priority.Key][nameof(EmulatorPlatformConfig.DolphinTool)] = priority.Value.DolphinTool.ToString();
+                iniData[priority.Key][nameof(EmulatorPlatformConfig.ExtractXiso)] = priority.Value.ExtractXiso.ToString();
             }
 
             try

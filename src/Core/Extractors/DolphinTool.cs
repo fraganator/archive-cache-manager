@@ -43,7 +43,7 @@ namespace ArchiveCacheManager
             return DiskUtils.GetFileSize(archivePath);
         }
 
-        public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        public override string[] List(string archivePath)
         {
             return string.Format("{0}.iso", Path.GetFileNameWithoutExtension(archivePath)).ToSingleArray();
         }

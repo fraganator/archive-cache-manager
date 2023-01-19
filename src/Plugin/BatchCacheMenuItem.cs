@@ -18,14 +18,9 @@ namespace ArchiveCacheManager
         public Image IconImage => Resources.icon16x16;
         public bool ShowInLaunchBox => true;
         public bool ShowInBigBox => false;
-
         public bool GetIsValidForGame(IGame selectedGame) => true;
         public bool GetIsValidForGames(IGame[] selectedGames) => true;
-
-        public void OnSelected(IGame selectedGame)
-        {
-            OnSelected(new IGame[] { selectedGame });
-        }
+        public void OnSelected(IGame selectedGame) => OnSelected(new IGame[] { selectedGame });
 
         public void OnSelected(IGame[] selectedGames)
         {

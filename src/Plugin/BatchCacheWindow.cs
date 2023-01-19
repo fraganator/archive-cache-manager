@@ -101,6 +101,7 @@ namespace ArchiveCacheManager
             Extractor zip = new Zip();
             Extractor chdman = new Chdman();
             Extractor dolphinTool = new DolphinTool();
+            Extractor extractXiso = new ExtractXiso();
             Extractor robocopy = new Robocopy();
             long archiveSize = 0;
             double archiveSizeMb = 0;
@@ -158,12 +159,14 @@ namespace ArchiveCacheManager
                     bool extract = (action == Config.Action.Extract || action == Config.Action.ExtractCopy);
                     bool copy = (action == Config.Action.Copy || action == Config.Action.ExtractCopy);
 
-                    if (extract && Zip.SupportedType(path))
-                        extractor = zip;
-                    else if (extract && Config.GetChdman(key) && Chdman.SupportedType(path))
+                    if (extract && Config.GetChdman(key) && Chdman.SupportedType(path))
                         extractor = chdman;
                     else if (extract && Config.GetDolphinTool(key) && DolphinTool.SupportedType(path))
                         extractor = dolphinTool;
+                    else if (extract && Config.GetExtractXiso(key) && ExtractXiso.SupportedType(path))
+                        extractor = extractXiso;
+                    else if (extract && Zip.SupportedType(path))
+                        extractor = zip;
                     else
                     {
                         extractor = robocopy;
@@ -189,6 +192,11 @@ namespace ArchiveCacheManager
                     }
 
                     progressBar.PerformStep();
+
+                    if (mStatus == StatusEnum.Closing)
+                    {
+                        return;
+                    }
                 }
 
                 cacheButton.Enabled = true;
@@ -207,23 +215,24 @@ namespace ArchiveCacheManager
 
         private void cacheButton_Click(object sender, EventArgs e)
         {
+            DialogResult result = DialogResult.No;
+
             if (requiredCacheSize > Config.CacheSize)
             {
-                var result = FlexibleMessageBox.Show(this, string.Format("The configured cache size isn't large enough to fit all of the games.\r\n\r\nIncrease the cache size from {0:N0} MB to {1:N0} MB?", Config.CacheSize, Math.Ceiling(requiredCacheSize)),
-                                                     "Increase cache size?", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                if (result == DialogResult.OK)
+                result = FlexibleMessageBox.Show(this, string.Format("The configured cache size isn't large enough to fit all of the games.\r\n\r\nIncrease the cache size from {0:N0} MB to {1:N0} MB?", Config.CacheSize, Math.Ceiling(requiredCacheSize)),
+                                                     "Increase cache size?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, "Yes", "No (cache anyway)", "Cancel");
+                if (result == DialogResult.Yes)
                 {
                     Config.CacheSize = (long)Math.Ceiling(requiredCacheSize);
                     Config.Save();
                 }
-                else
-                {
-                    return;
-                }
             }
 
-            RefreshLaunchBox = true;
-            CacheGames();
+            if (result != DialogResult.Cancel)
+            {
+                RefreshLaunchBox = true;
+                CacheGames();
+            }
         }
 
         public static string ExtractionProgress(string stdout)
@@ -399,34 +408,38 @@ namespace ArchiveCacheManager
             if (e.ColumnIndex == cacheStatusGridView.Columns["Archive"].Index ||
                 e.ColumnIndex == cacheStatusGridView.Columns["CacheStatus"].Index)
             {
-                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
-
-                Bitmap cellIcon = null;
+                Bitmap icon = null;
 
                 if (e.ColumnIndex == cacheStatusGridView.Columns["Archive"].Index)
-                    cellIcon = UserInterface.GetMediaIcon(cacheStatusGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString());
+                {
+                    icon = UserInterface.GetMediaIcon(cacheStatusGridView.Rows[e.RowIndex].Cells["ArchivePlatform"].Value.ToString());
+                }
                 else if (e.ColumnIndex == cacheStatusGridView.Columns["CacheStatus"].Index)
                 {
                     string statusText = cacheStatusGridView.Rows[e.RowIndex].Cells["CacheStatus"].Value.ToString().ToLower();
-                    if (statusText.Contains("complete") || statusText.Contains("already cached"))
+                    if (statusText.Contains("ready."))
                     {
-                        cellIcon = Resources.tick;
+                        // No icon. Also skip all subsequent checks.
+                    }
+                    else if (statusText.Contains("complete") || statusText.Contains("already cached"))
+                    {
+                        icon = Resources.tick;
                     }
                     else if (statusText.Contains("caching..."))
                     {
-                        cellIcon = Resources.hourglass;
+                        icon = Resources.hourglass;
                     }
                     else if (statusText.Contains("stopped"))
                     {
-                        cellIcon = Resources.exclamation_white;
+                        icon = Resources.exclamation_white;
                     }
                     else if (statusText.Contains("error"))
                     {
-                        cellIcon = Resources.exclamation_red;
+                        icon = Resources.exclamation_red;
                     }
                     else if (statusText.Contains("file not found"))
                     {
-                        cellIcon = Resources.exclamation;
+                        icon = Resources.exclamation;
                     }
                     else if (statusText.Contains("no rule") || statusText.Contains("disabled"))
                     {
@@ -434,15 +447,9 @@ namespace ArchiveCacheManager
                     }
                 }
 
-                if (cellIcon != null)
+                if (icon != null)
                 {
-                    var w = cellIcon.Width;
-                    var h = cellIcon.Height;
-                    var x = e.CellBounds.Left + 5;// + (e.CellBounds.Width - w) / 2;
-                    var y = e.CellBounds.Top + (e.CellBounds.Height - h) / 2;
-
-                    e.Graphics.DrawImage(cellIcon, new Rectangle(x, y, w, h));
-                    e.Handled = true;
+                    UserInterface.DrawCellIcon(e, icon);
                 }
             }
         }

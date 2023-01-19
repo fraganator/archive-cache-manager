@@ -43,8 +43,10 @@ namespace ArchiveCacheManager
             bool extract = (Config.GetAction(key) == Config.Action.Extract || Config.GetAction(key) == Config.Action.ExtractCopy);
             bool copy = (Config.GetAction(key) == Config.Action.Copy || Config.GetAction(key) == Config.Action.ExtractCopy);
 
-            if (extract && (Zip.SupportedType(archivePath) || (Config.GetChdman(key) && Chdman.SupportedType(archivePath))
-                            || (Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))))
+            if (extract && (Zip.SupportedType(archivePath)
+                            || (Config.GetChdman(key) && Chdman.SupportedType(archivePath))
+                            || (Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))
+                            || (Config.GetExtractXiso(key) && ExtractXiso.SupportedType(archivePath))))
             {
                 return true;
             }
@@ -79,8 +81,10 @@ namespace ArchiveCacheManager
                 return true;
             }
             // Only redirect extract when the extrator is enabled and the file type matches
-            else if (extract && (Zip.SupportedType(archivePath) || (Config.GetChdman(key) && Chdman.SupportedType(archivePath))
-                            || (Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))))
+            else if (extract && (Zip.SupportedType(archivePath)
+                                 || (Config.GetChdman(key) && Chdman.SupportedType(archivePath))
+                                 || (Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))
+                                 || (Config.GetExtractXiso(key) && ExtractXiso.SupportedType(archivePath))))
             {
                 return true;
             }
@@ -97,17 +101,21 @@ namespace ArchiveCacheManager
             bool copy = (Config.GetAction(key) == Config.Action.Copy || Config.GetAction(key) == Config.Action.ExtractCopy);
             Extractor extractor;
 
-            if (extract && Zip.SupportedType(archivePath))
-            {
-                extractor = new Zip();
-            }
-            else if (extract && Config.GetChdman(key) && Chdman.SupportedType(archivePath))
+            if (extract && Config.GetChdman(key) && Chdman.SupportedType(archivePath))
             {
                 extractor = new Chdman();
             }
             else if (extract && Config.GetDolphinTool(key) && DolphinTool.SupportedType(archivePath))
             {
                 extractor = new DolphinTool();
+            }
+            else if (extract && Config.GetExtractXiso(key) && ExtractXiso.SupportedType(archivePath))
+            {
+                extractor = new ExtractXiso();
+            }
+            else if (extract && Zip.SupportedType(archivePath))
+            {
+                extractor = new Zip();
             }
             else if (copy)
             {

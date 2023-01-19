@@ -29,28 +29,18 @@ namespace ArchiveCacheManager
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ArchiveListWindow));
-            this.fileListBox = new System.Windows.Forms.ListBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.okButton = new System.Windows.Forms.Button();
             this.archiveNameLabel = new System.Windows.Forms.Label();
             this.emulatorComboBox = new System.Windows.Forms.ComboBox();
             this.emulatorComboBoxLabel = new System.Windows.Forms.Label();
+            this.fileListGridView = new System.Windows.Forms.DataGridView();
+            this.File = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            ((System.ComponentModel.ISupportInitialize)(this.fileListGridView)).BeginInit();
             this.SuspendLayout();
-            // 
-            // fileListBox
-            // 
-            this.fileListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.fileListBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fileListBox.FormattingEnabled = true;
-            this.fileListBox.ItemHeight = 16;
-            this.fileListBox.Location = new System.Drawing.Point(12, 31);
-            this.fileListBox.Name = "fileListBox";
-            this.fileListBox.Size = new System.Drawing.Size(520, 372);
-            this.fileListBox.TabIndex = 0;
-            this.fileListBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.fileListBox_MouseDoubleClick);
             // 
             // cancelButton
             // 
@@ -114,6 +104,48 @@ namespace ArchiveCacheManager
             this.emulatorComboBoxLabel.TabIndex = 6;
             this.emulatorComboBoxLabel.Text = "Emulator:";
             // 
+            // fileListGridView
+            // 
+            this.fileListGridView.AllowUserToAddRows = false;
+            this.fileListGridView.AllowUserToDeleteRows = false;
+            this.fileListGridView.AllowUserToResizeRows = false;
+            this.fileListGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.fileListGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.fileListGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
+            this.fileListGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.fileListGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.fileListGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.fileListGridView.ColumnHeadersVisible = false;
+            this.fileListGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.File});
+            this.fileListGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.fileListGridView.Location = new System.Drawing.Point(12, 33);
+            this.fileListGridView.MultiSelect = false;
+            this.fileListGridView.Name = "fileListGridView";
+            this.fileListGridView.RowHeadersVisible = false;
+            this.fileListGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.fileListGridView.Size = new System.Drawing.Size(520, 374);
+            this.fileListGridView.StandardTab = true;
+            this.fileListGridView.TabIndex = 9;
+            // 
+            // File
+            // 
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(3, 0, 0, 0);
+            this.File.DefaultCellStyle = dataGridViewCellStyle2;
+            this.File.HeaderText = "File";
+            this.File.Name = "File";
+            this.File.ReadOnly = true;
+            // 
             // ArchiveListWindow
             // 
             this.AcceptButton = this.okButton;
@@ -121,12 +153,12 @@ namespace ArchiveCacheManager
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(544, 453);
+            this.Controls.Add(this.fileListGridView);
             this.Controls.Add(this.emulatorComboBox);
             this.Controls.Add(this.emulatorComboBoxLabel);
             this.Controls.Add(this.archiveNameLabel);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
-            this.Controls.Add(this.fileListBox);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(500, 200);
@@ -134,18 +166,19 @@ namespace ArchiveCacheManager
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Select File";
+            ((System.ComponentModel.ISupportInitialize)(this.fileListGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.ListBox fileListBox;
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button okButton;
         private System.Windows.Forms.Label archiveNameLabel;
         private System.Windows.Forms.ComboBox emulatorComboBox;
         private System.Windows.Forms.Label emulatorComboBoxLabel;
+        private System.Windows.Forms.DataGridView fileListGridView;
+        private System.Windows.Forms.DataGridViewTextBoxColumn File;
     }
 }

@@ -135,6 +135,10 @@
   <metadata name="Keep.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="label9.Text" xml:space="preserve">
+    <value>If chdman, DolphinTool, or extract-xiso is checked, ensure the corresponding chdman.exe, DolphinTool.exe,
+or extract-xiso.exe application is placed in the LaunchBox\Plugins\ArchiveCacheManager\Extractors folder.</value>
+  </data>
   <metadata name="Emulator.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -165,12 +169,20 @@
   <metadata name="DolphinTool.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="ExtractXiso.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <data name="label6.Text" xml:space="preserve">
     <value>Smart Extract will extract and launch a single file from an archive if the following conditions are met:
 
-- An individual file has been selected through the "Select ROM in Archive..." right-click menu.
 - All of the file types in an archive are the same, excluding files with Metadata Extensions.
-- All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.</value>
+    OR
+-All of the file types in an archive are Stand-alone ROMs, excluding files with Metadata Extensions.
+
+The file to extract will be (in priority order):
+1. The individual file selected through the "Select ROM in Archive..." right-click menu.
+2. The first file which matches a configured Priority.
+3. The first file in the archive.</value>
   </data>
   <data name="label8.Text" xml:space="preserve">
     <value>Bypass LaunchBox's check that a game's application path (ROM file) exists before launch.

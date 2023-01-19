@@ -20,25 +20,44 @@ namespace ArchiveCacheManager
 
         public override long GetSize(string archivePath, string fileInArchive = null)
         {
-            // Run List command
-            // Parse stdout for all "Size = " entries
-            // Extract sizes and sum
-            // Return -1 on error
-            long size = 0;
-
             var (stdout, _, exitCode) = ListArchiveDetails(archivePath, fileInArchive.ToSingleArray(), null, false);
 
             if (exitCode == 0)
             {
-                // TODO: Replace logic with regex?
-                string[] stdoutArray = stdout.Split(new string[] { "------------------------" }, StringSplitOptions.RemoveEmptyEntries);
-
-                // Take substring at 25th char, after date/time/attr details and before file sizes
-                string summary = stdoutArray[stdoutArray.Length - 1].Substring(25);
-                size = Convert.ToInt64(summary.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0]);
+                return ParseArchiveSize(stdout);
             }
 
-            return size;
+            return 0;
+        }
+
+        private long ParseArchiveSize(string stdout)
+        {
+            try
+            {
+                string[] stdoutArray = stdout.Split(new string[] { "------------------------" }, StringSplitOptions.RemoveEmptyEntries);
+                return ParseSize(stdoutArray[stdoutArray.Length - 1]);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to parse archive size ({this.GetType()}):\r\n{e.ToString()}");
+            }
+
+            return 0;
+        }
+
+        private long ParseSize(string line)
+        {
+            try
+            {
+                // Take substring at 25th char, after date/time/attr details and before file sizes
+                return Convert.ToInt64(line.Substring(25).Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0]);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to parse archive size ({this.GetType()}):\r\n{e.ToString()}");
+            }
+
+            return 0;
         }
 
         public override bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
@@ -51,18 +70,13 @@ namespace ArchiveCacheManager
             // -bsp1 = redirect progress to stdout
             string args = string.Format("x \"{0}\" \"-o{1}\" -y -aoa -bsp1 {2}", archivePath, cachePath, GetIncludeExcludeArgs(includeList, excludeList, false));
 
-            (_, _, int exitCode) = Run7z(args, true);
+            var (_, _, exitCode) = Run7z(args, true);
             return exitCode == 0;
         }
 
-        public override string[] List(string archivePath, string[] includeList = null, string[] excludeList = null, bool prefixWildcard = false)
+        public override string[] List(string archivePath)
         {
-            // Run List command
-            // Parse stdout for all "Path = " entries
-            // Return -1 on error
-            string[] fileList = Array.Empty<string>();
-
-            var (stdout, _, exitCode) = ListArchiveDetails(archivePath, includeList, excludeList, prefixWildcard);
+            var (stdout, _, exitCode) = ListArchiveDetails(archivePath);
 
             /*
             stdout will be in the format below:
@@ -99,6 +113,8 @@ namespace ArchiveCacheManager
             c:\LaunchBox\ThirdParty\7-Zip>
             --------
             */
+
+            string[] fileList = Array.Empty<string>();
 
             if (exitCode == 0)
             {
