@@ -1,5 +1,5 @@
 # Archive Cache Manager change history
-## v2.15 (2022-12-xx)
+## v2.15 (2023-01-19)
 * New _extract-xiso_ option for Xbox iso conversion
     * Full iso files (redump) automatically converted and cached in xiso format
     * Supports both zipped and unzipped iso files

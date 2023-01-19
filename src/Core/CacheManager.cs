@@ -23,7 +23,7 @@ namespace ArchiveCacheManager
             {
                 Version version = Version;
 
-                return string.Format("v{0}.{1} beta 1", version.Major, version.Minor);
+                return string.Format("v{0}.{1}", version.Major, version.Minor);
             }
         }
 
