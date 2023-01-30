@@ -29,6 +29,7 @@ namespace ArchiveCacheManager
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -48,6 +49,8 @@ namespace ArchiveCacheManager
             this.closeButton = new System.Windows.Forms.Button();
             this.stopButton = new System.Windows.Forms.Button();
             this.cacheButton = new System.Windows.Forms.Button();
+            this.pauseOnErrorCheckBox = new System.Windows.Forms.CheckBox();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.progressBar = new ArchiveCacheManager.ProgressBarFlat();
             ((System.ComponentModel.ISupportInitialize)(this.cacheStatusGridView)).BeginInit();
             this.SuspendLayout();
@@ -224,6 +227,18 @@ namespace ArchiveCacheManager
             this.cacheButton.UseVisualStyleBackColor = true;
             this.cacheButton.Click += new System.EventHandler(this.cacheButton_Click);
             // 
+            // pauseOnErrorCheckBox
+            // 
+            this.pauseOnErrorCheckBox.AutoSize = true;
+            this.pauseOnErrorCheckBox.Location = new System.Drawing.Point(300, 408);
+            this.pauseOnErrorCheckBox.Name = "pauseOnErrorCheckBox";
+            this.pauseOnErrorCheckBox.Size = new System.Drawing.Size(140, 17);
+            this.pauseOnErrorCheckBox.TabIndex = 13;
+            this.pauseOnErrorCheckBox.Text = "Pause Caching On Error";
+            this.toolTip.SetToolTip(this.pauseOnErrorCheckBox, "When checked, will pause the caching progress and display a message if an error o" +
+        "ccurs.");
+            this.pauseOnErrorCheckBox.UseVisualStyleBackColor = true;
+            // 
             // progressBar
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -241,6 +256,7 @@ namespace ArchiveCacheManager
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(944, 441);
+            this.Controls.Add(this.pauseOnErrorCheckBox);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.stopButton);
             this.Controls.Add(this.cacheButton);
@@ -277,5 +293,7 @@ namespace ArchiveCacheManager
         private System.Windows.Forms.DataGridViewTextBoxColumn CacheAction;
         private System.Windows.Forms.DataGridViewTextBoxColumn CacheStatus;
         private System.Windows.Forms.Button closeButton;
+        private System.Windows.Forms.CheckBox pauseOnErrorCheckBox;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }
