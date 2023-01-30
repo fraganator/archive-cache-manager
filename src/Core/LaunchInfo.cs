@@ -461,6 +461,9 @@ namespace ArchiveCacheManager
                 case Config.M3uName.TitleVersion:
                     m3uName = PathUtils.GetArchiveCacheM3uGameTitlePath(archiveCachePath, mGame.GameId, mGame.Title, mGame.Version, disc);
                     break;
+                case Config.M3uName.RomFilename:
+                    m3uName = PathUtils.GetArchiveCacheM3uGameRomFilenamePath(archiveCachePath, mGame.ArchivePath);
+                    break;
             }
 
             return m3uName;
@@ -484,6 +487,25 @@ namespace ArchiveCacheManager
             }
 
             return mGameCacheData.M3uName;
+        }
+
+        /// <summary>
+        /// Returns all possible M3U paths (game ID, title + version, rom filename per disc) for the given path.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <returns></returns>
+        public static List<string> GetAllM3uPaths(string archiveCachePath)
+        {
+            List<string> m3uPaths = new List<string>();
+
+            m3uPaths.Add(PathUtils.GetArchiveCacheM3uGameIdPath(archiveCachePath, mGame.GameId));
+            m3uPaths.Add(PathUtils.GetArchiveCacheM3uGameTitlePath(archiveCachePath, mGame.GameId, mGame.Title, mGame.Version, 1));
+            foreach (var discInfo in mGame.Discs)
+            {
+                m3uPaths.Add(PathUtils.GetArchiveCacheM3uGameRomFilenamePath(archiveCachePath, discInfo.ArchivePath));
+            }
+
+            return m3uPaths;
         }
 
         /// <summary>

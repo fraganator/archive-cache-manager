@@ -122,10 +122,16 @@ namespace ArchiveCacheManager
             if (LaunchInfo.Game.MultiDisc && LaunchInfo.MultiDiscSupport)
             {
                 Dictionary<int, string> filePaths = new Dictionary<int, string>();
+
                 foreach (var discInfo in LaunchInfo.Game.Discs)
                 {
-                    // Delete any previously generated m3u file, so it doesn't get included in the subsequent archive listing
-                    DiskUtils.DeleteFile(LaunchInfo.GetM3uPath(LaunchInfo.GetArchiveCachePath(discInfo.Disc), discInfo.Disc));
+                    foreach (var m3uPath in LaunchInfo.GetAllM3uPaths(LaunchInfo.GetArchiveCachePath(discInfo.Disc)))
+                    {
+                        // Delete all previously generated m3u files regardless of current m3u name configuration.
+                        // Keeps the cache folders clean from multiple m3u files when launching different discs,
+                        // and prevents m3u files from being included in the subsequent archive listing.
+                        DiskUtils.DeleteFile(m3uPath);
+                    }
                     filePaths.Add(discInfo.Disc, ListCacheArchive(LaunchInfo.GetArchiveCachePath(discInfo.Disc), discInfo.Disc).FirstOrDefault());
                 }
 

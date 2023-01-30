@@ -279,6 +279,17 @@ namespace ArchiveCacheManager
         }
 
         /// <summary>
+        /// Absolute path to the m3u file for the given archive cache path. Filename is the original archive's name with the extension set to m3u.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <param name="archivePath"></param>
+        /// <returns></returns>
+        public static string GetArchiveCacheM3uGameRomFilenamePath(string archiveCachePath, string archivePath)
+        {
+            return GetArchiveCacheM3uPath(archiveCachePath, Path.GetFileNameWithoutExtension(archivePath));
+        }
+
+        /// <summary>
         /// Absolute path to the m3u file for the given archive cache path.
         /// </summary>
         /// <param name="archiveCachePath"></param>

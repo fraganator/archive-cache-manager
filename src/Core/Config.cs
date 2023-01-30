@@ -26,7 +26,8 @@ namespace ArchiveCacheManager
         public enum M3uName
         {
             GameId,
-            TitleVersion
+            TitleVersion,
+            RomFilename
         };
 
         private static readonly string configSection = "Archive Cache Manager";
