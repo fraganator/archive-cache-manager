@@ -284,7 +284,7 @@ namespace ArchiveCacheManager
         /// <param name="archiveCachePath"></param>
         /// <param name="archivePath"></param>
         /// <returns></returns>
-        public static string GetArchiveCacheM3uGameRomFilenamePath(string archiveCachePath, string archivePath)
+        public static string GetArchiveCacheM3uGameFilenamePath(string archiveCachePath, string archivePath)
         {
             return GetArchiveCacheM3uPath(archiveCachePath, Path.GetFileNameWithoutExtension(archivePath));
         }

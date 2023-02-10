@@ -721,6 +721,7 @@ namespace ArchiveCacheManager
             // 
             dataGridViewCellStyle5.Padding = new System.Windows.Forms.Padding(24, 0, 0, 0);
             this.Emulator.DefaultCellStyle = dataGridViewCellStyle5;
+            this.Emulator.Frozen = true;
             this.Emulator.HeaderText = "Emulator";
             this.Emulator.MinimumWidth = 150;
             this.Emulator.Name = "Emulator";
@@ -790,7 +791,7 @@ namespace ArchiveCacheManager
             this.M3uName.Items.AddRange(new object[] {
             "Game ID",
             "Title + Version",
-            "ROM Filename"});
+            "Disc 1 Filename"});
             this.M3uName.MinimumWidth = 100;
             this.M3uName.Name = "M3uName";
             this.M3uName.Resizable = System.Windows.Forms.DataGridViewTriState.True;

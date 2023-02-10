@@ -27,7 +27,7 @@ namespace ArchiveCacheManager
         {
             GameId,
             TitleVersion,
-            RomFilename
+            DiscOneFilename
         };
 
         private static readonly string configSection = "Archive Cache Manager";
