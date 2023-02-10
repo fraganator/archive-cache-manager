@@ -461,6 +461,20 @@ namespace ArchiveCacheManager
                 case Config.M3uName.TitleVersion:
                     m3uName = PathUtils.GetArchiveCacheM3uGameTitlePath(archiveCachePath, mGame.GameId, mGame.Title, mGame.Version, disc);
                     break;
+                case Config.M3uName.DiscOneFilename:
+                    string archivePath;
+                    try
+                    {
+                        // Get the path of disc 1 (not index 1)
+                        archivePath = mMultiDiscCacheData[1].ArchivePath;
+                    }
+                    catch (Exception e)
+                    {
+                        archivePath = mGameCacheData.ArchivePath;
+                        Logger.Log($"Couldn't find disc 1 path when generating m3u filename, using ArchivePath instead. Exception info:\r\n{e.ToString()}");
+                    }
+                    m3uName = PathUtils.GetArchiveCacheM3uGameFilenamePath(archiveCachePath, archivePath);
+                    break;
             }
 
             return m3uName;
@@ -484,6 +498,25 @@ namespace ArchiveCacheManager
             }
 
             return mGameCacheData.M3uName;
+        }
+
+        /// <summary>
+        /// Returns all possible M3U paths (game ID, title + version, rom filename per disc) for the given path.
+        /// </summary>
+        /// <param name="archiveCachePath"></param>
+        /// <returns></returns>
+        public static List<string> GetAllM3uPaths(string archiveCachePath)
+        {
+            List<string> m3uPaths = new List<string>();
+
+            m3uPaths.Add(PathUtils.GetArchiveCacheM3uGameIdPath(archiveCachePath, mGame.GameId));
+            m3uPaths.Add(PathUtils.GetArchiveCacheM3uGameTitlePath(archiveCachePath, mGame.GameId, mGame.Title, mGame.Version, 1));
+            foreach (var discInfo in mGame.Discs)
+            {
+                m3uPaths.Add(PathUtils.GetArchiveCacheM3uGameFilenamePath(archiveCachePath, discInfo.ArchivePath));
+            }
+
+            return m3uPaths;
         }
 
         /// <summary>

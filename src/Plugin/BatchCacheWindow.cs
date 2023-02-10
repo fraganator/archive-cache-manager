@@ -319,21 +319,24 @@ namespace ArchiveCacheManager
                 }
                 else if (exitCode != 0)
                 {
-                    stopwatch.Stop();
                     errorCount++;
                     cacheStatusGridView.Rows[i].Cells["CacheStatus"].Value = "Caching error.";
-                    bool multiDisc = PluginUtils.IsGameMultiDisc(mSelectedGames[Convert.ToInt32(cacheStatusGridView.Rows[i].Cells["Index"].Value)]);
-                    var result = FlexibleMessageBox.Show(this, $"Error caching \"{cacheStatusGridView.Rows[i].Cells["Archive"].Value}\"" +
-                                                         (multiDisc ? " or one of its associated discs." : "."), "Caching Error",
-                                            MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2,
-                                            null, "Continue Caching", "Stop");
-                    if (result == DialogResult.Cancel)
+                    if (pauseOnErrorCheckBox.Checked)
                     {
-                        mStatus = StatusEnum.Stopped;
-                        progressBar.Visible = false;
-                        break;
+                        stopwatch.Stop();
+                        bool multiDisc = PluginUtils.IsGameMultiDisc(mSelectedGames[Convert.ToInt32(cacheStatusGridView.Rows[i].Cells["Index"].Value)]);
+                        var result = FlexibleMessageBox.Show(this, $"Error caching \"{cacheStatusGridView.Rows[i].Cells["Archive"].Value}\"" +
+                                                             (multiDisc ? " or one of its associated discs." : "."), "Caching Error",
+                                                MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2,
+                                                null, "Continue Caching", "Stop");
+                        if (result == DialogResult.Cancel)
+                        {
+                            mStatus = StatusEnum.Stopped;
+                            progressBar.Visible = false;
+                            break;
+                        }
+                        stopwatch.Start();
                     }
-                    stopwatch.Start();
                 }
                 else
                 {

@@ -1,4 +1,11 @@
 # Archive Cache Manager change history
+## v2.16 (2023-02-10)
+* New M3U name option - "Disc 1 Filename"
+    * Always use the filename of the first disc of a multi-disc game for the m3u file, regardless of which disc was launched
+    * Allows better support for The Bezel Project config files, which use config files based on the ROM name
+* New batch caching option to pause on caching errors (default is to skip and continue)
+* Minor config window tweaks
+
 ## v2.15 (2023-01-19)
 * New _extract-xiso_ option for Xbox iso conversion
     * Full iso files (redump) automatically converted and cached in xiso format
