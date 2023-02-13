@@ -56,6 +56,7 @@ namespace ArchiveCacheManager
         private static readonly bool defaultChdman = false;
         private static readonly bool defaultDolphinTool = false;
         private static readonly bool defaultExtractXiso = false;
+        private static readonly bool defaultNNASOS = false;
 
         public class EmulatorPlatformConfig
         {
@@ -68,6 +69,7 @@ namespace ArchiveCacheManager
             public bool Chdman;
             public bool DolphinTool;
             public bool ExtractXiso;
+            public bool NNASOS;
 
             public EmulatorPlatformConfig()
             {
@@ -80,6 +82,7 @@ namespace ArchiveCacheManager
                 Chdman = defaultChdman;
                 DolphinTool = defaultDolphinTool;
                 ExtractXiso = defaultExtractXiso;
+                NNASOS = defaultNNASOS;
             }
         };
 
@@ -342,6 +345,23 @@ namespace ArchiveCacheManager
             return defaultExtractXiso;
         }
 
+        public static bool GetNNASOS(string key)
+        {
+            try
+            {
+                return mEmulatorPlatformConfig[key].NNASOS;
+            }
+            catch (KeyNotFoundException) { }
+
+            try
+            {
+                return mEmulatorPlatformConfig[defaultEmulatorPlatform].NNASOS;
+            }
+            catch (KeyNotFoundException) { }
+
+            return defaultNNASOS;
+        }
+
         public static string EmulatorPlatformKey(string emulator, string platform) => string.Format(@"{0} \ {1}", emulator, platform);
 
         /// <summary>
@@ -504,6 +524,11 @@ namespace ArchiveCacheManager
                             {
                                 mEmulatorPlatformConfig[section.SectionName].ExtractXiso = Convert.ToBoolean(section.Keys[nameof(EmulatorPlatformConfig.ExtractXiso)]);
                             }
+
+                            if (section.Keys.ContainsKey(nameof(EmulatorPlatformConfig.NNASOS)))
+                            {
+                                mEmulatorPlatformConfig[section.SectionName].NNASOS = Convert.ToBoolean(section.Keys[nameof(EmulatorPlatformConfig.NNASOS)]);
+                            }
                         }
                     }
 
@@ -594,6 +619,7 @@ namespace ArchiveCacheManager
                 iniData[priority.Key][nameof(EmulatorPlatformConfig.Chdman)] = priority.Value.Chdman.ToString();
                 iniData[priority.Key][nameof(EmulatorPlatformConfig.DolphinTool)] = priority.Value.DolphinTool.ToString();
                 iniData[priority.Key][nameof(EmulatorPlatformConfig.ExtractXiso)] = priority.Value.ExtractXiso.ToString();
+                iniData[priority.Key][nameof(EmulatorPlatformConfig.NNASOS)] = priority.Value.NNASOS.ToString();
             }
 
             try

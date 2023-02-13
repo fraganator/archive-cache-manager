@@ -29,7 +29,9 @@ namespace ArchiveCacheManager
         private static readonly string tempArchiveFilename = @"temp.zip";
         private static readonly string restoreSettingsFileName = @"restore-settings.ini";
         private static readonly string relativePluginPath = @"Plugins\ArchiveCacheManager";
+        private static readonly string relativeThirdPartyPath = @"ThirdParty";
         private static readonly string relative7zPath = @"ThirdParty\7-Zip";
+        private static readonly string relativeNNASOSPath = @"ThirdParty\nNASOS1.8";
         private static readonly string relativeExtractorPath = Path.Combine(relativePluginPath, "Extractors");
         private static readonly string relativeLogPath = Path.Combine(relativePluginPath, "Logs");
         private static readonly DateTime dateTimeNow = DateTime.Now;
@@ -180,6 +182,12 @@ namespace ArchiveCacheManager
         public static string GetLaunchBox7zRootPath() => Path.Combine(launchBoxRootPath, relative7zPath);
 
         /// <summary>
+        /// Absolute path to NNASOS1.8 folder.
+        /// </summary>
+        /// <returns>Absolute path to NNASOS1.8 folder.</returns>
+        public static string GetLaunchBoxNNASOSRootPath() => Path.Combine(launchBoxRootPath, relativeNNASOSPath);
+
+        /// <summary>
         /// Absolute path to LaunchBox's temporary extraction location.
         /// </summary>
         /// <returns>Absolute path to LaunchBox's temporary extraction location.</returns>
@@ -220,6 +228,12 @@ namespace ArchiveCacheManager
         /// </summary>
         /// <returns>Absolute path to the folder containing the plugin's extractors.</returns>
         public static string GetExtractorRootPath() => Path.Combine(launchBoxRootPath, relativeExtractorPath);
+
+        /// <summary>
+        /// Absolute path to the folder containing LaunchBox's (not the plugins) third party programs.
+        /// </summary>
+        /// <returns>Absolute path to the folder containing LaunchBox's (not the plugins) third party programs.</returns>
+        public static string GetThirdPartyRootPath() => Path.Combine(launchBoxRootPath, relativeThirdPartyPath);
 
         /// <summary>
         /// Absolute path to the last played file for the given archive cache path.
