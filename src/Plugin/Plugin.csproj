@@ -65,7 +65,7 @@
     <Reference Include="UIAutomationProvider" />
     <Reference Include="Unbroken.LaunchBox.Plugins, Version=1.0.0.0, Culture=neutral, PublicKeyToken=558191e84f56affc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Visual Studio Reference DLLs\Unbroken.LaunchBox.Plugins.dll</HintPath>
+      <HintPath>..\..\thirdparty\Unbroken.LaunchBox.Plugins\12.8\Unbroken.LaunchBox.Plugins.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
