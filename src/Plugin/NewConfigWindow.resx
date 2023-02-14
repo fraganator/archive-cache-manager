@@ -137,8 +137,8 @@
   </metadata>
   <data name="label9.Text" xml:space="preserve">
     <value>If chdman, DolphinTool, or extract-xiso is checked, ensure the corresponding chdman.exe, DolphinTool.exe, or extract-xiso.exe
-application is placed in the LaunchBox\Plugins\ArchiveCacheManager\Extractors folder. If nNASOS is checked, nNASOS.exe needs to be in the
-LaunchBox\ThirdParty\nNASOS1.8 folder.</value>
+application is placed in the LaunchBox\Plugins\ArchiveCacheManager\Extractors folder. If nNASOS is checked, nNASOS.exe
+needs to be in the LaunchBox\ThirdParty\nNASOS1.8 folder.</value>
   </data>
   <metadata name="Emulator.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -173,8 +173,8 @@ LaunchBox\ThirdParty\nNASOS1.8 folder.</value>
   <metadata name="ExtractXiso.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="NNASOS.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-	<value>True</value>
+  <metadata name="nNASOS.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
   </metadata>
   <data name="label6.Text" xml:space="preserve">
     <value>Smart Extract will extract and launch a single file from an archive if the following conditions are met:
