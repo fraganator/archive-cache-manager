@@ -574,7 +574,8 @@ namespace ArchiveCacheManager
             // Should only happen when you extracted originally without checking the nNASOS checkbox in settings.
             if (mGameCacheData.Config.NNASOS)
             {
-                if (!string.IsNullOrEmpty(mGameCacheData.ArchiveCachePath))
+                if (!string.IsNullOrEmpty(mGameCacheData.ArchiveCachePath)
+                    && Directory.Exists(mGameCacheData.ArchiveCachePath))
                 {
                     if (Directory.GetFiles(mGameCacheData.ArchiveCachePath, "*.iso.dec").Length > 0
                         && Directory.GetFiles(mGameCacheData.ArchiveCachePath, "*.iso").Length == 0)
