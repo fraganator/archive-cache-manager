@@ -103,13 +103,18 @@ namespace ArchiveCacheManager
             // If needed, check for specific error messages on stdout. When nNASOS errors out, exit code is still 0 (at least on
             // the errors I observed), and there is nothing on stderr. Only stdout contains any error info.
             // Though on success, nNASOS writes out a message like this on stdout: Processing time: 44.61 seconds
-            if (exitCode != 0)
+            if (exitCode != 0 || String.IsNullOrEmpty(stdout) || !stdout.Contains("Processing time:"))
             {
-                if (String.IsNullOrEmpty(stdout) || !stdout.Contains("Processing time:"))
+                Logger.Log($"nNASOS returned exit code {exitCode} with stdout:\r\n{stdout}\r\nand stderro:\r\n{stderr}");
+                if (exitCode != 0)
                 {
-                    Logger.Log($"nNASOS returned exit code {exitCode} with stdout:\r\n{stdout}\r\nand stderro:\r\n{stderr}");
                     Environment.ExitCode = exitCode;
                 }
+                else
+                {
+                    Environment.ExitCode = 1;
+                }
+                return false;
             }
 
             return exitCode == 0;
