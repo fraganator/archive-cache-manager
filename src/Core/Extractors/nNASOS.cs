@@ -22,7 +22,7 @@ namespace ArchiveCacheManager
 
         public static bool SupportedType(string archivePath)
         {
-            return PathUtils.HasExtension(archivePath, new string[] { ".7z", ".zip", ".iso.dec" });
+            return PathUtils.HasExtension(archivePath, new string[] { ".7z", ".zip", ".dec" });
         }
 
         public override bool Extract(string archivePath, string cachePath, string[] includeList = null, string[] excludeList = null)
@@ -38,7 +38,7 @@ namespace ArchiveCacheManager
                 {
                     // .iso.dec is already in the cache path, so no need to extract or copy anything
                     // from archive path
-                    Logger.Log(string.Format("Skipping extract/copy from archive path as .iso.dec is already in cache path..."));
+                    Logger.Log("Skipping extract/copy from archive path as .iso.dec is already in cache path...");
                     isoDecPath = files[0];
                     skipArchiveCheck = true;
                 }
@@ -55,6 +55,7 @@ namespace ArchiveCacheManager
                         if (files.Length > 0)
                         {
                             // no need to further process with nNASOS as already in .iso format
+                            Logger.Log("Unzipped directly to .iso. No need for nNASOS decoding.");
                             return true;
                         }
                         else
@@ -63,7 +64,7 @@ namespace ArchiveCacheManager
                         }
                     }
                 }
-                else if (extension.Equals(".iso.dec"))
+                else if (extension.Equals(".dec"))
                 {
                     Extractor robocopy = new Robocopy();
                     if (robocopy.Extract(archivePath, cachePath, includeList, excludeList))
@@ -71,15 +72,7 @@ namespace ArchiveCacheManager
                         isoDecPath = Directory.GetFiles(cachePath, "*.iso.dec")[0];
                     }
                 }
-                else if (extension.Equals(".iso"))
-                {
-                    Extractor robocopy = new Robocopy();
-                    if (robocopy.Extract(archivePath, cachePath, includeList, excludeList))
-                    {
-                        // no need to extract as already in .iso format
-                        return true;
-                    }
-                }
+                // No need to handle .iso as it will be handled by the Extract or Copy option.
             }
 
             // Double-check isoDecPath is set, and not the original archive path, as it will be deleted.
@@ -103,15 +96,20 @@ namespace ArchiveCacheManager
              * Also, there is no option to specify an output path, but afaik, it simply extracts
              * to an .iso in the same folder as input file.
              */
-            string args = string.Format("-d -n \"{0}\"", isoDecPath);
+            string args = $@"-d -n ""{isoDecPath}""";
             
-            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executablePath, args);
+            (string stdout, string stderr, int exitCode) = ProcessUtils.RunProcess(executablePath, args, false, ExtractionProgress);
 
+            // If needed, check for specific error messages on stdout. When nNASOS errors out, exit code is still 0 (at least on
+            // the errors I observed), and there is nothing on stderr. Only stdout contains any error info.
+            // Though on success, nNASOS writes out a message like this on stdout: Processing time: 44.61 seconds
             if (exitCode != 0)
             {
-                // errors on stderr stream (at least according to the readme)
-                Logger.Log(string.Format("nNASOS returned exit code {0} with error output:\r\n{1}", exitCode, stderr));
-                Environment.ExitCode = exitCode;
+                if (String.IsNullOrEmpty(stdout) || !stdout.Contains("Processing time:"))
+                {
+                    Logger.Log($"nNASOS returned exit code {exitCode} with stdout:\r\n{stdout}\r\nand stderro:\r\n{stderr}");
+                    Environment.ExitCode = exitCode;
+                }
             }
 
             return exitCode == 0;
@@ -119,12 +117,21 @@ namespace ArchiveCacheManager
 
         public override long GetSize(string archivePath, string fileInArchive = null)
         {
-            return DiskUtils.GetFileSize(archivePath);
+            // nNASOS has no way to check the size of the decoded .iso from a given .iso.dec.
+            // Uncompressed Wii games should not exceed 8.54 GB, which is the size of a dual-layer DVD.
+            // Since this method is only used to make room in the cache, over-estimating is mostly ok.
+            return 8540000000;
         }
 
+        // Meant to return final extension after all possible extraction.
         public override string[] List(string archivePath)
         {
-            return string.Format("{0}.iso.dec", Path.GetFileNameWithoutExtension(archivePath)).ToSingleArray();
+            string filenameWithoutExt = Path.GetFileNameWithoutExtension(archivePath);
+            if (archivePath.ToLower().EndsWith(".iso.dec"))
+            {
+                filenameWithoutExt = archivePath.Substring(0, archivePath.ToLower().LastIndexOf(".iso.dec") - 1);
+            }
+            return string.Format($"{filenameWithoutExt}.iso").ToSingleArray();
         }
 
         public override string Name()
