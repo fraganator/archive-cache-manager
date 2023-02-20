@@ -91,6 +91,10 @@ namespace ArchiveCacheManager
             {
                 return new ExtractXiso();
             }
+            else if (extract && mGameCacheData.Config.NNASOS && NNASOS.SupportedType(archivePath))
+            {
+                return new NNASOS();
+            }
             else if (extract && Zip.SupportedType(archivePath))
             {
                 return new Zip();
@@ -564,6 +568,22 @@ namespace ArchiveCacheManager
             if (mGameCacheData.Config.SmartExtract && !string.IsNullOrEmpty(mGame.SelectedFile))
             {
                 mGameCacheData.ArchiveInCache &= File.Exists(Path.Combine(mGameCacheData.ArchiveCachePath, mGame.SelectedFile));
+            }
+
+            // Check if a compressed .iso.dec is in cache, meaning not extracted (when you have nNASOS setting selected).
+            // Should only happen when you extracted originally without checking the nNASOS checkbox in settings.
+            if (mGameCacheData.Config.NNASOS)
+            {
+                if (!string.IsNullOrEmpty(mGameCacheData.ArchiveCachePath)
+                    && Directory.Exists(mGameCacheData.ArchiveCachePath))
+                {
+                    if (Directory.GetFiles(mGameCacheData.ArchiveCachePath, "*.iso.dec").Length > 0
+                        && Directory.GetFiles(mGameCacheData.ArchiveCachePath, "*.iso").Length == 0)
+                    {
+                        Logger.Log("nNASOS mode is on and an .iso.dec exists in cache without an .iso");
+                        mGameCacheData.ArchiveInCache = false;
+                    }
+                }
             }
 
             return (bool)mGameCacheData.ArchiveInCache;

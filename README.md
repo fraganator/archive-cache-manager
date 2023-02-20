@@ -291,7 +291,7 @@ Default: _On first run, a message box will appear asking the user if they'd like
 ## Building
 The project is built with Visual Studio Community 2019 and .NET Framework 4.7.2.
 
-The plugin references version 12.8 of `Unbroken.LaunchBox.Plugins` assembly, to handle certain newer features (per emulator/platform ROM extraction). If building for an older version of LaunchBox (pre 12.8), you can define the `LAUNCHBOX_PRE_12_8` conditional compilation symbol. The oldest minimum version of the `Unbroken.LaunchBox.Plugins` assembly supported is 1.0.0.0 included with LaunchBox 10.11, required for _Badge_ support.
+The plugin references version 12.8 of `Unbroken.LaunchBox.Plugins` assembly, to handle certain newer features (per emulator/platform ROM extraction). If building for an older version of LaunchBox (pre 12.8), you can define the `LAUNCHBOX_PRE_12_8` conditional compilation symbol. The oldest minimum version of the `Unbroken.LaunchBox.Plugins` assembly supported is 1.0.0.0 included with LaunchBox 10.11, required for _Badge_ support. Add the .dll to .\thirdparty\Unbroken.LaunchBox.Plugins\12.8\Unbroken.LaunchBox.Plugins.dll.
 
 ### Dependencies
 Dependencies are listed below, and can be installed using Visual Studio's Package Manager Console with the command shown.

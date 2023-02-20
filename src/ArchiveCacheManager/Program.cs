@@ -55,6 +55,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace ArchiveCacheManager
 {
@@ -63,7 +64,13 @@ namespace ArchiveCacheManager
         static void Main(string[] args)
         {
 #if DEBUG
+            // Note: Debugger.Launch() returns true when debugging remotely, though it does not attach prompt for debug.
+            // So, it effectively does nothing when remote debugging.
             Debugger.Launch();
+#if REMOTEDEBUG
+            // This will block while you attach debugger to process for remote debugging.
+            MessageBox.Show("To debug, attach to 7z.exe process now...");
+#endif
 #endif
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();

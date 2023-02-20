@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extractors\Chdman.cs" />
+    <Compile Include="Extractors\nNASOS.cs" />
     <Compile Include="Extractors\DolphinTool.cs" />
     <Compile Include="Extractors\ExtractXiso.cs" />
     <Compile Include="Extractors\Robocopy.cs" />
